@@ -1,0 +1,100 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Supprimer {{ pos.name }} - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-danger rounded-circle">
+                        <i class="fas fa-trash text-danger fs-5"></i>
+                    </span>
+                </span>
+                Retrait d'Infrastructure
+            </h1>
+            <p class="text-white opacity-75 fs-6 fw-bold mb-0">Action critique : désaffectation du point de vente ou de l'entrepôt</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'inventory:pos_list' %}" class="btn btn-custom btn-white btn-active-light-primary text-primary fw-bold btn-sm">
+                <i class="fas fa-arrow-left me-2"></i> Annuler et retourner
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="row justify-content-center">
+        <div class="col-xl-6">
+            <div class="card card-flush shadow-sm">
+                <div class="card-body p-8 p-md-10 text-center">
+                    <div class="mb-5">
+                        <div class="symbol symbol-100px mb-5">
+                            <div class="symbol-label bg-light-danger shadow-sm">
+                                <i class="fas fa-store-slash text-danger fs-3x"></i>
+                            </div>
+                        </div>
+                        <h2 class="fw-bold text-gray-800 mb-2">Confirmation de démantèlement</h2>
+                        <p class="text-muted fs-5 fw-semibold mb-8">
+                            Êtes-vous certain de vouloir supprimer l'infrastructure : <br>
+                            <span class="text-dark fw-bold fs-3">"{{ pos.name }} ({{ pos.code }})"</span>
+                        </p>
+                    </div>
+
+                    {% if has_inventory %}
+                    <div class="alert alert-dismissible bg-light-danger border border-danger d-flex flex-column p-5 mb-10 text-start">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-lock fs-2hx text-danger me-4"></i>
+                            <h4 class="fw-bold text-danger mb-0">Action Bloquée</h4>
+                        </div>
+                        <div class="ps-12">
+                            <span class="text-gray-700 fw-bold">
+                                Ce point de vente contient encore des unités en stock. 
+                            </span>
+                            <p class="text-gray-600 fs-7 mt-2 mb-0 italic">
+                                Par mesure de sécurité et pour garantir l'intégrité de votre inventaire global, vous devez d'abord vider ce point de vente (via des transferts de stock ou des sorties de stock) avant de pouvoir le supprimer du système.
+                            </p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-dismissible bg-light-warning border border-warning d-flex align-items-center p-5 mb-10 text-start">
+                        <i class="fas fa-exclamation-triangle fs-2hx text-warning me-4"></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="fw-bold text-warning">Avertissement irréversible</h4>
+                            <span class="text-gray-700">Toutes les données de configuration liées à ce point de vente seront définitivement effacées.</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="d-flex justify-content-center gap-3">
+                        {% csrf_token %}
+                        {% if not has_inventory %}
+                        <button type="submit" class="btn btn-danger fw-bold px-10 shadow-sm">
+                            <i class="fas fa-check-circle me-2 small"></i> Confirmer la suppression
+                        </button>
+                        {% endif %}
+                        <a href="{% if has_inventory %}{% url 'inventory:pos_detail' pos.id %}{% else %}{% url 'inventory:pos_list' %}{% endif %}" class="btn btn-light fw-bold px-10">
+                            {% if has_inventory %}Retourner au détails{% else %}Conserver l'infrastructure{% endif %}
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

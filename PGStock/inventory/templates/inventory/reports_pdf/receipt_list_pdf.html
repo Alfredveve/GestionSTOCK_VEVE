@@ -1,0 +1,45 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_extras %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">N° Bon</th>
+                <th style="width: 25%;">Fournisseur</th>
+                <th style="width: 15%;">Date</th>
+                <th style="width: 15%;">Référence</th>
+                <th style="width: 15%;">Statut</th>
+                <th class="text-right" style="width: 15%;">Montant Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for receipt in receipts %}
+                <tr class="{% cycle '' 'row-even' %}">
+                    <td class="font-bold">{{ receipt.receipt_number }}</td>
+                    <td>{{ receipt.supplier_name }}</td>
+                    <td>{{ receipt.date_received|date:"d/m/Y" }}</td>
+                    <td class="text-muted">{{ receipt.supplier_reference|default:"-" }}</td>
+                    <td>
+                        <span class="badge {% if receipt.status == 'validated' %}badge-light-success{% elif receipt.status == 'received' %}badge-light-primary{% else %}badge-light-warning{% endif %}">
+                            {{ receipt.status_display }}
+                        </span>
+                    </td>
+                    <td class="text-right font-bold">{{ receipt.total_amount|format_currency:company_settings.currency }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted" style="padding: 40px;">Aucun bon de réception trouvé</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="background-color: #F4F6FA; font-weight: bold;">
+                <td colspan="5" class="text-right" style="padding: 10px;">TOTAL GÉNÉRAL</td>
+                <td class="text-right text-primary" style="padding: 10px; font-size: 10pt;">
+                    {{ total_amount_sum|format_currency:company_settings.currency }}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+{% endblock %}

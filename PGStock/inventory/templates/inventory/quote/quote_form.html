@@ -1,0 +1,442 @@
+{% extends 'inventory/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if quote %}Modifier{% else %}Nouveau{% endif %} Devis - GestionSTOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        --glass-bg: rgba(30, 30, 45, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    .text-gradient {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .form-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.25rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-header {
+        position: relative;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 40px;
+        height: 2px;
+        background: var(--primary-gradient);
+    }
+
+    .form-control, .form-select, .select2-container--bootstrap-5 .select2-selection {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #e2e8f0 !important;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus, .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+        background-color: rgba(255, 255, 255, 0.07) !important;
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2) !important;
+    }
+
+    .form-label {
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .item-row {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .item-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-submit {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-cancel {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        border-radius: 0.75rem;
+    }
+
+    /* Select2 custom styling for dark mode */
+    .select2-dropdown {
+        background-color: #1e1e2d !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    .select2-results__option {
+        color: #e2e8f0 !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: #e2e8f0 !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+        color: #1e1e2d !important;
+    }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted {
+        background-color: #6366f1 !important;
+        color: white !important;
+    }
+
+    .line-total {
+        font-family: 'Courier New', Courier, monospace;
+        color: #6366f1 !important;
+        font-weight: 700;
+    }
+
+    .summary-card {
+        background: rgba(99, 102, 241, 0.05);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <form method="post" novalidate id="quoteForm">
+        {% csrf_token %}
+
+        <!-- Header -->
+        <div class="row align-items-center mb-4 g-3">
+            <div class="col">
+                <h1 class="display-6 fw-bold text-gradient mb-1">
+                    {% if quote %}Modifier le Devis{% else %}Nouveau Devis{% endif %}
+                </h1>
+                <p class="text-secondary small mb-0">
+                    {% if quote %}Réf: <span class="text-white">#{{ quote.quote_number }}</span>{% else %}Créez une proposition commerciale prestigieuse.{% endif %}
+                </p>
+            </div>
+            <div class="col-auto d-flex gap-2">
+                <a href="{% url 'inventory:quote_list' %}" class="btn btn-cancel px-4">Annuler</a>
+                <button type="submit" class="btn btn-submit px-4">
+                    <i class="fas fa-save me-2"></i>Enregistrer
+                </button>
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Info Section -->
+                <div class="form-card p-4 mb-4">
+                    <div class="section-header">
+                        <h5 class="text-white fw-bold mb-0 small text-uppercase">Informations Générales</h5>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label required">Client</label>
+                            {{ form.client }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label required">Date d'émission</label>
+                            {{ form.date_issued }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label required">Validité</label>
+                            {{ form.valid_until }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Section -->
+                <div class="form-card p-4">
+                    <div class="section-header d-flex justify-content-between align-items-center">
+                        <h5 class="text-white fw-bold mb-0 small text-uppercase">Articles & Services</h5>
+                        <button type="button" id="add-item" class="btn btn-sm btn-outline-primary border-0 fw-bold">
+                            <i class="fas fa-plus-circle me-1"></i> Ajouter
+                        </button>
+                    </div>
+
+                    <!-- Items Header -->
+                    <div class="row fw-bold text-secondary small text-uppercase mb-3 px-2 d-none d-md-flex">
+                        <div class="col-md-4">Produit/Service</div>
+                        <div class="col-md-1 text-center">Qté</div>
+                        <div class="col-md-2 text-end">Prix Unit (GNF)</div>
+                        <div class="col-md-2 text-end">Remise (%)</div>
+                        <div class="col-md-2 text-end">Total (GNF)</div>
+                        <div class="col-1"></div>
+                    </div>
+
+                    {{ item_formset.management_form }}
+                    <div id="items-container" class="vstack gap-3">
+                        {% for item_form in item_formset %}
+                        <div class="item-row row g-2 align-items-center p-2">
+                            {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
+                            <div class="col-12 col-md-4">
+                                {{ item_form.product }}
+                            </div>
+                            <div class="col-6 col-md-1 text-center">
+                                {{ item_form.quantity }}
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                {{ item_form.unit_price }}
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                <div class="input-group input-group-sm">
+                                    {{ item_form.discount }}
+                                    <span class="input-group-text bg-transparent border-start-0 text-secondary small">%</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                <span class="line-total">0.00</span>
+                            </div>
+                            <div class="col-12 col-md-1 text-center">
+                                {% if item_form.instance.pk %}
+                                    <div class="form-check d-inline-block">
+                                        {{ item_form.DELETE }}
+                                        <i class="fas fa-trash-alt text-danger small"></i>
+                                    </div>
+                                {% else %}
+                                    <button type="button" class="btn btn-link text-danger p-0 remove-item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Template for new rows -->
+                    <div id="empty-form" class="d-none">
+                        <div class="item-row row g-2 align-items-center p-2 mt-2">
+                            <div class="col-12 col-md-4">
+                                {{ item_formset.empty_form.product }}
+                            </div>
+                            <div class="col-6 col-md-1 text-center">
+                                {{ item_formset.empty_form.quantity }}
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                {{ item_formset.empty_form.unit_price }}
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                <div class="input-group input-group-sm">
+                                    {{ item_formset.empty_form.discount }}
+                                    <span class="input-group-text bg-transparent border-start-0 text-secondary small">%</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2 text-end">
+                                <span class="line-total">0.00</span>
+                            </div>
+                            <div class="col-12 col-md-1 text-center">
+                                <button type="button" class="btn btn-link text-danger p-0 remove-item">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="form-label">Notes Publiques / Conditions</label>
+                    {{ form.notes }}
+                </div>
+            </div>
+
+            <!-- Sidebar Summary -->
+            <div class="col-lg-3">
+                <div class="form-card p-4 sticky-top" style="top: 2rem;">
+                    <div class="section-header">
+                        <h5 class="text-white fw-bold mb-0 small text-uppercase">Récapitulatif</h5>
+                    </div>
+                    
+                    <div class="vstack gap-3 mb-4">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary small">Sous-Total</span>
+                            <span class="text-white font-monospace" id="summary-subtotal">0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-secondary small">TVA</span>
+                            <div class="d-flex align-items-center gap-1" style="width: 70px;">
+                                {{ form.tax_rate }}
+                                <span class="text-secondary small">%</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary small">Montant TVA</span>
+                            <span class="text-danger small font-monospace" id="summary-tax">0.00</span>
+                        </div>
+                        
+                        <div class="summary-card p-3 rounded-3 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-white small fw-bold">TOTAL TTC</span>
+                                <span class="h4 fw-bold text-gradient font-monospace mb-0" id="summary-total">0.00</span>
+                            </div>
+                            <div class="text-end text-secondary small">GNF</div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top border-white-5">
+                        <label class="form-label">Statut du Devis</label>
+                        {{ form.status }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addItemBtn = document.getElementById('add-item');
+        const itemsContainer = document.getElementById('items-container');
+        const totalForms = document.getElementById('id_quoteitem_set-TOTAL_FORMS');
+        const emptyFormTemplate = document.getElementById('empty-form').innerHTML;
+
+        const summarySubtotal = document.getElementById('summary-subtotal');
+        const summaryTax = document.getElementById('summary-tax');
+        const summaryTotal = document.getElementById('summary-total');
+        const taxRateInput = document.getElementById('id_tax_rate');
+
+        // Styles correction for Select2 and form controls
+        function styleNewRow(row) {
+            $(row).find('select').select2({ theme: "bootstrap-5", width: '100%', dropdownParent: $('.sheet').length ? $('.sheet') : $('body') });
+            $(row).find('input, select').addClass('form-control form-control-sm');
+        }
+
+        // Initialize calculations
+        calculateTotals();
+        initDetailEvents();
+
+        if(taxRateInput) {
+            taxRateInput.addEventListener('input', calculateTotals);
+        }
+
+        function initDetailEvents() {
+             const rows = itemsContainer.querySelectorAll('.item-row');
+             rows.forEach(row => {
+                 const inputs = row.querySelectorAll('input');
+                 inputs.forEach(input => {
+                     if(input.name.includes('quantity') || input.name.includes('unit_price') || input.name.includes('discount')) {
+                         input.removeEventListener('input', calculateRowTotal);
+                         input.addEventListener('input', calculateRowTotal);
+                     }
+                 });
+             });
+        }
+
+        function calculateRowTotal(e) {
+            const row = e.target.closest('.item-row');
+            updateRowDisplay(row);
+            calculateTotals();
+        }
+
+        function updateRowDisplay(row) {
+             const qty = parseFloat(row.querySelector('[name$="-quantity"]').value) || 0;
+             const price = parseFloat(row.querySelector('[name$="-unit_price"]').value) || 0;
+             const discount = parseFloat(row.querySelector('[name$="-discount"]').value) || 0;
+
+             let sub = qty * price;
+             let discAmt = sub * (discount / 100);
+             let total = sub - discAmt;
+
+             const totalSpan = row.querySelector('.line-total');
+             if(totalSpan) totalSpan.textContent = total.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+             
+             return total;
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+            const rows = itemsContainer.querySelectorAll('.item-row');
+            rows.forEach(row => {
+               if(row.style.display !== 'none') {
+                   subtotal += updateRowDisplay(row);
+               }
+            });
+
+            const taxRate = parseFloat(taxRateInput ? taxRateInput.value : 0) || 0;
+            const taxAmt = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmt;
+
+            summarySubtotal.textContent = subtotal.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+            summaryTax.textContent = taxAmt.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+            summaryTotal.textContent = total.toLocaleString('fr-FR', {minimumFractionDigits: 2});
+        }
+
+        addItemBtn.addEventListener('click', function () {
+            const formIdx = totalForms.value;
+            const newForm = emptyFormTemplate.replace(/__prefix__/g, formIdx);
+            itemsContainer.insertAdjacentHTML('beforeend', newForm);
+            
+            const newRow = itemsContainer.lastElementChild;
+            styleNewRow(newRow);
+            updateFormIndices();
+            initDetailEvents();
+        });
+
+        itemsContainer.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-item')) {
+                const row = e.target.closest('.item-row');
+                row.remove();
+                updateFormIndices();
+                calculateTotals();
+            }
+        });
+
+        function updateFormIndices() {
+            const forms = itemsContainer.querySelectorAll('.item-row');
+            forms.forEach((form, index) => {
+                form.querySelectorAll('input, select, textarea, label').forEach(element => {
+                    if (element.id) element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                    if (element.name) element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                    if (element.htmlFor) element.htmlFor = element.htmlFor.replace(/-\d+-/, `-${index}-`);
+                });
+            });
+            totalForms.value = forms.length;
+        }
+
+        // Global initialization
+        $('select').select2({ theme: "bootstrap-5", width: '100%' });
+        $('input:not([type="checkbox"]), select').addClass('form-control');
+        $('textarea').addClass('form-control bg-transparent border-white-10 text-white').attr('rows', 3);
+    });
+</script>
+{% endblock %}

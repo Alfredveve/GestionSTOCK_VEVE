@@ -1,0 +1,809 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load permission_tags %}
+
+{% block title %}Produits - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-primary rounded-circle">
+                        <i class="fas fa-box fs-5"></i>
+                    </span>
+                </span>
+                Produits
+            </h1>
+            <span class="text-white opacity-75 fs-6 fw-bold">Gérez votre catalogue de produits</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0 justify-content-center justify-content-md-end">
+            <a href="{% url 'inventory:export_products_excel' %}"
+                class="btn btn-custom btn-white btn-active-light-success text-success fw-bold btn-sm shadow-sm">
+                <i class="fas fa-file-excel me-md-2"></i> <span class="d-none d-md-inline">Excel</span>
+            </a>
+            <a href="{% url 'inventory:export_products_pdf' %}"
+                class="btn btn-custom btn-white btn-active-light-danger text-danger fw-bold btn-sm shadow-sm">
+                <i class="fas fa-file-pdf me-md-2"></i> <span class="d-none d-md-inline">PDF</span>
+            </a>
+            <a href="{% url 'inventory:product_import' %}"
+                class="btn btn-custom btn-white btn-active-light-primary text-primary fw-bold btn-sm shadow-sm">
+                <i class="fas fa-file-import me-md-2"></i> <span class="d-none d-md-inline">Importer</span>
+            </a>
+            <a href="{% url 'inventory:product_create' %}" class="btn btn-primary fw-bold btn-sm shadow-sm">
+                <i class="fas fa-plus me-md-2"></i> <span class="d-none d-md-inline">Nouveau Produit</span><span class="d-md-none">Nouveau</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card card-flush shadow-sm">
+            <!-- Card Header: Title & Search/Filter Bar -->
+            <div class="card-header border-0 pt-6 flex-wrap gap-3">
+                <!-- Title -->
+                <div class="card-title m-0">
+                    <h3 class="fw-bold text-gray-800">Détails des produits</h3>
+                </div>
+                <!-- Search & Filter Toolbar -->
+                <div class="card-toolbar d-flex align-items-center flex-wrap gap-2 gap-md-3">
+                    <!-- View Toggle Buttons -->
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-light-primary view-toggle active" data-view="table" title="Vue tableau">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button type="button" class="btn btn-light-primary view-toggle" data-view="cards" title="Vue cartes">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="separator separator-vertical h-30px d-none d-sm-block"></div>
+                    <form method="get" id="filter-form" class="d-flex align-items-center flex-wrap gap-2">
+                        <!-- Search Input -->
+                        <div class="position-relative flex-grow-1">
+                            <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                                <i class="fas fa-search fs-6 text-muted"></i>
+                            </span>
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control form-control-sm pe-4" 
+                                   style="min-width: 150px; padding-left: 2.5rem; border-radius: 0.475rem; border: 1px solid #E4E6EF; background-color: #F9F9F9;"
+                                   placeholder="Rechercher..."
+                                   value="{{ search_query|default:'' }}" 
+                                   autocomplete="off" />
+                        </div>
+                        
+                        <!-- Category Filter Dropdown -->
+                        <div class="position-relative flex-grow-1">
+                            <select name="category" 
+                                    id="category_select" 
+                                    class="form-select form-select-sm"
+                                    style="min-width: 140px; border-radius: 0.475rem; border: 1px solid #E4E6EF; background-color: #F9F9F9;">
+                                <option value="">Statut</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Filter Button -->
+                        <button type="submit" class="btn btn-primary btn-sm px-4" style="border-radius: 0.475rem;">
+                            <i class="fas fa-filter d-md-none"></i>
+                            <span class="d-none d-md-inline">Filtrer</span>
+                        </button>
+
+                        <!-- Reset Filter Button -->
+                        {% if search_query or category_filter %}
+                        <a href="{% url 'inventory:product_list' %}" 
+                           class="btn btn-light-danger btn-sm px-3"
+                           style="border-radius: 0.475rem;"
+                           title="Réinitialiser">
+                            <i class="fas fa-times fs-6"></i>
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-body py-4">
+                {% if products %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bold text-muted bg-light">
+                                <th class="ps-4 min-w-30px rounded-start">#</th>
+                                <th class="min-w-150px">Produit <i class="fas fa-sort text-gray-400 ms-2"></i></th>
+                                <th class="min-w-125px">Catégorie</th>
+                                <th class="min-w-100px text-center">Stock</th>
+                                {% if user|can_view_finances %}
+                                <th class="min-w-100px text-end">Prix Achat</th>
+                                <th class="min-w-100px text-end">Marge</th>
+                                {% endif %}
+                                <th class="min-w-100px text-end">Prix Vente</th>
+                                <th class="min-w-100px text-center">Statut</th>
+                                <th class="min-w-100px text-center rounded-end">Actes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">
+                                    {{ forloop.counter0|add:page_obj.start_index }}
+                                </td>
+                                
+                                <td class="text-dark fw-bold">
+                                    <a href="{% url 'inventory:product_detail' product.pk %}" class="text-dark text-hover-primary">
+                                        {{ product.name }}
+                                    </a>
+                                </td>
+
+                                <td class="text-gray-600 fw-semibold">
+                                    {{ product.category.name }}
+                                </td>
+
+                                <td class="text-center text-dark fw-bold">
+                                    {{ product.total_stock_annotated }}
+                                </td>
+
+                                {% if user|can_view_finances %}
+                                <td class="text-end text-gray-600">
+                                    {{ product.purchase_price|format_currency:company_settings.currency }}
+                                </td>
+                                <td class="text-end">
+                                    {% if product.margin > 0 %}
+                                    <span class="text-success fw-bold">{{ product.margin|format_currency:company_settings.currency }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+
+                                <td class="text-end text-dark fw-bold">
+                                    {{ product.selling_price|format_currency:company_settings.currency }}
+                                </td>
+
+                                <td class="text-center">
+                                    {% with total_stock=product.total_stock_annotated %}
+                                    {% if total_stock == 0 %}
+                                    <span class="badge badge-light-danger">Rupture</span>
+                                    {% elif total_stock <= 20 %}
+                                    <span class="badge badge-light-warning">Faible</span>
+                                    {% else %}
+                                    <span class="badge badge-light-success">En Stock</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </td>
+
+                                <td class="text-center">
+                                    <a href="{% url 'inventory:product_detail' product.pk %}" class="btn btn-icon btn-sm btn-active-light-primary me-1" title="Voir">
+                                        <i class="fas fa-eye text-primary fs-5"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:product_update' product.pk %}" class="btn btn-icon btn-sm btn-active-light-warning me-1" title="Modifier">
+                                        <i class="fas fa-pencil-alt text-warning fs-5"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:product_delete' product.pk %}" class="btn btn-icon btn-sm btn-active-light-danger" title="Supprimer">
+                                        <i class="fas fa-trash-alt text-danger fs-5"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Card View (Hidden by default) -->
+                <div id="cards-view" class="row g-3 g-md-4" style="display: none;">
+                    {% for product in products %}
+                    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="card card-product-premium h-100 border-0">
+                            <!-- Product Image with Overlay -->
+                            <div class="product-image-container position-relative overflow-hidden">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" class="product-image w-100" alt="{{ product.name }}">
+                                {% else %}
+                                <div class="product-image-placeholder w-100 d-flex align-items-center justify-content-center">
+                                    <div class="text-center">
+                                        <i class="fas fa-box-open fs-2x text-white opacity-75 mb-2"></i>
+                                        <p class="text-white opacity-50 fs-8 mb-0">Pas d'image</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Gradient Overlay -->
+                                <div class="product-overlay position-absolute bottom-0 start-0 w-100"></div>
+                                
+                                <!-- Stock Badge -->
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    {% with total_stock=product.total_stock_annotated %}
+                                    {% if total_stock == 0 %}
+                                    <span class="badge-premium badge-danger-premium">Rupture</span>
+                                    {% elif total_stock <= 20 %}
+                                    <span class="badge-premium badge-warning-premium">Faible</span>
+                                    {% else %}
+                                    <span class="badge-premium badge-success-premium">En Stock</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </div>
+                                
+                                <!-- Quick Actions Overlay -->
+                                <div class="product-quick-actions position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center gap-2">
+                                    <a href="{% url 'inventory:product_detail' product.pk %}" class="btn-quick-action" title="Voir les détails">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:product_update' product.pk %}" class="btn-quick-action" title="Modifier">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:product_delete' product.pk %}" class="btn-quick-action" title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="card-body p-3">
+                                <!-- Product Name -->
+                                <h5 class="product-title mb-1">
+                                    <a href="{% url 'inventory:product_detail' product.pk %}" class="text-decoration-none text-dark">
+                                        {{ product.name }}
+                                    </a>
+                                </h5>
+                                
+                                <!-- Category -->
+                                <div class="product-category mb-2 text-muted">
+                                    <i class="fas fa-tag me-1 text-primary"></i>
+                                    <span>{{ product.category.name }}</span>
+                                </div>
+                                
+                                <!-- Divider -->
+                                <div class="divider-premium mb-2"></div>
+                                
+                                <!-- Product Info Grid -->
+                                <div class="product-info-grid">
+                                    <!-- Stock -->
+                                    <div class="info-item">
+                                        <div class="info-label">Stock</div>
+                                        <div class="info-value">{{ product.total_stock_annotated }}</div>
+                                    </div>
+                                    
+                                    {% if user|can_view_finances %}
+                                    <!-- Purchase Price -->
+                                    <div class="info-item">
+                                        <div class="info-label">Achat</div>
+                                        <div class="info-value text-muted">{{ product.purchase_price|format_currency:company_settings.currency }}</div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Selling Price -->
+                                    <div class="info-item">
+                                        <div class="info-label">Vente</div>
+                                        <div class="info-value text-primary">{{ product.selling_price|format_currency:company_settings.currency }}</div>
+                                    </div>
+                                    
+                                    {% if user|can_view_finances and product.margin > 0 %}
+                                    <!-- Margin -->
+                                    <div class="info-item">
+                                        <div class="info-label">Marge</div>
+                                        <div class="info-value text-success">{{ product.margin|format_currency:company_settings.currency }}</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination (Bottom) -->
+                {% if page_obj.has_other_pages %}
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-8 gap-4">
+                    <!-- Results Info -->
+                    <div class="fs-6 fw-semibold text-gray-600">
+                        <span class="text-gray-800">{{ page_obj.start_index }}</span> - 
+                        <span class="text-gray-800">{{ page_obj.end_index }}</span> sur 
+                        <span class="text-gray-800 fw-bold">{{ page_obj.paginator.count }}</span> résultats
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <ul class="pagination pagination-modern">
+                        <!-- Previous Button -->
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
+                               class="page-link page-link-arrow" 
+                               title="Page précédente">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link page-link-arrow">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        </li>
+                        {% endif %}
+
+                        <!-- First Page -->
+                        {% if page_obj.number > 3 %}
+                        <li class="page-item">
+                            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
+                               class="page-link">1</a>
+                        </li>
+                        {% if page_obj.number > 4 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+
+                        <!-- Page Numbers -->
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if page_obj.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
+                            {% elif i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+                            <li class="page-item">
+                                <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
+                                   class="page-link">{{ i }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Last Page -->
+                        {% if page_obj.number < page_obj.paginator.num_pages|add:'-2' %}
+                        {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
+                               class="page-link">{{ products.paginator.num_pages }}</a>
+                        </li>
+                        {% endif %}
+
+                        <!-- Next Button -->
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
+                               class="page-link page-link-arrow" 
+                               title="Page suivante">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link page-link-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-10">
+                <div class="mb-5">
+                    <span class="symbol symbol-75px">
+                        <span class="symbol-label bg-light-primary text-primary">
+                            <i class="fas fa-box-open fs-1"></i>
+                        </span>
+                    </span>
+                </div>
+                <h3 class="fw-bold fs-2 text-gray-800 mb-2">Aucun produit trouvé</h3>
+                <p class="text-muted fs-6 mb-5">Commencez par ajouter des produits à votre inventaire.</p>
+                <a href="{% url 'inventory:product_create' %}" class="btn btn-primary fw-bold">
+                    <i class="fas fa-plus me-2"></i> Ajouter un produit
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* View Toggle Buttons */
+    .view-toggle {
+        transition: all 0.3s ease;
+    }
+    
+    .view-toggle.active {
+        background-color: #009EF7 !important;
+        color: white !important;
+        border-color: #009EF7 !important;
+    }
+    
+    .view-toggle:not(.active):hover {
+        background-color: #F5F8FA;
+        color: #009EF7;
+    }
+
+    /* Premium Card Styles */
+    .card-product-premium {
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    .card-product-premium:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Product Image Container */
+    .product-image-container {
+        height: 140px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+    }
+    
+    .product-image {
+        height: 140px;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-product-premium:hover .product-image {
+        transform: scale(1.1);
+    }
+    
+    .product-image-placeholder {
+        height: 140px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Gradient Overlay */
+    .product-overlay {
+        height: 40%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+        pointer-events: none;
+    }
+    
+    /* Premium Badges */
+    .badge-premium {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .badge-success-premium {
+        background: rgba(80, 205, 137, 0.95);
+        color: #ffffff;
+    }
+    
+    .badge-warning-premium {
+        background: rgba(255, 159, 67, 0.95);
+        color: #ffffff;
+    }
+    
+    .badge-danger-premium {
+        background: rgba(255, 71, 87, 0.95);
+        color: #ffffff;
+    }
+    
+    /* Quick Actions Overlay */
+    .product-quick-actions {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .card-product-premium:hover .product-quick-actions {
+        opacity: 1;
+    }
+    
+    .btn-quick-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        color: #3F4254;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .btn-quick-action:hover {
+        background: #009EF7;
+        color: #ffffff;
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(0, 158, 247, 0.4);
+    }
+    
+    /* Product Title */
+    .product-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: #181C32;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 36px;
+    }
+    
+    .product-title a {
+        transition: color 0.2s ease;
+    }
+    
+    .product-title a:hover {
+        color: #009EF7;
+    }
+    
+    /* Product Category */
+    .product-category {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .product-category i {
+        font-size: 0.7rem;
+    }
+    
+    /* Premium Divider */
+    .divider-premium {
+        height: 1px;
+        background: linear-gradient(90deg, #009EF7 0%, transparent 100%);
+        border-radius: 1px;
+    }
+    
+    /* Product Info Grid */
+    .product-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .info-item {
+        background: #F9F9F9;
+        padding: 6px 8px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .info-item:hover {
+        background: #F5F8FA;
+        transform: translateY(-1px);
+    }
+    
+    .info-label {
+        font-size: 0.65rem;
+        color: #A1A5B7;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 2px;
+    }
+    
+    .info-value {
+        font-size: 0.8rem;
+        color: #181C32;
+        font-weight: 500;
+    }
+
+    /* Modern Pagination Styles */
+    .pagination-modern {
+        gap: 0.25rem;
+    }
+
+    .pagination-modern .page-link {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        border: 1px solid #E4E6EF;
+        color: #7E8299;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        margin: 0;
+    }
+
+    .pagination-modern .page-link:hover {
+        background-color: #F5F8FA;
+        border-color: #009EF7;
+        color: #009EF7;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 6px rgba(0, 158, 247, 0.15);
+    }
+
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        border-color: #009EF7;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.25);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        background-color: #F5F8FA;
+        border-color: #E4E6EF;
+        color: #B5B5C3;
+        cursor: not-allowed;
+    }
+
+    .pagination-modern .page-link-arrow {
+        min-width: 40px;
+        font-size: 0.875rem;
+    }
+
+    /* Search and Filter Enhancements */
+    .form-control-solid:focus,
+    .form-select-solid:focus {
+        border-color: #009EF7;
+        box-shadow: 0 0 0 0.2rem rgba(0, 158, 247, 0.15);
+    }
+
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Filter Button Enhancements */
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.3);
+    }
+
+    .btn-light-danger {
+        transition: all 0.3s ease;
+    }
+
+    .btn-light-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+    }
+
+    /* Table Enhancements */
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F5F8FA;
+        transform: scale(1.001);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .pagination-modern .page-link {
+            min-width: 32px;
+            height: 32px;
+            font-size: 0.75rem;
+        }
+        
+        .card-product-premium {
+            border-radius: 12px;
+        }
+        
+        .product-image-container, .product-image, .product-image-placeholder {
+            height: 120px;
+        }
+        
+        .card-body {
+            padding: 0.75rem !important;
+        }
+        
+        .product-title {
+            font-size: 0.85rem;
+            min-height: 32px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .product-info-grid {
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+        
+        .info-item {
+            padding: 4px 6px;
+        }
+        
+        .info-value {
+            font-size: 0.75rem;
+        }
+        
+        .badge-premium {
+            padding: 2px 6px;
+            font-size: 8px;
+        }
+        
+        /* Two columns on mobile: reduce gaps */
+        #cards-view {
+            --bs-gutter-x: 0.75rem;
+            --bs-gutter-y: 0.75rem;
+        }
+    }
+</style>
+
+<script>
+    // Initialize Popovers
+    document.addEventListener('DOMContentLoaded', function() {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+
+        // Auto-submit search on Enter key
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.form.submit();
+                }
+            });
+        }
+
+        // View Toggle Functionality
+        const viewToggles = document.querySelectorAll('.view-toggle');
+        const tableView = document.querySelector('.table-responsive');
+        const cardsView = document.getElementById('cards-view');
+        
+        // Load saved view preference
+        const savedView = localStorage.getItem('productListView') || 'table';
+        switchView(savedView);
+        
+        // Add click handlers to toggle buttons
+        viewToggles.forEach(button => {
+            button.addEventListener('click', function() {
+                const view = this.getAttribute('data-view');
+                switchView(view);
+                localStorage.setItem('productListView', view);
+            });
+        });
+        
+        function switchView(view) {
+            // Update button states
+            viewToggles.forEach(btn => {
+                if (btn.getAttribute('data-view') === view) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Toggle views
+            if (view === 'table') {
+                tableView.style.display = 'block';
+                cardsView.style.display = 'none';
+            } else {
+                tableView.style.display = 'none';
+                cardsView.style.display = 'flex';
+            }
+        }
+    });
+</script>
+
+{% endblock %}

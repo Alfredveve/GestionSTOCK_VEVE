@@ -1,0 +1,296 @@
+{% extends 'inventory/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if invoice %}Modifier{% else %}Nouvelle{% endif %} Facture - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-body-emphasis">{% if invoice %}Modifier la{% else %}Nouvelle{% endif %} Facture
+            </h1>
+            <p class="text-body-secondary mt-2 mb-0">
+                {% if invoice %}
+                Mise à jour du document N° {{ invoice.invoice_number|default:"..." }}
+                {% else %}
+                Création d'une nouvelle pièce comptable
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'inventory:invoice_list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour</span>
+        </a>
+    </div>
+
+    <form method="post" novalidate id="invoiceForm">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <div>{{ form.non_field_errors }}</div>
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <!-- Left Column: Details -->
+            <div class="col-lg-8">
+                <div class="vstack gap-4">
+
+                    <!-- Card: Client Info -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                                <span
+                                    class="badge bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="fas fa-user-tie"></i>
+                                </span>
+                                Informations Client
+                            </h3>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {{ form.client|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.point_of_sale|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Billing Details -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                                <span
+                                    class="badge bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </span>
+                                Détails de Facturation
+                            </h3>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    {{ form.invoice_type|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.status|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.tax_rate|as_crispy_field }}
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch p-3 bg-body-tertiary rounded border">
+                                        {{ form.apply_tax }}
+                                        <label class="form-check-label ms-2 cursor-pointer"
+                                            for="{{ form.apply_tax.id_for_label }}">
+                                            Appliquer la TVA sur cette facture
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Dates & Notes -->
+            <div class="col-lg-4">
+                <div class="vstack gap-4">
+
+                    <!-- Card: Dates -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                                <span
+                                    class="badge bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                                Échéances
+                            </h3>
+
+                            <div class="vstack gap-3">
+                                <div>
+                                    {{ form.date_issued|as_crispy_field }}
+                                </div>
+                                <div>
+                                    {{ form.date_due|as_crispy_field }}
+                                    <div class="form-text mt-1">Date limite de règlement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Notes -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                                <span
+                                    class="badge bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="fas fa-sticky-note"></i>
+                                </span>
+                                Notes
+                            </h3>
+
+                            <div>
+                                {{ form.notes|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <h3 class="h5 text-body-emphasis mb-0 d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary-subtle text-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="fas fa-box-open"></i>
+                        </span>
+                        Articles de la facture
+                    </h3>
+                    <button type="button" id="add-item" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2">
+                        <i class="fas fa-plus"></i> Ajouter un article
+                    </button>
+                </div>
+
+                <!-- FormSet Management Form -->
+                {{ item_formset.management_form }}
+
+                <!-- Items Container -->
+                <div id="items-container">
+                    {% for form in item_formset %}
+                    <div class="item-row row g-2 align-items-end mb-3 pb-3 border-bottom position-relative">
+                        <!-- Hidden fields for ID if updating -->
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+                        <div class="col-md-5">
+                            {{ form.product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.quantity|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.unit_price|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.discount|as_crispy_field }}
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center mb-3">
+                            {% if form.instance.pk %}
+                                <div class="form-check">
+                                    {{ form.DELETE }}
+                                    <label class="form-check-label text-danger" for="{{ form.DELETE.id_for_label }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </label>
+                                </div>
+                            {% else %}
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-item" title="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Empty Form Template for JS -->
+                <div id="empty-form" class="d-none">
+                    <div class="item-row row g-2 align-items-end mb-3 pb-3 border-bottom position-relative">
+                        <div class="col-md-5">
+                            {{ item_formset.empty_form.product|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ item_formset.empty_form.quantity|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ item_formset.empty_form.unit_price|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ item_formset.empty_form.discount|as_crispy_field }}
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center mb-3">
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-item" title="Supprimer">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Float Action Bar -->
+        <div class="d-flex justify-content-end gap-2 pt-4 border-top mt-4">
+            <a href="{% url 'inventory:invoice_list' %}" class="btn btn-light border">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-dark d-flex align-items-center gap-2 shadow-sm">
+                <i class="fas fa-check small"></i>
+                {% if invoice %}Mettre à jour{% else %}Créer la facture{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addItemBtn = document.getElementById('add-item');
+        const itemsContainer = document.getElementById('items-container');
+        const totalForms = document.getElementById('id_invoiceitem_set-TOTAL_FORMS');
+        const emptyFormTemplate = document.getElementById('empty-form').innerHTML;
+
+        // Function to update form indices
+        function updateFormIndices() {
+            const forms = itemsContainer.querySelectorAll('.item-row');
+            forms.forEach((form, index) => {
+                form.querySelectorAll('input, select, textarea, label').forEach(element => {
+                    if (element.id) element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                    if (element.name) element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                    if (element.htmlFor) element.htmlFor = element.htmlFor.replace(/-\d+-/, `-${index}-`);
+                });
+            });
+            totalForms.value = forms.length;
+        }
+
+        // Add Item
+        addItemBtn.addEventListener('click', function () {
+            const formIdx = totalForms.value;
+            const newForm = emptyFormTemplate.replace(/__prefix__/g, formIdx);
+            itemsContainer.insertAdjacentHTML('beforeend', newForm);
+            
+            // Re-initialize any plugins if needed (e.g., select2)
+            const newRow = itemsContainer.lastElementChild;
+            const newSelects = newRow.querySelectorAll('select');
+            newSelects.forEach(select => {
+                 // Example: if using Select2, re-init here
+                 // $(select).select2();
+            });
+
+            updateFormIndices();
+        });
+
+        // Remove Item
+        itemsContainer.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-item')) {
+                const row = e.target.closest('.item-row');
+                row.remove();
+                updateFormIndices();
+            }
+        });
+    });
+</script>
+{% endblock %}

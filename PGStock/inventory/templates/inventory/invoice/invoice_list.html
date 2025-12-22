@@ -1,0 +1,650 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}Factures - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-primary rounded-circle">
+                        <i class="fas fa-file-invoice-dollar fs-5"></i>
+                    </span>
+                </span>
+                Factures
+            </h1>
+            <span class="text-white opacity-75 fs-6 fw-bold">Gestion des factures clients</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+            <a href="{% url 'inventory:export_invoice_status_excel' %}?{{ request.GET.urlencode }}"
+                class="btn btn-custom btn-white btn-active-light-success text-success fw-bold btn-sm">
+                <i class="fas fa-file-excel me-2"></i> Excel
+            </a>
+            <a href="{% url 'inventory:export_invoice_status_pdf' %}?{{ request.GET.urlencode }}"
+                class="btn btn-custom btn-white btn-active-light-danger text-danger fw-bold btn-sm">
+                <i class="fas fa-file-pdf me-2"></i> PDF
+            </a>
+            {% if perms.inventory.add_invoice %}
+            <a href="{% url 'inventory:invoice_create' %}" class="btn btn-primary fw-bold btn-sm">
+                <i class="fas fa-plus me-2"></i> Nouvelle Facture
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card card-flush shadow-sm">
+        <!-- Card Header: Title & Search/Filter Bar -->
+        <div class="card-header border-0 pt-6 flex-wrap">
+            <!-- Title -->
+            <div class="card-title">
+                <h3 class="fw-bold text-gray-800">Liste des factures</h3>
+            </div>
+            <!-- Search & Filter Toolbar -->
+            <div class="card-toolbar d-flex align-items-center gap-3 flex-wrap">
+                <form method="get" id="filter-form" class="d-flex align-items-center gap-3 flex-wrap">
+                    <!-- Search Input -->
+                    <div class="position-relative search-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-search fs-6 text-primary"></i>
+                        </span>
+                        <input type="text" 
+                               name="q" 
+                               class="form-control form-control-sm modern-input" 
+                               placeholder="Rechercher (n°, client)..."
+                               value="{{ query|default:'' }}" 
+                               autocomplete="off" />
+                    </div>
+
+                    <!-- Date Start Input -->
+                    <div class="position-relative date-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-calendar-alt fs-6 text-success"></i>
+                        </span>
+                        <input type="date" 
+                               name="start_date" 
+                               class="form-control form-control-sm modern-input date-input" 
+                               placeholder="Date début"
+                               value="{{ start_date|default:'' }}" />
+                    </div>
+
+                    <!-- Date End Input -->
+                    <div class="position-relative date-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-calendar-check fs-6 text-warning"></i>
+                        </span>
+                        <input type="date" 
+                               name="end_date" 
+                               class="form-control form-control-sm modern-input date-input" 
+                               placeholder="Date fin"
+                               value="{{ end_date|default:'' }}" />
+                    </div>
+
+                    <!-- Status Filter Dropdown -->
+                    <div class="position-relative type-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-filter fs-6 text-info"></i>
+                        </span>
+                        <select name="status" 
+                                id="status_select" 
+                                class="form-select form-select-sm modern-select">
+                            <option value="">Tous les statuts</option>
+                            <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>📄 Brouillon</option>
+                            <option value="sent" {% if status_filter == 'sent' %}selected{% endif %}>📨 Envoyée</option>
+                            <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>✅ Payée</option>
+                            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>❌ Annulée</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Button -->
+                    <button type="submit" class="btn btn-primary btn-sm modern-btn-filter">
+                        <i class="fas fa-search me-2"></i>
+                        Filtrer
+                    </button>
+
+                    <!-- Reset Filter Button -->
+                    {% if query or status_filter or start_date or end_date %}
+                    <a href="{% url 'inventory:invoice_list' %}" 
+                       class="btn btn-light-danger btn-sm modern-btn-reset"
+                       title="Réinitialiser les filtres">
+                        <i class="fas fa-times me-1"></i>
+                        Effacer
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body pt-0">
+            {% if invoices %}
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5">
+                    <thead>
+                        <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-100px">Numéro</th>
+                            <th class="min-w-150px">Client</th>
+                            <th class="min-w-100px">Date</th>
+                            <th class="min-w-100px">Échéance</th>
+                            <th class="min-w-100px">Statut</th>
+                            <th class="min-w-100px">Total</th>
+                            <th class="min-w-100px">Reste dû</th>
+                            <th class="text-end min-w-100px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-semibold text-gray-600">
+                        <style>
+                            .table-font-12 td, .table-font-12 td span, .table-font-12 td a, .table-font-12 td div {
+                                font-size: 12px !important;
+                            }
+                        </style>
+                        {% for invoice in invoices %}
+                        <tr class="table-font-12">
+                            <td>
+                                <a href="{% url 'inventory:invoice_detail' invoice.pk %}"
+                                    class="text-gray-800 text-hover-primary fw-bold">{{ invoice.invoice_number }}</a>
+                                <div class="text-muted">{{ invoice.get_invoice_type_display }}</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="ms-0">
+                                        <a href="{% url 'inventory:client_detail' invoice.client.pk %}" class="text-gray-800 text-hover-primary fw-bold">
+                                            {{ invoice.client.name }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-gray-800 fw-bold">{{ invoice.date_issued|date:"d/m/Y" }}</span>
+                            </td>
+                            <td>
+                                {% if invoice.is_overdue %}
+                                <span class="badge badge-light-danger">{{ invoice.date_due|date:'d/m/Y' }}</span>
+                                {% else %}
+                                <span class="text-muted">{{ invoice.date_due|date:'d/m/Y' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if invoice.status == 'paid' %}
+                                <span class="badge badge-light-success">Payée</span>
+                                {% elif invoice.status == 'sent' %}
+                                <span class="badge badge-light-info">Envoyée</span>
+                                {% elif invoice.status == 'draft' %}
+                                <span class="badge badge-light-secondary">Brouillon</span>
+                                {% elif invoice.status == 'cancelled' %}
+                                <span class="badge badge-light-danger">Annulée</span>
+                                {% else %}
+                                <span class="badge badge-light">{{ invoice.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-gray-800 fw-bold">{{ invoice.total_amount|format_currency:company_settings.currency }}</span>
+                            </td>
+                            <td>
+                                {% if invoice.get_remaining_amount > 0 %}
+                                <span class="text-danger fw-bold">{{ invoice.get_remaining_amount|format_currency:company_settings.currency }}</span>
+                                {% else %}
+                                <span class="badge badge-light-success fw-bold"><i class="fas fa-check-circle text-success me-1"></i>Réglé</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    {% if invoice.get_remaining_amount > 0 %}
+                                    <a href="{% url 'inventory:payment_create' invoice.pk %}"
+                                        class="btn btn-icon btn-light-success btn-sm w-30px h-30px" title="Payer">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'inventory:invoice_detail' invoice.pk %}"
+                                        class="btn btn-icon btn-light-primary btn-sm w-30px h-30px"
+                                        title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:invoice_update' invoice.pk %}"
+                                        class="btn btn-icon btn-light-warning btn-sm w-30px h-30px"
+                                        title="Modifier">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    {% if perms.inventory.delete_invoice %}
+                                    <a href="{% url 'inventory:invoice_delete' invoice.pk %}"
+                                        class="btn btn-icon btn-light-danger btn-sm w-30px h-30px"
+                                        onclick="return confirm('Supprimer cette facture?')" title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if invoices.has_other_pages %}
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-8 gap-4">
+                <!-- Results Info -->
+                <div class="fs-6 fw-semibold text-gray-600">
+                    <span class="text-gray-800">{{ invoices.start_index }}</span> - 
+                    <span class="text-gray-800">{{ invoices.end_index }}</span> sur 
+                    <span class="text-gray-800 fw-bold">{{ invoices.paginator.count }}</span> résultats
+                </div>
+
+                <!-- Pagination Controls -->
+                <ul class="pagination pagination-modern">
+                    <!-- Previous Button -->
+                    {% if invoices.has_previous %}
+                    <li class="page-item">
+                        <a href="?page={{ invoices.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" 
+                           class="page-link page-link-arrow" 
+                           title="Page précédente">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link page-link-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+
+                    <!-- First Page -->
+                    {% if invoices.number > 3 %}
+                    <li class="page-item">
+                        <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" 
+                           class="page-link">1</a>
+                    </li>
+                    {% if invoices.number > 4 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    {% for i in invoices.paginator.page_range %}
+                        {% if invoices.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                        {% elif i >= invoices.number|add:'-2' and i <= invoices.number|add:'2' %}
+                        <li class="page-item">
+                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" 
+                               class="page-link">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Last Page -->
+                    {% if invoices.number < invoices.paginator.num_pages|add:'-2' %}
+                    {% if invoices.number < invoices.paginator.num_pages|add:'-3' %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a href="?page={{ invoices.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" 
+                           class="page-link">{{ invoices.paginator.num_pages }}</a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Next Button -->
+                    {% if invoices.has_next %}
+                    <li class="page-item">
+                        <a href="?page={{ invoices.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" 
+                           class="page-link page-link-arrow" 
+                           title="Page suivante">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link page-link-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-10">
+                <div class="mb-5">
+                    <span class="symbol symbol-75px">
+                        <span class="symbol-label bg-light-primary text-primary">
+                            <i class="fas fa-file-invoice-dollar fs-1"></i>
+                        </span>
+                    </span>
+                </div>
+                <h3 class="fw-bold fs-2 text-gray-800 mb-2">Aucune facture trouvée</h3>
+                <p class="text-muted fs-6 mb-5">Commencez par créer votre première facture.</p>
+                <a href="{% url 'inventory:invoice_create' %}" class="btn btn-primary fw-bold">
+                    <i class="fas fa-plus me-2"></i> Créer une facture
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ========== MODERN FILTER STYLES ========== */
+    
+    /* Search Field */
+    .search-field {
+        min-width: 220px;
+    }
+    
+    .search-field .modern-input {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(0, 158, 247, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+    }
+    
+    .search-field .modern-input:focus {
+        border-color: #009EF7;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(0, 158, 247, 0.15), 0 0 0 4px rgba(0, 158, 247, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Date Fields */
+    .date-field {
+        min-width: 180px;
+    }
+    
+    .date-field .modern-input {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        color: #3F4254;
+    }
+    
+    .date-field .modern-input:focus {
+        border-color: #10b981;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15), 0 0 0 4px rgba(16, 185, 129, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Date input calendar icon styling */
+    .date-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .date-input::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+    
+    /* Type Field */
+    .type-field {
+        min-width: 180px;
+    }
+    
+    .type-field .modern-select {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .type-field .modern-select:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15), 0 0 0 4px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .type-field .modern-select:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 3px 12px rgba(59, 130, 246, 0.12);
+    }
+    
+    /* Filter Button */
+    .modern-btn-filter {
+        padding: 0.5rem 1.75rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.25);
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modern-btn-filter:hover {
+        background: linear-gradient(135deg, #0095E8 0%, #0086D0 100%);
+        box-shadow: 0 6px 20px rgba(0, 158, 247, 0.35);
+        transform: translateY(-2px);
+    }
+    
+    .modern-btn-filter:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 158, 247, 0.2);
+    }
+    
+    /* Reset Button */
+    .modern-btn-reset {
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(145deg, #ffffff 0%, #fee2e2 100%);
+        border: 2px solid #fecaca;
+        color: #dc2626;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modern-btn-reset:hover {
+        background: linear-gradient(145deg, #fee2e2 0%, #fecaca 100%);
+        border-color: #dc2626;
+        color: #991b1b;
+        box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .modern-btn-reset:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+    }
+    
+    /* Icon Colors in Fields */
+    .search-field i.text-primary {
+        color: #009EF7 !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 158, 247, 0.2));
+    }
+    
+    .date-field i.text-success {
+        color: #10b981 !important;
+        filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2));
+    }
+    
+    .date-field i.text-warning {
+        color: #f59e0b !important;
+        filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.2));
+    }
+    
+    .type-field i.text-info {
+        color: #3b82f6 !important;
+        filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
+    }
+    
+    /* Form Animation on Load */
+    #filter-form > div {
+        animation: slideInUp 0.4s ease-out backwards;
+    }
+    
+    #filter-form > div:nth-child(1) { animation-delay: 0.05s; }
+    #filter-form > div:nth-child(2) { animation-delay: 0.1s; }
+    #filter-form > div:nth-child(3) { animation-delay: 0.15s; }
+    #filter-form > div:nth-child(4) { animation-delay: 0.2s; }
+    #filter-form > button { animation-delay: 0.25s; }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .search-field,
+        .date-field,
+        .type-field {
+            min-width: 100%;
+        }
+        
+        .modern-btn-filter,
+        .modern-btn-reset {
+            width: 100%;
+        }
+    }
+
+    /* ========== EXISTING PAGINATION STYLES ========== */
+    
+    /* Modern Pagination Styles */
+    .pagination-modern {
+        gap: 0.25rem;
+    }
+
+    .pagination-modern .page-link {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        border: 1px solid #E4E6EF;
+        color: #7E8299;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        margin: 0;
+    }
+
+    .pagination-modern .page-link:hover {
+        background-color: #F5F8FA;
+        border-color: #009EF7;
+        color: #009EF7;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 6px rgba(0, 158, 247, 0.15);
+    }
+
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        border-color: #009EF7;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.25);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        background-color: #F5F8FA;
+        border-color: #E4E6EF;
+        color: #B5B5C3;
+        cursor: not-allowed;
+    }
+
+    .pagination-modern .page-link-arrow {
+        min-width: 40px;
+        font-size: 0.875rem;
+    }
+
+    /* Custom Export Buttons */
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button Hover Effects */
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.3);
+    }
+
+    .btn-light-danger {
+        transition: all 0.3s ease;
+    }
+
+    .btn-light-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+    }
+
+    /* Search and Filter Enhancements */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #009EF7;
+        box-shadow: 0 0 0 0.2rem rgba(0, 158, 247, 0.15);
+    }
+
+    /* Table Enhancements */
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F5F8FA;
+        transform: scale(1.001);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .pagination-modern .page-link {
+            min-width: 36px;
+            height: 36px;
+            font-size: 0.875rem;
+        }
+    }
+</style>
+
+<script>
+    // Auto-submit search on Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.form.submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

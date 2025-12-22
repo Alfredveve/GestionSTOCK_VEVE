@@ -1,0 +1,53 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 12%;">Date/Heure</th>
+                <th style="width: 25%;">Produit</th>
+                <th style="width: 10%;">Type</th>
+                <th style="width: 8%;" class="text-center">Qté</th>
+                <th style="width: 12%;">De (Magasin)</th>
+                <th style="width: 12%;">Vers (Magasin)</th>
+                <th style="width: 10%;">Réf.</th>
+                <th style="width: 11%;">Utilisateur</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movement in movements %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>
+                    {{ movement.created_at|date:"d/m/Y" }}<br>
+                    <span class="text-muted" style="font-size: 8pt;">{{ movement.created_at|date:"H:i" }}</span>
+                </td>
+                <td>
+                    <span class="font-bold">{{ movement.product.name }}</span><br>
+                    <span class="text-muted" style="font-size: 8pt;">SKU: {{ movement.product.sku|default:"-" }}</span>
+                </td>
+                <td class="text-center">
+                    <span class="badge 
+                        {% if movement.movement_type == 'entry' %}badge-light-success
+                        {% elif movement.movement_type == 'exit' %}badge-light-danger
+                        {% elif movement.movement_type == 'transfer' %}badge-light-primary
+                        {% elif movement.movement_type == 'adjustment' %}badge-light-warning
+                        {% else %}badge-light-primary{% endif %}">
+                        {{ movement.get_movement_type_display }}
+                    </span>
+                </td>
+                <td class="text-center font-bold">{{ movement.quantity }}</td>
+                <td>{{ movement.from_point_of_sale.name|default:"-" }}</td>
+                <td>{{ movement.to_point_of_sale.name|default:"-" }}</td>
+                <td class="text-muted">{{ movement.reference|default:"-" }}</td>
+                <td>{{ movement.user.username|default:"Système" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted" style="padding: 40px;">
+                    Aucun mouvement trouvé pour ces critères.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,408 @@
+{% extends 'inventory/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nouveau Mouvement - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center min-vh-100 fade-in py-5" style="background: #ffffff;">
+    <div class="container" style="max-width: 950px;">
+        
+        <!-- HEADER -->
+        <div class="text-center mb-5 mb-md-12">
+            <h1 class="gradient-text fw-bold mb-3 fs-2 fs-md-1 text-uppercase" style="letter-spacing: 3px;">
+                Mouvement de Stock
+            </h1>
+            <div class="separator-gradient mx-auto mb-4"></div>
+            <p class="text-muted fs-6 fs-md-5 fw-light fst-italic px-3">
+                Enregistrez les entrées, sorties, ajustements et transferts de stock en temps réel.
+            </p>
+        </div>
+
+        <form method="post" novalidate class="form-minimalist px-2 px-md-5" id="movementForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger shadow-sm border-0 rounded-0 mb-5 mb-md-8 mx-3 mx-md-0" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="row g-4 g-md-5 mb-5">
+                <!-- ROW 1: Product & Movement Type -->
+                <div class="col-12 col-md-7">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.product.id_for_label }}" class="custom-label">Produit <span class="text-danger">*</span></label>
+                        {{ form.product }}
+                        <span class="focus-border"></span>
+                        {% if form.product.errors %}<div class="text-danger small mt-1">{{ form.product.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-5">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.movement_type.id_for_label }}" class="custom-label">Type de Mouvement <span class="text-danger">*</span></label>
+                        {{ form.movement_type }}
+                        <span class="focus-border"></span>
+                        {% if form.movement_type.errors %}<div class="text-danger small mt-1">{{ form.movement_type.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- ROW 2: Quantity -->
+                <div class="col-12 col-md-4">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.quantity.id_for_label }}" class="custom-label">Quantité <span class="text-danger">*</span></label>
+                        {{ form.quantity }}
+                        <span class="focus-border"></span>
+                        {% if form.quantity.errors %}<div class="text-danger small mt-1">{{ form.quantity.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- DIVIDER -->
+                <div class="col-12">
+                    <div class="section-divider my-3"></div>
+                    <p class="text-muted text-center small mb-0 fst-italic">Points de vente / Entrepôts</p>
+                </div>
+
+                <!-- ROW 3: Source & Destination -->
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.from_point_of_sale.id_for_label }}" class="custom-label">Point de vente (Origine)</label>
+                        {{ form.from_point_of_sale }}
+                        <span class="focus-border"></span>
+                        <div class="form-text mt-1 small text-muted">Origine du stock</div>
+                        {% if form.from_point_of_sale.errors %}<div class="text-danger small mt-1">{{ form.from_point_of_sale.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.to_point_of_sale.id_for_label }}" class="custom-label">Point de vente (Destination)</label>
+                        {{ form.to_point_of_sale }}
+                        <span class="focus-border"></span>
+                        <div class="form-text mt-1 small text-muted">Destination (pour transferts)</div>
+                        {% if form.to_point_of_sale.errors %}<div class="text-danger small mt-1">{{ form.to_point_of_sale.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <!-- DIVIDER -->
+                <div class="col-12">
+                    <div class="section-divider my-3"></div>
+                    <p class="text-muted text-center small mb-0 fst-italic">Informations complémentaires</p>
+                </div>
+
+                <!-- ROW 4: Reference & Notes -->
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.reference.id_for_label }}" class="custom-label">Référence</label>
+                        {{ form.reference }}
+                        <span class="focus-border"></span>
+                        {% if form.reference.errors %}<div class="text-danger small mt-1">{{ form.reference.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.notes.id_for_label }}" class="custom-label">Notes</label>
+                        {{ form.notes }}
+                        <span class="focus-border"></span>
+                        {% if form.notes.errors %}<div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex flex-column flex-md-row gap-3 gap-md-4 mt-5 mt-md-8 mb-5">
+                <button type="submit" class="btn btn-gradient text-white fw-bold px-5 py-3 py-md-4 text-uppercase shadow-lg hover-lift w-100 w-md-auto order-1 order-md-1">
+                    <i class="fas fa-check me-2"></i>Confirmer le mouvement
+                </button>
+                <a href="{% url 'inventory:movement_list' %}" class="btn btn-link text-decoration-none text-muted align-self-center text-uppercase fw-bold text-hover-primary letter-spacing-1 order-2 order-md-2 mt-2 mt-md-0">
+                    Annuler
+                </a>
+            </div>
+        </form>
+
+        <!-- INFO BOX - Glassmorphism Card -->
+        <div class="info-glass-card mt-5 mb-5">
+            <div class="card-header-gradient mb-4">
+                <h4 class="h6 fw-bold mb-0 d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2"></i> Impact sur le Stock
+                </h4>
+            </div>
+            <p class="mb-4 small text-muted fst-italic">
+                L'inventaire sera mis à jour en temps réel selon le type d'opération :
+            </p>
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="movement-type-card bg-success-subtle">
+                        <div class="icon-wrapper bg-success">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="content">
+                            <strong class="d-block">Entrée</strong>
+                            <small class="text-muted">Ajoute au stock</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="movement-type-card bg-danger-subtle">
+                        <div class="icon-wrapper bg-danger">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="content">
+                            <strong class="d-block">Sortie</strong>
+                            <small class="text-muted">Déduit du stock</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="movement-type-card bg-primary-subtle">
+                        <div class="icon-wrapper bg-primary">
+                            <i class="fas fa-equals"></i>
+                        </div>
+                        <div class="content">
+                            <strong class="d-block">Ajustement</strong>
+                            <small class="text-muted">Définit le niveau exact</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="movement-type-card bg-warning-subtle">
+                        <div class="icon-wrapper bg-warning">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="content">
+                            <strong class="d-block">Transfert</strong>
+                            <small class="text-muted">Déplace entre entrepôts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Gradient Text & Separator */
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple gradient */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .separator-gradient {
+        height: 4px;
+        width: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+    }
+
+    /* Section Divider */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e1e1e1, transparent);
+    }
+
+    /* Minimalist Inputs with Animated Underline */
+    .form-minimalist .form-control,
+    .form-minimalist .form-select {
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid #e1e1e1;
+        border-radius: 0;
+        padding: 12px 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-minimalist .form-control:focus,
+    .form-minimalist .form-select:focus {
+        border-bottom-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
+    
+    /* Textarea specific styling */
+    .form-minimalist textarea.form-control {
+        min-height: 80px;
+        resize: vertical;
+    }
+    
+    /* The animated bottom border */
+    .form-group .focus-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        transition: width 0.4s ease;
+    }
+    
+    .form-control:focus ~ .focus-border,
+    .form-select:focus ~ .focus-border {
+        width: 100%;
+    }
+
+    /* Labels */
+    .custom-label {
+        color: #7f8c8d;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Gradient Button */
+    .btn-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 2px; 
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4) !important;
+        color: white;
+    }
+    
+    .letter-spacing-1 { letter-spacing: 1px; }
+    
+    /* Glassmorphism Info Card */
+    .info-glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .info-glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(to right, #667eea, #764ba2);
+    }
+    
+    .card-header-gradient {
+        color: #2c3e50;
+    }
+    
+    /* Movement Type Cards */
+    .movement-type-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .movement-type-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .movement-type-card .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .movement-type-card .icon-wrapper i {
+        font-size: 1rem;
+    }
+    
+    .movement-type-card .content {
+        flex: 1;
+    }
+    
+    .movement-type-card strong {
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+    
+    .movement-type-card small {
+        font-size: 0.75rem;
+    }
+    
+    /* Fade In Animation */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .gradient-text {
+            font-size: 1.75rem !important;
+        }
+        
+        .info-glass-card {
+            padding: 1.5rem;
+        }
+        
+        .movement-type-card {
+            padding: 1rem;
+        }
+    }
+    
+    /* Hide scrollbar if needed */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for dropdowns
+        $('#id_product').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un produit',
+            allowClear: true
+        });
+        
+        $('#id_movement_type').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner le type',
+            allowClear: false,
+            minimumResultsForSearch: -1 // Hide search box
+        });
+        
+        $('#id_from_point_of_sale').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner l\'origine',
+            allowClear: true
+        });
+        
+        $('#id_to_point_of_sale').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner la destination',
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

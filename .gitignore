@@ -1,0 +1,124 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+__pycache__/
+*.pyc
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static
+
+# Environnement virtuel
+venv/
+vert/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Fichiers sensibles - NE JAMAIS COMMITER
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Base de données
+*.sqlite3
+*.db
+
+# Fichiers de migration (optionnel - décommenter si nécessaire)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Fichiers de couverture de tests
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Fichiers de build
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Fichiers système Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Dossier pour stocker les e-mails de test (généré en dev si EMAIL_FILE_BASED activé)
+sent_emails/
+
+# Scripts de debug et utilitaires temporaires
+PGStock/check_db_connection.py
+PGStock/check_db_info.py
+PGStock/clean_env.py
+PGStock/create_admin.py
+PGStock/debug_conversion.py
+PGStock/debug_reportlab.py
+PGStock/extract_db.py
+PGStock/extract_invoices.py
+PGStock/find_duplicates.py
+PGStock/list_data.py
+PGStock/reproduce_issue.py
+PGStock/simulate_fresh.py
+PGStock/simulate_q1.py
+PGStock/verify_search.py
+
+# Fichiers de logs, extractions et outputs temporaires
+PGStock/*_log.txt
+PGStock/*_output.txt
+PGStock/db_extraction*.txt
+PGStock/error_log*.txt
+PGStock/result_log*.txt
+PGStock/traceback_output*.txt
+PGStock/simulation*.txt
+
+# Backups de base de données
+PGStock/*.backup_*
+PGStock/db.sqlite3.backup*

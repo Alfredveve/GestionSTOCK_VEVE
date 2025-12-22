@@ -1,0 +1,358 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load permission_tags %}
+
+{% block title %}Finances & Paiements - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-6 gap-3">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <i class="fas fa-wallet text-primary fs-2"></i> Flux Financiers
+            </h1>
+            <p class="text-white opacity-75 fs-6 fw-bold mb-0">Supervision des encaissements, recouvrement et historique transactionnel</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-custom btn-white btn-active-light-success text-success fw-bold btn-sm" onclick="window.print()">
+                <i class="fas fa-print me-2"></i> Exporter Rapport
+            </button>
+        </div>
+    </div>
+
+    <!-- Executive Summary Stats -->
+    {% if user|can_view_finances %}
+    <div class="row g-4 mb-6">
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-flush shadow-sm h-100 py-2 border-top border-success border-4">
+                <div class="card-body d-flex align-items-center justify-content-between px-6">
+                    <div class="d-flex align-items-center mt-3">
+                         <div class="symbol symbol-50px symbol-circle me-3">
+                            <span class="symbol-label bg-light-success shadow-sm">
+                                <i class="fas fa-hand-holding-usd text-success fs-2hx"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-800 fw-boldest fs-1">{{ total_collected|format_currency:company_settings.currency }}</span>
+                            <span class="text-muted fw-bold fs-7 text-uppercase">Volume Total Encaissé</span>
+                        </div>
+                    </div>
+                    <div class="badge badge-light-success fw-boldest fs-8 px-3 py-2">LIQUIDITÉS</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-flush shadow-sm h-100 py-2 border-top border-warning border-4">
+                <div class="card-body d-flex align-items-center justify-content-between px-6">
+                    <div class="d-flex align-items-center mt-3">
+                         <div class="symbol symbol-50px symbol-circle me-3">
+                            <span class="symbol-label bg-light-warning shadow-sm">
+                                <i class="fas fa-file-invoice text-warning fs-2hx"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-800 fw-boldest fs-1 text-danger">{{ total_outstanding|format_currency:company_settings.currency }}</span>
+                            <span class="text-muted fw-bold fs-7 text-uppercase">Créances Clients (Reste à recouvrer)</span>
+                        </div>
+                    </div>
+                    <div class="badge badge-light-danger fw-boldest fs-8 px-3 py-2">RISQUE D'IMPAYÉS</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Central Management Card -->
+    <div class="card card-flush shadow-sm mt-5">
+        <div class="card-header border-0 pt-6">
+            <div class="card-toolbar w-100">
+                <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold w-100 justify-content-start" id="paymentTabs">
+                    <li class="nav-item">
+                        <a class="nav-link text-active-primary active py-4 me-10" data-bs-toggle="tab" href="#unpaid-tab">
+                            <i class="fas fa-clock text-warning me-2"></i> Recouvrement
+                            <span class="badge badge-circle badge-light-warning ms-2 fs-9">{{ unpaid_invoices|length }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-active-info py-4" data-bs-toggle="tab" href="#history-tab">
+                            <i class="fas fa-history text-info me-2"></i> Historique Transactions
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-body pt-0 px-8">
+            <div class="tab-content" id="paymentTabsContent">
+                <!-- Tab: UNPAID -->
+                <div class="tab-pane fade show active" id="unpaid-tab" role="tabpanel">
+                    {% if unpaid_invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle gs-0 gy-4 border-gray-200">
+                            <thead>
+                                <tr class="fw-bold text-muted bg-light">
+                                    <th class="ps-4 min-w-150px rounded-start">N° Facture</th>
+                                    <th class="min-w-150px">Débiteur / Client</th>
+                                    <th class="min-w-120px text-center">Échéance</th>
+                                    <th class="min-w-120px text-end">Montant Total</th>
+                                    <th class="min-w-120px text-end">Versé</th>
+                                    <th class="min-w-120px text-end">Balance Due</th>
+                                    <th class="min-w-100px text-center rounded-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in unpaid_invoices %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-file-invoice text-muted me-3"></i>
+                                            <a href="{% url 'inventory:invoice_detail' invoice.pk %}" class="text-dark fw-boldest text-hover-primary">{{ invoice.invoice_number }}</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-gray-900 fw-bold fs-6">{{ invoice.client.name }}</span>
+                                            <span class="text-muted fs-8 fw-semibold italic">{{ invoice.client.email|default:"- No email -" }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if invoice.is_overdue %}
+                                        <span class="badge badge-light-danger fw-bold px-3 py-1 animate_blink">
+                                            <i class="fas fa-exclamation-triangle text-danger me-1 fs-9"></i> {{ invoice.date_due|date:"d/m/Y" }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-gray-700 fw-bold fs-7">{{ invoice.date_due|date:"d/m/Y" }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end fw-boldest text-gray-800">{{ invoice.total_amount|format_currency:company_settings.currency }}</td>
+                                    <td class="text-end fw-bold text-success">{{ invoice.get_amount_paid|format_currency:company_settings.currency }}</td>
+                                    <td class="text-end">
+                                        <span class="text-danger fw-boldest fs-6">{{ invoice.get_balance|format_currency:company_settings.currency }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'inventory:payment_create' invoice.pk %}" class="btn btn-icon btn-sm btn-active-light-success shadow-sm" title="Procéder à l'encaissement">
+                                            <i class="fas fa-cash-register text-success fs-4"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-20">
+                        <div class="symbol symbol-100px symbol-circle mb-7">
+                            <div class="symbol-label bg-light-success">
+                                <i class="fas fa-check-double text-success fs-3x"></i>
+                            </div>
+                        </div>
+                        <h2 class="fw-bold text-gray-800">Situation financière saine</h2>
+                        <p class="text-muted fs-5 fw-semibold">Toutes les factures émises ont été intégralement recouvrées.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tab: HISTORY -->
+                <div class="tab-pane fade" id="history-tab" role="tabpanel">
+                    {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4">
+                            <thead>
+                                <tr class="fw-bold text-muted">
+                                    <th class="ps-4 min-w-120px">Date Transaction</th>
+                                    <th class="min-w-150px">Référence / Mode</th>
+                                    <th class="min-w-150px">Facture Cible</th>
+                                    <th class="min-w-150px">Débiteur (Client)</th>
+                                    <th class="min-w-150px text-end pe-4">Valeur Encaissée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex flex-column">
+                                            <span class="text-gray-800 fw-boldest fs-6">{{ payment.payment_date|date:"d/m/Y" }}</span>
+                                            <span class="text-muted fs-8 fw-bold">Opérateur: {{ payment.created_by.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge badge-light-primary fw-bold fs-9 text-uppercase px-3">{{ payment.get_payment_method_display }}</span>
+                                        </div>
+                                        <span class="text-muted fs-8 fw-semibold italic">{{ payment.reference|default:"Sans référence externe" }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'inventory:invoice_detail' payment.invoice.pk %}" class="text-dark fw-bold text-hover-primary d-flex align-items-center">
+                                            <i class="fas fa-link fs-8 me-2 opacity-50"></i>{{ payment.invoice.invoice_number }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="text-gray-700 fw-bold fs-7">{{ payment.invoice.client.name }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <span class="text-success fw-boldest fs-5 font-monospace">+ {{ payment.amount|format_currency:company_settings.currency }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if payments.has_other_pages %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 pb-4 border-top pt-4">
+                        <!-- Results Info -->
+                        <div class="d-flex align-items-center text-gray-600 fw-semibold fs-6">
+                            <div class="badge badge-light-primary fw-bold me-2 fs-7 p-2">
+                                {{ payments.start_index }} - {{ payments.end_index }}
+                            </div>
+                            <span>sur <span class="text-gray-900 fw-bold mx-1">{{ payments.paginator.count }}</span> résultats</span>
+                        </div>
+
+                        <!-- Modern Pagination Controls -->
+                        <nav aria-label="Navigation des pages" class="d-flex justify-content-end">
+                            <ul class="pagination pagination-modern mb-0 gap-1">
+                                <!-- Previous -->
+                                {% if payments.has_previous %}
+                                <li class="page-item">
+                                    <a href="?page={{ payments.previous_page_number }}" class="page-link shadow-sm text-dark fw-bold">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-left"></i></span>
+                                </li>
+                                {% endif %}
+
+                                <!-- Page Numbers logic -->
+                                {% for i in payments.paginator.page_range %}
+                                    {% if payments.paginator.num_pages <= 7 %}
+                                        <li class="page-item {% if payments.number == i %}active{% endif %}">
+                                            <a href="?page={{ i }}" class="page-link shadow-sm {% if payments.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                                {{ i }}
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        {% if i == 1 or i == payments.paginator.num_pages %}
+                                            <li class="page-item {% if payments.number == i %}active{% endif %}">
+                                                <a href="?page={{ i }}" class="page-link shadow-sm {% if payments.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                                    {{ i }}
+                                                </a>
+                                            </li>
+                                        {% elif i >= payments.number|add:'-2' and i <= payments.number|add:'2' %}
+                                            <li class="page-item {% if payments.number == i %}active{% endif %}">
+                                                <a href="?page={{ i }}" class="page-link shadow-sm {% if payments.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                                    {{ i }}
+                                                </a>
+                                            </li>
+                                        {% elif i == payments.number|add:'-3' or i == payments.number|add:'3' %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link shadow-sm text-muted border-0 bg-transparent">...</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <!-- Next -->
+                                {% if payments.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ payments.next_page_number }}" class="page-link shadow-sm text-dark fw-bold">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-right"></i></span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-20">
+                        <i class="fas fa-search text-gray-300 fs-4x mb-5"></i>
+                        <p class="text-muted fw-bold fs-6">Aucune archive transactionnelle trouvée dans la base.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+
+    .fw-boldest {
+        font-weight: 800;
+    }
+
+    .animate_blink {
+        animation: blinker 2s linear infinite;
+    }
+
+    @keyframes blinker {
+        50% { opacity: 0.5; }
+    }
+
+    .nav-line-tabs .nav-item .nav-link.active {
+        color: #009EF7 !important;
+        border-bottom: 3px solid #009EF7 !important;
+    }
+    
+    .nav-line-tabs .nav-item .nav-link {
+        color: #7E8299;
+    }
+
+    .nav-line-tabs .nav-item .nav-link:hover {
+        color: #009EF7;
+    }
+
+    /* Modern Pagination */
+    .pagination-modern .page-link {
+        border-radius: 0.5rem;
+        margin: 0 2px;
+        border: none;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: white;
+    }
+
+    .pagination-modern .page-item:not(.active) .page-link:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        color: #009EF7 !important;
+    }
+    
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.35) !important;
+        transform: scale(1.05);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

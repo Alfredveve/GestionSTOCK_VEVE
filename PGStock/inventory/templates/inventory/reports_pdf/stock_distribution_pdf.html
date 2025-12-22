@@ -1,0 +1,33 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_extras %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30%;">Magasin / Point de Vente</th>
+                <th style="width: 15%;">Code</th>
+                <th class="text-center" style="width: 15%;">Produits</th>
+                <th class="text-center" style="width: 15%;">Quantité Totale</th>
+                <th class="text-right" style="width: 25%;">Valeur Totale</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in stock_by_pos %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td class="font-bold">{{ item.point_of_sale_name }}</td>
+                <td><span class="badge badge-light-primary">{{ item.point_of_sale_code|default:"-" }}</span></td>
+                <td class="text-center">{{ item.total_products }}</td>
+                <td class="text-center font-bold">{{ item.total_quantity }}</td>
+                <td class="text-right text-success font-bold">
+                    {{ item.total_value|format_currency:company_settings.currency }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted" style="padding: 40px;">Aucune répartition de stock trouvée.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

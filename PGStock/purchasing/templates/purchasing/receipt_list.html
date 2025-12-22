@@ -1,0 +1,95 @@
+{% extends 'inventory/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Bons de Réception" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{% trans "Réceptions Fournisseurs" %}</h1>
+        <a href="{% url 'purchasing:receipt_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {% trans "Nouvelle Réception" %}
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Numéro" %}</th>
+                            <th>{% trans "Fournisseur" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th>{% trans "Référence" %}</th>
+                            <th>{% trans "Statut" %}</th>
+                            <th>{% trans "Total" %}</th>
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for receipt in receipts %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'purchasing:receipt_detail' receipt.pk %}" class="fw-bold text-decoration-none">
+                                    {{ receipt.receipt_number }}
+                                </a>
+                            </td>
+                            <td>{{ receipt.supplier.name }}</td>
+                            <td>{{ receipt.date_received|date:"d/m/Y" }}</td>
+                            <td>{{ receipt.supplier_reference }}</td>
+                            <td>
+                                {% if receipt.status == 'validated' %}
+                                    <span class="badge bg-success">{% trans "Validé" %}</span>
+                                {% elif receipt.status == 'received' %}
+                                    <span class="badge bg-info">{% trans "Reçu" %}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{% trans "Brouillon" %}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold">{{ receipt.total_amount }}</td>
+                            <td>
+                                <a href="{% url 'purchasing:receipt_detail' receipt.pk %}" class="btn btn-sm btn-info text-white">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <p class="text-muted mb-0">{% trans "Aucun bon de réception trouvé." %}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Précédent" %}</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            {% trans "Page" %} {{ page_obj.number }} {% trans "sur" %} {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Suivant" %}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

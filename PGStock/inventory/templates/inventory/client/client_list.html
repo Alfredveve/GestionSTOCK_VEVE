@@ -1,0 +1,333 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}Clients - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-primary rounded-circle">
+                        <i class="fas fa-users fs-5"></i>
+                    </span>
+                </span>
+                Clients
+            </h1>
+            <span class="text-white opacity-75 fs-6 fw-bold">Gérez votre base de clients partenaires</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+            {% if user.is_authenticated %}
+            <a href="{% url 'inventory:client_create' %}" class="btn btn-primary fw-bold btn-sm">
+                <i class="fas fa-plus me-2"></i> Nouveau Client
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card card-flush shadow-sm">
+        <!-- Card Header: Title & Search Bar -->
+        <div class="card-header border-0 pt-6 flex-wrap">
+            <div class="card-title">
+                <h3 class="fw-bold text-gray-800">Répertoire des clients</h3>
+            </div>
+            <div class="card-toolbar">
+                <form method="get" id="filter-form" class="d-flex align-items-center gap-2 flex-wrap">
+                    <!-- Search Input -->
+                    <div class="position-relative search-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-search fs-6 text-muted"></i>
+                        </span>
+                        <input type="text" 
+                               name="q" 
+                               class="form-control form-control-sm modern-input pe-4" 
+                               placeholder="Rechercher par nom, email, téléphone..."
+                               value="{{ query|default:'' }}" 
+                               autocomplete="off" />
+                    </div>
+
+                    <!-- Filter Button -->
+                    <button type="submit" class="btn btn-primary btn-sm modern-btn-filter px-6">
+                        <i class="fas fa-search me-1"></i> Rechercher
+                    </button>
+
+                    {% if query %}
+                    <a href="{% url 'inventory:client_list' %}" 
+                       class="btn btn-light-danger btn-sm modern-btn-reset px-4"
+                       title="Réinitialiser">
+                        <i class="fas fa-times fs-6"></i>
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <div class="card-body py-4">
+            {% if clients %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle gs-0 gy-4">
+                    <thead>
+                        <tr class="fw-bold text-muted bg-light">
+                            <th class="ps-4 min-w-200px rounded-start">Client</th>
+                            <th class="min-w-150px">Contact</th>
+                            <th class="min-w-200px">Coordonnées</th>
+                            <th class="min-w-125px">Ville</th>
+                            <th class="min-w-100px text-center rounded-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="symbol symbol-40px me-3">
+                                        <div class="symbol-label bg-light-primary text-primary fw-bold">
+                                            {{ client.name|slice:":1"|upper }}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <a href="{% url 'inventory:client_detail' client.pk %}" class="text-dark fw-bold text-hover-primary fs-6">{{ client.name }}</a>
+                                        <span class="text-muted fw-semibold fs-7 small">ID: #{{ client.pk }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if client.contact_person %}
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-circle text-gray-400 me-2"></i>
+                                    <span class="text-gray-800 fw-bold fs-7">{{ client.contact_person }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted fs-7 italic">Non spécifié</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    {% if client.email %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-envelope text-primary me-2 fs-7" style="width: 15px;"></i>
+                                        <a href="mailto:{{ client.email }}" class="text-primary text-hover-dark fs-7">{{ client.email }}</a>
+                                    </div>
+                                    {% endif %}
+                                    {% if client.phone %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-phone text-success me-2 fs-7" style="width: 15px;"></i>
+                                        <span class="text-gray-600 fs-7">{{ client.phone }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if not client.email and not client.phone %}
+                                    <span class="text-muted fs-7">Aucun contact</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if client.city %}
+                                <span class="badge badge-light-primary fw-bold">{{ client.city }}</span>
+                                {% else %}
+                                <span class="text-muted fs-7">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a href="{% url 'inventory:client_detail' client.pk %}" 
+                                       class="btn btn-icon btn-sm btn-active-light-primary" 
+                                       title="Détails">
+                                        <i class="fas fa-eye text-primary fs-5"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:client_update' client.pk %}" 
+                                       class="btn btn-icon btn-sm btn-active-light-warning" 
+                                       title="Modifier">
+                                        <i class="fas fa-pencil-alt text-warning fs-5"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:client_delete' client.pk %}" 
+                                       class="btn btn-icon btn-sm btn-active-light-danger" 
+                                       title="Supprimer">
+                                        <i class="fas fa-trash-alt text-danger fs-5"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if clients.has_other_pages %}
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4">
+                <!-- Results Info -->
+                <div class="d-flex align-items-center text-gray-600 fw-semibold fs-6">
+                    <div class="badge badge-light-primary fw-bold me-2 fs-7 p-2">
+                        {{ clients.start_index }} - {{ clients.end_index }}
+                    </div>
+                    <span>sur <span class="text-gray-900 fw-bold mx-1">{{ clients.paginator.count }}</span> résultats</span>
+                </div>
+
+                <!-- Modern Pagination Controls -->
+                <nav aria-label="Navigation des pages" class="d-flex justify-content-end">
+                    <ul class="pagination pagination-modern mb-0 gap-1">
+                        <!-- Previous -->
+                        {% if clients.has_previous %}
+                        <li class="page-item">
+                            <a href="?page={{ clients.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-left"></i></span>
+                        </li>
+                        {% endif %}
+
+                        <!-- Page Numbers logic -->
+                        {% for i in clients.paginator.page_range %}
+                            {% if clients.paginator.num_pages <= 7 %}
+                                <li class="page-item {% if clients.number == i %}active{% endif %}">
+                                    <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}" class="page-link shadow-sm {% if clients.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                        {{ i }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                {% if i == 1 or i == clients.paginator.num_pages %}
+                                    <li class="page-item {% if clients.number == i %}active{% endif %}">
+                                        <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}" class="page-link shadow-sm {% if clients.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                            {{ i }}
+                                        </a>
+                                    </li>
+                                {% elif i >= clients.number|add:'-2' and i <= clients.number|add:'2' %}
+                                    <li class="page-item {% if clients.number == i %}active{% endif %}">
+                                        <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}" class="page-link shadow-sm {% if clients.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                            {{ i }}
+                                        </a>
+                                    </li>
+                                {% elif i == clients.number|add:'-3' or i == clients.number|add:'3' %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link shadow-sm text-muted border-0 bg-transparent">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Next -->
+                        {% if clients.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ clients.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-right"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-10">
+                <div class="mb-5">
+                    <span class="symbol symbol-75px">
+                        <span class="symbol-label bg-light-primary text-primary">
+                            <i class="fas fa-users fs-1"></i>
+                        </span>
+                    </span>
+                </div>
+                <h3 class="fw-bold fs-2 text-gray-800 mb-2">Aucun client trouvé</h3>
+                <p class="text-muted fs-6 mb-5">Commencez par ajouter votre premier client partenaire.</p>
+                <a href="{% url 'inventory:client_create' %}" class="btn btn-primary fw-bold">
+                    <i class="fas fa-plus me-2"></i> Ajouter un client
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ========== MODERN FILTER STYLES ========== */
+    .search-field {
+        min-width: 300px;
+    }
+
+    .modern-input {
+        padding-left: 2.5rem; 
+        border-radius: 0.475rem; 
+        border: 1px solid #E4E6EF; 
+        background-color: #F9F9F9;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        background-color: #fff;
+        border-color: #009ef7;
+        box-shadow: 0 0 0 3px rgba(0, 158, 247, 0.1);
+    }
+
+    .modern-btn-filter {
+        border-radius: 0.475rem;
+    }
+    
+    .modern-btn-reset {
+        border-radius: 0.475rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .search-field {
+            min-width: 100%;
+        }
+
+        .modern-btn-filter,
+        .modern-btn-reset {
+            width: 100%;
+        }
+    }
+    
+    /* Modern Pagination Styles */
+    .pagination-modern .page-link {
+        border-radius: 0.5rem;
+        margin: 0 2px;
+        border: none;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: white;
+    }
+
+    .pagination-modern .page-item:not(.active) .page-link:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        color: #009EF7 !important;
+    }
+    
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.35) !important;
+        transform: scale(1.05);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F5F8FA;
+    }
+</style>
+{% endblock %}

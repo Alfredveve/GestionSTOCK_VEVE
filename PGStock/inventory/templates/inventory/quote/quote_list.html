@@ -1,0 +1,250 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}Devis - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-body-emphasis d-flex align-items-center gap-2">
+                <i class="fas fa-file-invoice text-primary"></i> Devis
+            </h1>
+            <p class="text-secondary mt-1 mb-0">Gérez vos devis clients</p>
+        </div>
+        <a href="{% url 'inventory:quote_create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="fas fa-plus"></i> Nouveau Devis
+        </a>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-end-0">
+                            <i class="fas fa-search text-secondary"></i>
+                        </span>
+                        <input type="text" name="q" value="{{ query|default:'' }}"
+                            class="form-control border-start-0 ps-0" placeholder="Rechercher un devis...">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <select name="status" class="form-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Brouillon</option>
+                        <option value="sent" {% if status_filter == 'sent' %}selected{% endif %}>Envoyé</option>
+                        <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepté</option>
+                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejeté</option>
+                        <option value="converted" {% if status_filter == 'converted' %}selected{% endif %}>Converti
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        Filtrer
+                    </button>
+                    {% if query or status_filter %}
+                    <a href="{% url 'inventory:quote_list' %}" class="btn btn-outline-secondary" title="Effacer">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quotes Table -->
+    {% if quotes %}
+    <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Numéro</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Validité</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Total</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quote in quotes %}
+                    <tr>
+                        <td class="fw-bold">{{ quote.quote_number }}</td>
+                        <td>{{ quote.client.name }}</td>
+                        <td>{{ quote.date_issued|date:'d/m/Y' }}</td>
+                        <td>{{ quote.valid_until|date:'d/m/Y' }}</td>
+                        <td>
+                            {% if quote.status == 'accepted' %}
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Accepté</span>
+                            {% elif quote.status == 'converted' %}
+                            <span
+                                class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">Converti</span>
+                            {% elif quote.status == 'sent' %}
+                            <span
+                                class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">Envoyé</span>
+                            {% elif quote.status == 'rejected' %}
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Rejeté</span>
+                            {% else %}
+                            <span
+                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Brouillon</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ quote.total_amount|format_currency:company_settings.currency }}</td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'inventory:quote_detail' quote.pk %}" class="btn btn-icon btn-light-primary btn-sm"
+                                    title="Voir">
+                                    <i class="fas fa-eye fs-5"></i>
+                                </a>
+                                {% if quote.status != 'converted' %}
+                                <a href="{% url 'inventory:quote_update' quote.pk %}" class="btn btn-icon btn-light-warning btn-sm"
+                                    title="Modifier">
+                                    <i class="fas fa-pencil-alt fs-5"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'inventory:quote_delete' quote.pk %}" class="btn btn-icon btn-light-danger btn-sm"
+                                    title="Supprimer" onclick="return confirm('Supprimer ce devis?')">
+                                    <i class="fas fa-trash-alt fs-5"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if quotes.has_other_pages %}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 pb-4">
+        <!-- Results Info -->
+        <div class="d-flex align-items-center text-gray-600 fw-semibold fs-6">
+            <div class="badge badge-light-primary fw-bold me-2 fs-7 p-2">
+                {{ quotes.start_index }} - {{ quotes.end_index }}
+            </div>
+            <span>sur <span class="text-gray-900 fw-bold mx-1">{{ quotes.paginator.count }}</span> résultats</span>
+        </div>
+
+        <!-- Modern Pagination Controls -->
+        <nav aria-label="Navigation des pages" class="d-flex justify-content-end">
+            <ul class="pagination pagination-modern mb-0 gap-1">
+                <!-- Previous -->
+                {% if quotes.has_previous %}
+                <li class="page-item">
+                    <a href="?page={{ quotes.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                <!-- Page Numbers logic -->
+                {% for i in quotes.paginator.page_range %}
+                    {% if quotes.paginator.num_pages <= 7 %}
+                        <li class="page-item {% if quotes.number == i %}active{% endif %}">
+                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-link shadow-sm {% if quotes.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                {{ i }}
+                            </a>
+                        </li>
+                    {% else %}
+                        {% if i == 1 or i == quotes.paginator.num_pages %}
+                            <li class="page-item {% if quotes.number == i %}active{% endif %}">
+                                <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-link shadow-sm {% if quotes.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                        {% elif i >= quotes.number|add:'-2' and i <= quotes.number|add:'2' %}
+                            <li class="page-item {% if quotes.number == i %}active{% endif %}">
+                                <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-link shadow-sm {% if quotes.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                        {% elif i == quotes.number|add:'-3' or i == quotes.number|add:'3' %}
+                            <li class="page-item disabled">
+                                <span class="page-link shadow-sm text-muted border-0 bg-transparent">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next -->
+                {% if quotes.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ quotes.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    <style>
+        /* Modern Pagination */
+        .pagination-modern .page-link {
+            border-radius: 0.5rem;
+            margin: 0 2px;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: white;
+        }
+
+        .pagination-modern .page-item:not(.active) .page-link:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+            color: #009EF7 !important;
+        }
+        
+        .pagination-modern .page-item.active .page-link {
+            background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0, 158, 247, 0.35) !important;
+            transform: scale(1.05);
+        }
+
+        .pagination-modern .page-item.disabled .page-link {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-3">
+            <i class="fas fa-file-alt fa-3x text-body-tertiary"></i>
+        </div>
+        <h3 class="h5 text-body-secondary">Aucun devis trouvé</h3>
+        <p class="text-body-tertiary mb-4">Commencez par créer votre premier devis.</p>
+        <a href="{% url 'inventory:quote_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Créer un devis
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

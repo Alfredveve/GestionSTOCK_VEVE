@@ -1,0 +1,35 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_extras %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Date</th>
+                <th style="width: 25%;">Produit</th>
+                <th class="text-right" style="width: 10%;">Quantité</th>
+                <th style="width: 15%;">Point de Vente</th>
+                <th style="width: 10%;">Référence</th>
+                <th style="width: 25%;">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in returned_products %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+                <td class="font-bold">{{ item.product.name }}</td>
+                <td class="text-right">
+                    <span class="badge badge-light-primary">{{ item.quantity }}</span>
+                </td>
+                <td>{{ item.from_point_of_sale.name }}</td>
+                <td class="text-muted">{{ item.reference|default:"-" }}</td>
+                <td class="text-muted">{{ item.notes|default:"-"|truncatechars:50 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted" style="padding: 40px;">Aucun produit retourné trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

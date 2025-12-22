@@ -1,0 +1,214 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}{{ client.name }} - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div class="d-flex align-items-center">
+            <div class="symbol symbol-60px me-4">
+                <div class="symbol-label bg-white text-primary fs-2 fw-bold shadow-sm">
+                    {{ client.name|slice:":1"|upper }}
+                </div>
+            </div>
+            <div>
+                <h1 class="text-white fw-bold mb-1">{{ client.name }}</h1>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-light-primary fw-bold">{{ client.get_client_type_display }}</span>
+                    <span class="text-white opacity-75 fs-7">Client depuis le {{ client.created_at|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventory:client_update' client.pk %}" class="btn btn-custom btn-white btn-active-light-warning text-warning fw-bold btn-sm">
+                <i class="fas fa-edit me-2"></i> Modifier
+            </a>
+            <a href="{% url 'inventory:client_list' %}" class="btn btn-custom btn-white btn-active-light-primary text-primary fw-bold btn-sm">
+                <i class="fas fa-arrow-left me-2"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Client Info Card -->
+        <div class="col-xl-4">
+            <div class="card card-flush shadow-sm h-100">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h3 class="fw-bold text-gray-800">Informations Générales</h3>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="d-flex flex-column gap-5">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-info text-info"><i class="fas fa-user"></i></span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="text-muted fw-bold fs-8">Contact Principal</span>
+                                <span class="text-gray-800 fw-bold fs-7">{{ client.contact_person|default:"Non renseigné" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-primary text-primary"><i class="fas fa-envelope"></i></span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="text-muted fw-bold fs-8">Email</span>
+                                {% if client.email %}
+                                <a href="mailto:{{ client.email }}" class="text-primary fw-bold fs-7 text-hover-dark">{{ client.email }}</a>
+                                {% else %}
+                                <span class="text-gray-400 fs-7 italic">Aucun email</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-success text-success"><i class="fas fa-phone"></i></span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="text-muted fw-bold fs-8">Téléphone</span>
+                                {% if client.phone %}
+                                <span class="text-gray-800 fw-bold fs-7">{{ client.phone }}</span>
+                                {% else %}
+                                <span class="text-gray-400 fs-7 italic">Aucun téléphone</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-danger text-danger"><i class="fas fa-map-marker-alt"></i></span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="text-muted fw-bold fs-8">Adresse</span>
+                                <span class="text-gray-800 fw-bold fs-7">{{ client.address|default:"-" }}</span>
+                                <span class="text-gray-600 fs-7 fw-semibold">{{ client.city|default:"" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-warning text-warning"><i class="fas fa-file-invoice"></i></span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="text-muted fw-bold fs-8">Identifiant Fiscal (NIF)</span>
+                                <span class="text-dark fw-bold fs-7">{{ client.tax_id|default:"Non spécifié" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Card -->
+        <div class="col-xl-8">
+            <div class="card card-flush shadow-sm h-100">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h3 class="fw-bold text-gray-800">Notes & Observations</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="p-6 bg-light rounded text-gray-700 fs-6 min-h-150px">
+                        {{ client.notes|default:"Aucune note enregistrée pour ce client."|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Invoices Table Card -->
+    <div class="card card-flush shadow-sm">
+        <div class="card-header border-0 pt-6">
+            <div class="card-title">
+                <h3 class="fw-bold text-gray-800">Historique des Factures</h3>
+            </div>
+        </div>
+        <div class="card-body py-4">
+            {% if invoices %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle gs-0 gy-4">
+                    <thead>
+                        <tr class="fw-bold text-muted bg-light">
+                            <th class="ps-4 min-w-150px rounded-start">N° Facture</th>
+                            <th class="min-w-150px">Date d'émission</th>
+                            <th class="min-w-150px">État du paiement</th>
+                            <th class="min-w-150px text-end">Montant Total</th>
+                            <th class="min-w-100px text-center rounded-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">
+                                <a href="{% url 'inventory:invoice_detail' invoice.pk %}" class="text-primary text-hover-dark">{{ invoice.invoice_number }}</a>
+                            </td>
+                            <td class="text-muted fs-7">
+                                {{ invoice.date_issued|date:"d M Y" }}
+                            </td>
+                            <td>
+                                {% if invoice.status == 'PAID' %}
+                                <span class="badge badge-light-success fw-bold">Payée</span>
+                                {% elif invoice.status == 'OVERDUE' %}
+                                <span class="badge badge-light-danger fw-bold">En Retard</span>
+                                {% else %}
+                                <span class="badge badge-light-warning fw-bold">En Attente</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold text-dark fs-6">
+                                {{ invoice.total_amount|format_currency:company_settings.currency }}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'inventory:invoice_detail' invoice.pk %}" class="btn btn-icon btn-sm btn-active-light-primary" title="Voir la facture">
+                                    <i class="fas fa-eye text-primary fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <div class="mb-5">
+                    <span class="symbol symbol-75px">
+                        <span class="symbol-label bg-light-primary text-primary">
+                            <i class="fas fa-file-invoice-dollar fs-1"></i>
+                        </span>
+                    </span>
+                </div>
+                <h3 class="fw-bold fs-4 text-gray-500">Aucune facturation trouvée</h3>
+                <p class="text-muted fs-7 mb-0">Ce client n'a pas encore de factures enregistrées.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+
+    .table tbody tr:hover {
+        background-color: #F5F8FA;
+    }
+    
+    .min-h-150px {
+        min-height: 150px;
+    }
+</style>
+{% endblock %}

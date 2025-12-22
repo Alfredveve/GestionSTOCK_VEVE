@@ -1,0 +1,442 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Authentification - GestionSTOCK{% endblock %}
+
+{% block content_wrapper %}
+<div class="auth-wrapper d-flex flex-column min-vh-100 position-relative justify-content-center align-items-center">
+    
+    <!-- Animated Background -->
+    <div class="auth-background"></div>
+    
+    <!-- Animated Particles -->
+    <div class="auth-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Centered Content -->
+    <div class="position-relative z-3 w-100 p-4 auth-content" style="max-width: 550px;">
+        
+        <!-- Logo -->
+        <a href="{% url 'inventory:dashboard' %}" class="d-block text-decoration-none text-center mb-5 auth-logo">
+            <div class="logo-container">
+                <i class="fas fa-box-open logo-icon"></i>
+                <h1 class="text-white fw-bold fs-1 mb-0 mt-2">GestionSTOCK</h1>
+                <p class="text-white opacity-75 fs-6 mb-0">Gestion intelligente de stock</p>
+            </div>
+        </a>
+
+        <!-- Card Wrapper -->
+        <div class="auth-card shadow-lg border-0">
+            <div class="card-body p-4 p-md-5">
+                
+                <!-- Messages -->
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="alert alert-modern alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-center">
+                                    {% if message.tags == 'success' %}
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    {% elif message.tags == 'warning' %}
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    {% endif %}
+                                    <div>{{ message }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Auth Content -->
+                {% block content_auth %}{% endblock %}
+                
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="d-flex justify-content-center mt-5 auth-footer">
+            <a href="#" class="text-white text-decoration-none px-3 small">À propos</a>
+            <span class="text-white opacity-50">•</span>
+            <a href="#" class="text-white text-decoration-none px-3 small">Contact</a>
+            <span class="text-white opacity-50">•</span>
+            <a href="#" class="text-white text-decoration-none px-3 small">Support</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Auth Wrapper */
+    .auth-wrapper {
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+    }
+
+    /* Animated Background */
+    .auth-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        z-index: 1;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Animated Particles */
+    .auth-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 20s infinite;
+    }
+
+    .particle:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        left: 10%;
+        animation-delay: 0s;
+        animation-duration: 20s;
+    }
+
+    .particle:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        left: 20%;
+        animation-delay: 2s;
+        animation-duration: 18s;
+    }
+
+    .particle:nth-child(3) {
+        width: 100px;
+        height: 100px;
+        left: 35%;
+        animation-delay: 4s;
+        animation-duration: 22s;
+    }
+
+    .particle:nth-child(4) {
+        width: 50px;
+        height: 50px;
+        left: 50%;
+        animation-delay: 0s;
+        animation-duration: 16s;
+    }
+
+    .particle:nth-child(5) {
+        width: 70px;
+        height: 70px;
+        left: 65%;
+        animation-delay: 3s;
+        animation-duration: 19s;
+    }
+
+    .particle:nth-child(6) {
+        width: 90px;
+        height: 90px;
+        left: 75%;
+        animation-delay: 5s;
+        animation-duration: 21s;
+    }
+
+    .particle:nth-child(7) {
+        width: 40px;
+        height: 40px;
+        left: 85%;
+        animation-delay: 1s;
+        animation-duration: 17s;
+    }
+
+    .particle:nth-child(8) {
+        width: 65px;
+        height: 65px;
+        left: 90%;
+        animation-delay: 6s;
+        animation-duration: 20s;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.3;
+        }
+        90% {
+            opacity: 0.3;
+        }
+        100% {
+            transform: translateY(-100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    /* Auth Content */
+    .auth-content {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Logo */
+    .auth-logo {
+        transition: transform 0.3s ease;
+    }
+
+    .auth-logo:hover {
+        transform: scale(1.05);
+    }
+
+    .logo-container {
+        animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .logo-icon {
+        font-size: 3rem;
+        color: white;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Glassmorphism Card */
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: cardSlideIn 0.6s ease-out 0.2s both;
+    }
+
+    @keyframes cardSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Modern Alerts */
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.25rem;
+        font-weight: 500;
+    }
+
+    .alert-modern.alert-success {
+        background: linear-gradient(135deg, rgba(80, 205, 137, 0.15) 0%, rgba(80, 205, 137, 0.1) 100%);
+        color: #50CD89;
+        border-left: 4px solid #50CD89;
+    }
+
+    .alert-modern.alert-danger,
+    .alert-modern.alert-error {
+        background: linear-gradient(135deg, rgba(241, 65, 108, 0.15) 0%, rgba(241, 65, 108, 0.1) 100%);
+        color: #F1416C;
+        border-left: 4px solid #F1416C;
+    }
+
+    .alert-modern.alert-warning {
+        background: linear-gradient(135deg, rgba(255, 199, 0, 0.15) 0%, rgba(255, 199, 0, 0.1) 100%);
+        color: #FFA800;
+        border-left: 4px solid #FFC700;
+    }
+
+    .alert-modern.alert-info {
+        background: linear-gradient(135deg, rgba(0, 158, 247, 0.15) 0%, rgba(0, 158, 247, 0.1) 100%);
+        color: #009EF7;
+        border-left: 4px solid #009EF7;
+    }
+
+    /* Modern Form Inputs */
+    .form-modern {
+        border-radius: 12px;
+        border: 2px solid #E4E6EF;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        transition: all 0.3s ease;
+        background: #F9F9F9;
+        font-size: 0.95rem;
+    }
+
+    .form-modern:focus {
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        transform: translateY(-1px);
+        outline: none;
+    }
+
+    .form-modern.is-invalid {
+        border-color: #F1416C;
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    /* Input Group with Icon */
+    .input-group-modern {
+        position: relative;
+    }
+
+    .input-group-modern .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7E8299;
+        font-size: 1.1rem;
+        z-index: 10;
+        transition: color 0.3s ease;
+    }
+
+    .input-group-modern .form-modern:focus ~ .input-icon {
+        color: #667eea;
+    }
+
+    /* Gradient Buttons */
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-gradient-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-gradient-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-gradient-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-gradient-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-gradient-success {
+        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-gradient-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 176, 155, 0.4);
+        color: white;
+    }
+
+    /* Footer Links */
+    .auth-footer a {
+        transition: all 0.3s ease;
+        opacity: 0.75;
+    }
+
+    .auth-footer a:hover {
+        opacity: 1;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .auth-card {
+            border-radius: 20px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+
+        .particle {
+            display: none;
+        }
+    }
+
+    /* Loading Spinner */
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}{% endblock %}

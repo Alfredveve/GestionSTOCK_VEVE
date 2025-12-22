@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Caisse - {{ invoice.invoice_number }}</title>
+    <style>
+        @page {
+            margin: 0;
+            size: 80mm auto; /* Largeur Epson TM-T20III */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            line-height: 1.3;
+            margin: 0;
+            padding: 8px 4px;
+            width: 80mm;
+            color: #000;
+            background: #fff;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed #000;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            margin: 1px 0;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+        
+        .info {
+            margin-bottom: 8px;
+            font-size: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed #000;
+        }
+        
+        .info p {
+            margin: 2px 0;
+            line-height: 1.3;
+        }
+        
+        .separator {
+            border-top: 1px dashed #000;
+            margin: 6px 0;
+        }
+        
+        .items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+        
+        .items th {
+            text-align: left;
+            border-bottom: 1px solid #000;
+            font-size: 9px;
+            padding: 3px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .items td {
+            padding: 3px 0;
+            vertical-align: top;
+            border-bottom: 1px dotted #ccc;
+        }
+        
+        .items tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .items .qty {
+            width: 12%;
+            text-align: center;
+        }
+        
+        .items .desc {
+            width: 58%;
+            padding-right: 4px;
+        }
+        
+        .items .price {
+            width: 30%;
+            text-align: right;
+        }
+        
+        .totals {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid #000;
+            font-size: 11px;
+        }
+        
+        .totals p {
+            margin: 3px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .totals .label {
+            text-align: left;
+        }
+        
+        .totals .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .totals .grand-total {
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #000;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 9px;
+            padding-top: 6px;
+            border-top: 1px dashed #000;
+            line-height: 1.4;
+        }
+        
+        .footer p {
+            margin: 2px 0;
+        }
+        
+        /* Bouton d'impression */
+        .btn-print {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        
+        .btn-print:hover {
+            background: #333;
+        }
+        
+        /* Masquer le bouton lors de l'impression */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                padding: 4px 2px;
+            }
+            
+            /* Force le noir et blanc */
+            * {
+                color: #000 !important;
+                background: #fff !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button onclick="window.print()" class="no-print btn-print">IMPRIMER</button>
+
+    <div class="header">
+        <h1>{{ settings.company_name|default:"MON MAGASIN" }}</h1>
+        {% if invoice.point_of_sale %}
+        <p>{{ invoice.point_of_sale.name }}</p>
+        <p>{{ invoice.point_of_sale.address }}</p>
+        <p>Tel: {{ invoice.point_of_sale.phone }}</p>
+        {% endif %}
+    </div>
+
+    <div class="info">
+        <p>Ticket #: {{ invoice.invoice_number }}</p>
+        <p>Date: {{ invoice.date_issued|date:"d/m/Y" }}</p>
+        {% if invoice.created_at %}
+        <p>Heure: {{ invoice.created_at|date:"H:i" }}</p>
+        {% endif %}
+        <p>Client: {{ invoice.client.name }}</p>
+        <p>Caissier: {{ invoice.created_by.username }}</p>
+    </div>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th class="qty">Qté</th>
+                <th class="desc">Article</th>
+                <th class="price">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td class="qty">{{ item.quantity }}</td>
+                <td class="desc">{{ item.product.name }}</td>
+                <td class="price">{{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p>
+            <span class="label">Sous-total:</span>
+            <span class="amount">{{ invoice.subtotal }}</span>
+        </p>
+        {% if invoice.tax_amount > 0 %}
+        <p>
+            <span class="label">TVA ({{ invoice.tax_rate|floatformat:0 }}%):</span>
+            <span class="amount">{{ invoice.tax_amount }}</span>
+        </p>
+        {% endif %}
+        <p class="grand-total">
+            <span class="label">TOTAL:</span>
+            <span class="amount">{{ invoice.total_amount }}</span>
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>═══════════════════════════</p>
+        <p><strong>Merci de votre visite !</strong></p>
+        <p>À bientôt.</p>
+        <p>═══════════════════════════</p>
+    </div>
+
+    <script>
+        // Auto-impression après chargement (décommenter si désiré)
+        // window.onload = function() { 
+        //     setTimeout(function() { window.print(); }, 500);
+        // }
+    </script>
+</body>
+</html>

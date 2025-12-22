@@ -1,0 +1,347 @@
+{% extends 'inventory/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ action }} Point de Vente - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center min-vh-100 fade-in py-5" style="background: #ffffff;">
+    <div class="container" style="max-width: 900px;">
+        
+        <!-- HEADER -->
+        <div class="text-center mb-5 mb-md-12">
+            <h1 class="gradient-text fw-bold mb-3 fs-2 fs-md-1 text-uppercase" style="letter-spacing: 3px;">
+                {% if pos %}Modifier Point de Vente{% else %}Nouveau Point de Vente{% endif %}
+            </h1>
+            <div class="separator-gradient mx-auto mb-4"></div>
+            <p class="text-muted fs-6 fs-md-5 fw-light fst-italic px-3">
+                {% if pos %}Mise à jour des paramètres structurels de votre réseau logistique.{% else %}Extension et déploiement du réseau logistique - Créez un nouveau point de vente ou entrepôt.{% endif %}
+            </p>
+        </div>
+
+        <form method="post" novalidate class="form-minimalist px-2 px-md-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger shadow-sm border-0 rounded-0 mb-5 mb-md-8 mx-3 mx-md-0" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- SECTION: Identification -->
+            <div class="section-header mb-4">
+                <h5 class="section-title">
+                    <i class="fas fa-tag me-2"></i>Identification
+                </h5>
+            </div>
+
+            <div class="row g-4 g-md-5 mb-5">
+                <div class="col-12 col-md-7">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.name.id_for_label }}" class="custom-label">Nom du Point de Vente <span class="text-danger">*</span></label>
+                        {{ form.name }}
+                        <span class="focus-border"></span>
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-5">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.code.id_for_label }}" class="custom-label">Code Unique <span class="text-danger">*</span></label>
+                        {{ form.code }}
+                        <span class="focus-border"></span>
+                        <div class="form-text mt-1 small text-muted fst-italic">Format suggéré: LOC-001</div>
+                        {% if form.code.errors %}<div class="text-danger small mt-1">{{ form.code.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIVIDER -->
+            <div class="col-12 mb-4">
+                <div class="section-divider my-3"></div>
+            </div>
+
+            <!-- SECTION: Localisation -->
+            <div class="section-header mb-4">
+                <h5 class="section-title">
+                    <i class="fas fa-map-marked-alt me-2"></i>Localisation
+                </h5>
+            </div>
+
+            <div class="row g-4 g-md-5 mb-5">
+                <div class="col-12">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.address.id_for_label }}" class="custom-label">Adresse Géographique</label>
+                        {{ form.address }}
+                        <span class="focus-border"></span>
+                        {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.city.id_for_label }}" class="custom-label">Ville / Localité</label>
+                        {{ form.city }}
+                        <span class="focus-border"></span>
+                        {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.phone.id_for_label }}" class="custom-label">Contact Téléphonique</label>
+                        {{ form.phone }}
+                        <span class="focus-border"></span>
+                        {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIVIDER -->
+            <div class="col-12 mb-4">
+                <div class="section-divider my-3"></div>
+            </div>
+
+            <!-- SECTION: Gestion & Type -->
+            <div class="section-header mb-4">
+                <h5 class="section-title">
+                    <i class="fas fa-cogs me-2"></i>Gestion & Configuration
+                </h5>
+            </div>
+
+            <div class="row g-4 g-md-5 mb-5">
+                <div class="col-12 col-md-7">
+                    <div class="form-group position-relative">
+                        <label for="{{ form.manager.id_for_label }}" class="custom-label">Responsable Assigné</label>
+                        {{ form.manager }}
+                        <span class="focus-border"></span>
+                        {% if form.manager.errors %}<div class="text-danger small mt-1">{{ form.manager.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-5">
+                    <div class="config-card">
+                        <div class="form-check form-switch mb-4">
+                            <input type="checkbox" class="form-check-input" id="{{ form.is_active.id_for_label }}" name="{{ form.is_active.name }}" {% if form.is_active.value %}checked{% endif %}>
+                            <label class="form-check-label custom-label" for="{{ form.is_active.id_for_label }}">
+                                Point de Vente Actif
+                            </label>
+                            <div class="form-text small text-muted">Autoriser les opérations</div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="{{ form.is_warehouse.id_for_label }}" name="{{ form.is_warehouse.name }}" {% if form.is_warehouse.value %}checked{% endif %}>
+                            <label class="form-check-label custom-label" for="{{ form.is_warehouse.id_for_label }}">
+                                Entrepôt Principal
+                            </label>
+                            <div class="form-text small text-muted">Source de réapprovisionnement</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="d-flex flex-column flex-md-row gap-3 gap-md-4 mt-5 mt-md-8 mb-5">
+                <button type="submit" class="btn btn-gradient text-white fw-bold px-5 py-3 py-md-4 text-uppercase shadow-lg hover-lift w-100 w-md-auto order-1 order-md-1">
+                    <i class="fas fa-save me-2"></i>{{ action|default:"Enregistrer" }}
+                </button>
+                <a href="{% url 'inventory:pos_list' %}" class="btn btn-link text-decoration-none text-muted align-self-center text-uppercase fw-bold text-hover-primary letter-spacing-1 order-2 order-md-2 mt-2 mt-md-0">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Gradient Text & Separator */
+    .gradient-text {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* Pink to Red gradient */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .separator-gradient {
+        height: 4px;
+        width: 80px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 2px;
+    }
+
+    /* Section Headers */
+    .section-header {
+        margin-top: 2rem;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: #f5576c;
+    }
+
+    /* Section Divider */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e1e1e1, transparent);
+    }
+
+    /* Minimalist Inputs with Animated Underline */
+    .form-minimalist .form-control,
+    .form-minimalist .form-select {
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid #e1e1e1;
+        border-radius: 0;
+        padding: 12px 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-minimalist .form-control:focus,
+    .form-minimalist .form-select:focus {
+        border-bottom-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
+    
+    /* Textarea specific styling */
+    .form-minimalist textarea.form-control {
+        min-height: 80px;
+        resize: vertical;
+    }
+    
+    /* The animated bottom border */
+    .form-group .focus-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(to right, #f093fb, #f5576c);
+        transition: width 0.4s ease;
+    }
+    
+    .form-control:focus ~ .focus-border,
+    .form-select:focus ~ .focus-border {
+        width: 100%;
+    }
+
+    /* Labels */
+    .custom-label {
+        color: #7f8c8d;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Configuration Card */
+    .config-card {
+        background: rgba(245, 87, 108, 0.05);
+        border: 2px dashed rgba(245, 87, 108, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .config-card:hover {
+        background: rgba(245, 87, 108, 0.08);
+        border-color: rgba(245, 87, 108, 0.3);
+    }
+
+    /* Custom Switch Styling */
+    .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+        cursor: pointer;
+        border: 2px solid #e1e1e1;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .form-check-input:checked {
+        background-color: #f5576c;
+        border-color: #f5576c;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    }
+
+    .form-check-input:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.25rem rgba(245, 87, 108, 0.15);
+    }
+
+    .form-check-label {
+        margin-left: 0.5rem;
+        cursor: pointer;
+    }
+
+    /* Gradient Button */
+    .btn-gradient {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        border-radius: 2px; 
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4) !important;
+        color: white;
+    }
+    
+    .letter-spacing-1 { letter-spacing: 1px; }
+    
+    /* Fade In Animation */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .gradient-text {
+            font-size: 1.75rem !important;
+        }
+        
+        .config-card {
+            padding: 1.25rem;
+        }
+    }
+    
+    /* Hide scrollbar if needed */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* Hide crispy forms asterisk */
+    .asteriskField {
+        display: none;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for manager dropdown
+        $('#id_manager').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un responsable',
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

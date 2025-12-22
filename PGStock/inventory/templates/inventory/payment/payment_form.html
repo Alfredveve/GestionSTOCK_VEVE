@@ -1,0 +1,159 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}Enregistrer un Paiement - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+     <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-6 gap-3">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-success rounded-circle shadow-sm">
+                        <i class="fas fa-hand-holding-usd text-success fs-5"></i>
+                    </span>
+                </span>
+                Validation d'Encaissement
+            </h1>
+            <p class="text-white opacity-75 fs-6 fw-bold mb-0">Imputation d'un nouveau règlement pour la facture <span class="badge badge-light-primary">{{ invoice.invoice_number }}</span></p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'inventory:payment_list' %}" class="btn btn-custom btn-white btn-active-light-primary text-primary fw-bold btn-sm">
+                <i class="fas fa-arrow-left me-2"></i> Retour au suivi
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-8">
+            <div class="card card-flush shadow-sm">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <h3 class="fw-bold text-gray-800">Détails du Règlement</h3>
+                    </div>
+                </div>
+                <div class="card-body p-8 p-md-10">
+                    <div class="row g-7">
+                        <!-- Left Column: Context -->
+                        <div class="col-md-5">
+                            <div class="bg-light-info rounded p-6 h-100 border border-info border-dashed">
+                                <h4 class="fw-bold text-info mb-6 d-flex align-items-center">
+                                    <i class="fas fa-info-circle me-3"></i> État de la Facture
+                                </h4>
+                                <div class="d-flex flex-column gap-5">
+                                    <div class="d-flex flex-stack border-bottom border-info border-opacity-25 pb-3">
+                                        <span class="text-gray-600 fw-bold fs-7 italic">Client:</span>
+                                        <span class="text-gray-900 fw-boldest fs-7">{{ invoice.client.name }}</span>
+                                    </div>
+                                    <div class="d-flex flex-stack border-bottom border-info border-opacity-25 pb-3">
+                                        <span class="text-gray-600 fw-bold fs-7 italic">Montant Initial:</span>
+                                        <span class="text-gray-900 fw-boldest fs-7">{{ invoice.total_amount|format_currency:company_settings.currency }}</span>
+                                    </div>
+                                    <div class="d-flex flex-stack border-bottom border-info border-opacity-25 pb-3">
+                                        <span class="text-gray-600 fw-bold fs-7 italic">Déjà Réglé:</span>
+                                        <span class="text-success fw-boldest fs-7">{{ invoice.get_amount_paid|format_currency:company_settings.currency }}</span>
+                                    </div>
+                                    <div class="d-flex flex-stack pt-2">
+                                        <span class="text-gray-800 fw-boldest fs-6">SOLDE DÛ:</span>
+                                        <span class="text-danger fw-boldest fs-3">{{ balance|format_currency:company_settings.currency }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Form -->
+                        <div class="col-md-7">
+                            <form method="post" novalidate class="form-modern">
+                                {% csrf_token %}
+
+                                <div class="mb-7">
+                                    <label class="required fw-bold fs-6 mb-2">Montant à Encaisser</label>
+                                    <div class="input-group input-group-solid border border-gray-300 rounded">
+                                        <span class="input-group-text bg-light text-gray-600 fw-bold">{{ company_settings.currency }}</span>
+                                        <input type="number" name="amount" class="form-control bg-light fw-boldest text-primary fs-3" step="0.01" min="0.01"
+                                            max="{{ balance }}" value="{{ balance }}" required>
+                                    </div>
+                                    <div class="text-muted fs-8 mt-1 italic">Par défaut, le système propose le solde total restant.</div>
+                                </div>
+
+                                <div class="row g-5 mb-7">
+                                    <div class="col-md-6">
+                                        <label class="required fw-bold fs-6 mb-2">Date d'effet</label>
+                                        <input type="date" name="payment_date" class="form-control form-control-solid fw-bold" value="{% now 'Y-m-d' %}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="required fw-bold fs-6 mb-2">Mode de Règlement</label>
+                                        <select name="payment_method" class="form-select form-select-solid fw-bold" required>
+                                            <option value="cash">Espèces (Cash)</option>
+                                            <option value="mobile_money">Mobile Money (Orange/MTN/Wave)</option>
+                                            <option value="bank_transfer">Virement Bancaire</option>
+                                            <option value="check">Chèque Certifié</option>
+                                            <option value="card">Carte Bancaire (TPE)</option>
+                                            <option value="other">Autre / Compensation</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-7">
+                                    <label class="fw-bold fs-6 mb-2">Référence Transactionnelle</label>
+                                    <input type="text" name="reference" class="form-control form-control-solid fw-bold"
+                                        placeholder="Ex: N° Chèque, ID Orange Money, Réf Virement...">
+                                </div>
+
+                                <div class="mb-10">
+                                    <label class="fw-bold fs-6 mb-2">Notes & Observations</label>
+                                    <textarea name="notes" class="form-control form-control-solid fw-bold" rows="2" placeholder="Informations complémentaires sur ce règlement..."></textarea>
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-3 pt-5 border-top">
+                                    <a href="{% url 'inventory:payment_list' %}" class="btn btn-light fw-bold px-6">Annuler</a>
+                                    <button type="submit" class="btn btn-success fw-bold px-8 shadow-sm">
+                                        <i class="fas fa-check-circle me-2 small"></i> Confirmer l'Encaissement
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+
+    .fw-boldest {
+        font-weight: 900;
+    }
+
+    .form-control-solid, .form-select-solid {
+        background-color: #F5F8FA;
+        border-color: #F5F8FA;
+        color: #1E1E2D;
+        transition: color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .form-control-solid:focus, .form-select-solid:focus {
+        background-color: #eff2f5;
+        border-color: #009EF7;
+    }
+
+    label.required:after {
+        content: "*";
+        color: #f1416c;
+        margin-left: 4px;
+    }
+</style>
+{% endblock %}

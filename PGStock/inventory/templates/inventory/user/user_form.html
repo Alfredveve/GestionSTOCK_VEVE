@@ -1,0 +1,141 @@
+{% extends 'inventory/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-body-emphasis">{{ title }}</h1>
+            <p class="text-body-secondary mt-2 mb-0">Gestion des accès et des permissions utilisateurs</p>
+        </div>
+        <a href="{% url 'inventory:user_list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour</span>
+        </a>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if user_form.errors or profile_form.errors %}
+                <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <div>
+                        <strong>Des erreurs sont présentes</strong>
+                        <div class="small mt-1">
+                            {{ user_form.non_field_errors }}
+                            {{ profile_form.non_field_errors }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Section: Identifiants -->
+                <section class="mb-5">
+                    <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                        <span
+                            class="badge bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-id-card"></i>
+                        </span>
+                        Identifiants de Connexion
+                    </h3>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ user_form.username|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ user_form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-12">
+                            {{ user_form.password|as_crispy_field }}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Informations Personnelles -->
+                <section class="mb-5">
+                    <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                        <span
+                            class="badge bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-user-circle"></i>
+                        </span>
+                        Profil Utilisateur
+                    </h3>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ user_form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ user_form.last_name|as_crispy_field }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Photo de Profil</label>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if target_user.profile.avatar %}
+                                <div class="flex-shrink-0">
+                                    <img src="{{ target_user.profile.avatar.url }}" alt="Avatar"
+                                        class="rounded-circle object-fit-cover border"
+                                        style="width: 80px; height: 80px;">
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    {{ profile_form.avatar|as_crispy_field }}
+                                    <div class="form-text mt-1">JPG, PNG ou GIF. Max 5Mo.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Permissions -->
+                <section class="mb-5">
+                    <h3 class="h5 text-body-emphasis border-bottom pb-3 mb-4 d-flex align-items-center gap-2">
+                        <span
+                            class="badge bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-shield-alt"></i>
+                        </span>
+                        Rôles & Accès
+                    </h3>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            {{ user_form.group|as_crispy_field }}
+                            <div class="form-text mt-1">Définit ce que l'utilisateur peut voir et modifier.</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card bg-body-tertiary border-0">
+                                <div class="card-body">
+                                    {{ user_form.is_active|as_crispy_field }}
+                                    <div class="form-text ms-4">L'utilisateur peut se connecter au système.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-end gap-2 pt-4 border-top">
+                    <a href="{% url 'inventory:user_list' %}" class="btn btn-light border">
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-dark d-flex align-items-center gap-2 shadow-sm">
+                        <i class="fas fa-check small"></i>
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

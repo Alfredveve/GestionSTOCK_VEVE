@@ -1,0 +1,21 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Supprimer le Devis - GestionSTOCK{% endblock %}
+
+{% block content %}
+\u003cdiv class="page-header"\u003e
+    \u003ch1\u003eSupprimer le Devis\u003c/h1\u003e
+\u003c/div\u003e
+
+\u003cdiv class="card"\u003e
+    \u003ch2\u003eConfirmation de Suppression\u003c/h2\u003e
+    \u003cp\u003eÊtes-vous sûr de vouloir supprimer le devis \u003cstrong\u003e{{ quote.quote_number }}\u003c/strong\u003e pour \u003cstrong\u003e{{ quote.client.name }}\u003c/strong\u003e ?\u003c/p\u003e
+    \u003cform method="post"\u003e
+        {% csrf_token %}
+        \u003cdiv class="form-actions"\u003e
+            \u003cbutton type="submit" class="btn btn-danger"\u003e🗑️ Confirmer la Suppression\u003c/button\u003e
+            \u003ca href="{% url 'inventory:quote_detail' quote.pk %}" class="btn btn-secondary"\u003eAnnuler\u003c/a\u003e
+        \u003c/div\u003e
+    \u003c/form\u003e
+\u003c/div\u003e
+{% endblock %}

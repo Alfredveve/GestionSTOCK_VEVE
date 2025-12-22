@@ -1,0 +1,25 @@
+{% extends 'inventory/base_auth.html' %}
+{% load static %}
+
+
+{% block content_auth %}
+<div class="text-center pt-3 pb-3">
+    <!-- Icon -->
+    <div class="mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle p-4" style="width: 80px; height: 80px;">
+             <i class="bi bi-shield-check fs-1 text-success"></i>
+        </div>
+    </div>
+
+    <!-- Heading -->
+    <h2 class="text-dark fw-bold mb-3">À bientôt !</h2>
+    <div class="text-secondary mb-5">
+        Vous avez été déconnecté avec succès.
+    </div>
+
+    <!-- Actions -->
+    <a href="{% url 'inventory:login' %}" class="btn btn-lg btn-nature w-100 mb-3">
+        SE RECONNECTER
+    </a>
+</div>
+{% endblock %}

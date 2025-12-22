@@ -1,0 +1,782 @@
+{% extends 'inventory/base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ action }} Produit - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Breadcrumb & Header -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-2">
+            <li class="breadcrumb-item"><a href="{% url 'inventory:dashboard' %}" class="text-decoration-none">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'inventory:product_list' %}" class="text-decoration-none">Produits</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+        <div class="d-flex align-items-center justify-content-between">
+            <h1 class="h3 fw-bold text-dark mb-0">
+                <i class="fas fa-edit me-2 text-primary"></i>
+                {{ action }} un Produit
+            </h1>
+            <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-light-primary fw-bold">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </nav>
+
+    <form method="post" enctype="multipart/form-data" novalidate id="productForm">
+        {% csrf_token %}
+
+        <div class="row g-4">
+            <!-- Left Column: Primary Info & Pricing -->
+            <div class="col-lg-8">
+                <div class="vstack gap-4">
+                    <!-- General Information -->
+                    <div class="card card-premium shadow-sm border-0">
+                        <div class="card-header border-0 py-3" style="background: linear-gradient(135deg, rgba(255,168,0,0.05) 0%, transparent 100%);">
+                            <h3 class="h6 mb-0 d-flex align-items-center gap-2 text-dark fw-bold">
+                                <span class="badge badge-soft-warning p-1 d-flex align-items-center justify-content-center shadow-xs" style="width: 32px; height: 32px; border-radius: 8px;">
+                                    <i class="fas fa-info-circle fs-6"></i>
+                                </span>
+                                Informations Générales
+                            </h3>
+                        </div>
+                        <div class="card-body p-4 pt-0">
+                            <div class="row g-4">
+                                <div class="col-md-8">
+                                    {{ form.name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4 position-relative">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">{{ form.sku.label }}</label>
+                                        <span class="badge badge-soft-primary smallest fw-boldest px-2 py-1">AUTO</span>
+                                    </div>
+                                    {{ form.sku|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.category|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.supplier|as_crispy_field }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form.units_per_box|as_crispy_field }}
+                                </div>
+                                <div class="col-12">
+                                    {{ form.description|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing - Modern Design -->
+                    <div class="card card-premium shadow-sm border-0 pricing-card">
+                        <div class="card-header border-0 py-3" style="background: linear-gradient(135deg, rgba(27,197,189,0.05) 0%, transparent 100%);">
+                            <h3 class="h6 mb-0 d-flex align-items-center gap-2 text-dark fw-bold">
+                                <span class="badge badge-soft-success p-1 d-flex align-items-center justify-content-center icon-pulse shadow-xs" style="width: 32px; height: 32px; border-radius: 8px;">
+                                    <i class="fas fa-dollar-sign fs-6"></i>
+                                </span>
+                                Tarification & Marges
+                            </h3>
+                        </div>
+                        <div class="card-body p-4 pt-2">
+                            <div class="row g-5">
+                                <!-- Group 1: Retail -->
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center gap-2 mb-4">
+                                        <h6 class="fw-boldest text-primary text-uppercase small mb-0 ls-1">1. Vente au Détail</h6>
+                                        <div class="flex-grow-1 border-top border-primary border-opacity-10 ms-2"></div>
+                                    </div>
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <label class="form-label requiredField fw-bold smallest mb-2">
+                                                <i class="fas fa-shopping-basket text-primary opacity-50 me-1"></i>
+                                                {{ form.purchase_price.label|safe }}
+                                            </label>
+                                            <div class="input-group input-group-modern shadow-xs">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-tag text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-white border-0 price-input" id="{{ form.purchase_price.id_for_label }}_display" placeholder="0.00">
+                                                <input type="number" name="{{ form.purchase_price.name }}" step="0.01" class="d-none" id="{{ form.purchase_price.id_for_label }}" value="{{ form.purchase_price.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-white border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label requiredField fw-bold smallest mb-2">
+                                                <i class="fas fa-money-check-alt text-success opacity-50 me-1"></i>
+                                                {{ form.selling_price.label|safe }}
+                                            </label>
+                                            <div class="input-group input-group-modern shadow-xs">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-cash-register text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-white border-0 price-input" id="{{ form.selling_price.id_for_label }}_display" placeholder="0.00">
+                                                <input type="number" name="{{ form.selling_price.name }}" step="0.01" class="d-none" id="{{ form.selling_price.id_for_label }}" value="{{ form.selling_price.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-white border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold smallest mb-2">
+                                                <i class="fas fa-percentage text-info opacity-50 me-1"></i>
+                                                Marge (Désirée)
+                                            </label>
+                                            <div class="input-group input-group-modern shadow-xs opacity-75">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-balance-scale text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-light border-0" id="{{ form.margin.id_for_label }}_display" readonly>
+                                                <input type="number" name="{{ form.margin.name }}" step="0.01" class="d-none" id="{{ form.margin.id_for_label }}" value="{{ form.margin.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-light border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Group 2: Wholesale -->
+                                <div class="col-12 mt-5">
+                                    <div class="d-flex align-items-center gap-2 mb-4">
+                                        <h6 class="fw-boldest text-info text-uppercase small mb-0 ls-1">2. Vente en Gros (Carton)</h6>
+                                        <div class="flex-grow-1 border-top border-info border-opacity-10 ms-2"></div>
+                                    </div>
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold smallest mb-2">PUA Gros</label>
+                                            <div class="input-group input-group-modern shadow-xs">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-boxes text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-white border-0 price-input" id="{{ form.wholesale_purchase_price.id_for_label }}_display" placeholder="0.00">
+                                                <input type="number" name="{{ form.wholesale_purchase_price.name }}" step="0.01" class="d-none" id="{{ form.wholesale_purchase_price.id_for_label }}" value="{{ form.wholesale_purchase_price.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-white border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold smallest mb-2">PUV Gros</label>
+                                            <div class="input-group input-group-modern shadow-xs">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-truck-loading text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-white border-0 price-input" id="{{ form.wholesale_selling_price.id_for_label }}_display" placeholder="0.00">
+                                                <input type="number" name="{{ form.wholesale_selling_price.name }}" step="0.01" class="d-none" id="{{ form.wholesale_selling_price.id_for_label }}" value="{{ form.wholesale_selling_price.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-white border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold smallest mb-2">Marge (Gros)</label>
+                                            <div class="input-group input-group-modern shadow-xs opacity-75">
+                                                <span class="input-group-text bg-light border-0"><i class="fas fa-chart-line text-muted"></i></span>
+                                                <input type="text" class="form-control form-control-modern bg-light border-0" id="{{ form.wholesale_margin.id_for_label }}_display" readonly>
+                                                <input type="number" name="{{ form.wholesale_margin.name }}" step="0.01" class="d-none" id="{{ form.wholesale_margin.id_for_label }}" value="{{ form.wholesale_margin.value|default:''|stringformat:'s' }}">
+                                                <span class="input-group-text bg-light border-0 fw-bold text-muted small">GNF</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dashboard de Bénéfice -->
+                            <div class="mt-5 profit-card p-4 rounded-4 shadow-sm position-relative overflow-hidden border-0">
+                                <div class="profit-background"></div>
+                                <div class="position-relative">
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-7">
+                                            <div class="d-flex align-items-center gap-3 mb-3">
+                                                <div class="profit-icon shadow-sm">
+                                                    <i class="fas fa-hand-holding-usd text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="fw-bold text-white ls-1 text-uppercase smallest opacity-75 d-block">Bénéfice Unitaire</span>
+                                                    <span class="profit-amount text-white" id="profitDisplay">---</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <div class="margin-info border-white border-opacity-10 bg-white bg-opacity-10 p-3 rounded-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="smallest fw-boldest text-white text-uppercase ls-1 opacity-75">Performance (Marge %)</span>
+                                                    <span class="badge bg-white text-dark fw-boldest shadow-sm rounded-pill" id="marginPercentage">0%</span>
+                                                </div>
+                                                <div class="progress bg-white bg-opacity-20" style="height: 10px; border-radius: 20px;">
+                                                    <div class="progress-bar progress-bar-animated shadow-sm" id="marginProgressBar" role="progressbar" style="width: 0%; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        /* Modern Input Styling */
+                        .input-group-modern {
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            border-radius: 12px;
+                            overflow: hidden;
+                        }
+
+                        .input-group-modern:focus-within {
+                            transform: translateY(-2px);
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .form-control-modern {
+                            padding: 0.6rem 0.8rem; /* Reduced from 0.8rem 1.2rem */
+                            font-size: 0.9rem; /* Reduced from 1.05rem */
+                            font-weight: 500;
+                            border: 1px solid #e2e8f0;
+                            transition: all 0.2s;
+                        }
+
+                        .form-control-modern:focus {
+                            border-color: var(--kt-primary);
+                            background-color: #fff;
+                            box-shadow: none;
+                        }
+
+                        .price-input {
+                            letter-spacing: 0.5px;
+                            color: var(--text-dark);
+                        }
+
+                        /* Icon Pulse Animation */
+                        @keyframes iconPulse {
+                            0%, 100% { transform: scale(1); opacity: 1; }
+                            50% { transform: scale(1.1); opacity: 0.8; }
+                        }
+
+                        .icon-pulse {
+                            animation: iconPulse 3s ease-in-out infinite;
+                        }
+
+                        /* Profit Card Styling - Glassmorphism */
+                        .profit-card {
+                            background: rgba(255, 255, 255, 0.05);
+                            backdrop-filter: blur(12px);
+                            -webkit-backdrop-filter: blur(12px);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                        }
+
+                        .profit-card.positive {
+                            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+                            border-color: rgba(16, 185, 129, 0.2);
+                        }
+
+                        .profit-card.negative {
+                            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+                            border-color: rgba(239, 68, 68, 0.2);
+                        }
+
+                        .profit-background {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            opacity: 0.05;
+                            background-image: 
+                                radial-gradient(circle at 10% 20%, white 1px, transparent 1px),
+                                radial-gradient(circle at 90% 80%, white 1px, transparent 1px);
+                            background-size: 40px 40px;
+                        }
+
+                        .profit-icon {
+                            width: 38px; /* Reduced from 42px */
+                            height: 38px;
+                            background: rgba(255, 255, 255, 0.2);
+                            border-radius: 10px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.15rem;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                        }
+
+                        .profit-amount {
+                            font-size: 1.5rem; /* Reduced from 1.75rem */
+                            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            letter-spacing: -0.5px;
+                        }
+
+                        .margin-info {
+                            background: rgba(255, 255, 255, 0.1);
+                            padding: 1rem; /* Reduced from 1.25rem */
+                            border-radius: 12px;
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                        }
+
+                        .margin-badge {
+                            font-size: 0.75rem;
+                            padding: 0.4rem 0.8rem;
+                            background: rgba(255, 255, 255, 0.2);
+                            color: white;
+                            border-radius: 30px;
+                            font-weight: 700;
+                            letter-spacing: 0.5px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                        }
+
+                        .progress {
+                            background: rgba(255, 255, 255, 0.2);
+                            overflow: hidden;
+                            border-radius: 20px;
+                            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+                        }
+
+                        .progress-bar {
+                            background: #fff;
+                            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+                        }
+
+                        /* Card Hover Effects */
+                        .card-premium {
+                            transition: all 0.3s ease;
+                            border: 1px solid rgba(0,0,0,0.05) !important;
+                            border-radius: 12px !important;
+                        }
+
+                        .card-premium:hover {
+                            transform: translateY(-4px);
+                            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.08) !important;
+                        }
+
+                        /* Sticky Footer Actions */
+                        .sticky-footer-actions {
+                            position: fixed;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            background: rgba(255, 255, 255, 0.82);
+                            backdrop-filter: blur(12px);
+                            -webkit-backdrop-filter: blur(12px);
+                            border-top: 1px solid rgba(0, 0, 0, 0.05);
+                            padding: 1rem 2rem;
+                            z-index: 1050;
+                            box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.06);
+                        }
+
+                        .footer-spacer {
+                            height: 100px;
+                        }
+
+                        /* Premium Utility Classes */
+                        .shadow-xs { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05) !important; }
+                        .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+                        .fw-boldest { font-weight: 700 !important; } /* Reduced from 800 */
+                        .smallest { font-size: 0.7rem !important; } /* Reduced from 0.75rem */
+                        .ls-1 { letter-spacing: 0.03rem !important; }
+                        
+                        .bg-primary-subtle { background-color: #e1f0ff !important; }
+                        .bg-success-subtle { background-color: #c9f7f5 !important; }
+                        .bg-info-subtle { background-color: #eee5ff !important; }
+                        .bg-light-primary { background-color: #f1faff !important; color: #009ef7 !important; }
+
+                        /* Custom Badge Styles Refinement */
+                        .badge-soft-primary { background-color: #f1faff; color: #009ef7; }
+                        .badge-soft-warning { background-color: #fff8dd; color: #ffc700; }
+                        .badge-soft-success { background-color: #e8fff3; color: #50cd89; }
+                        .badge-soft-info { background-color: #f8f5ff; color: #7239ea; }
+                        .badge-soft-danger { background-color: #fff5f8; color: #f1416c; }
+
+                        /* Pricing Field Input Styling */
+                        .input-group-modern .form-control-modern {
+                            border: 1px solid #f1f1f2;
+                            padding: 0.6rem 0.8rem;
+                            font-weight: 500;
+                            font-size: 0.9rem;
+                            color: #3f4254;
+                        }
+
+                        .input-group-modern .input-group-text {
+                            border: 1px solid #f1f1f2;
+                            color: #7e8299;
+                            font-size: 0.75rem; /* Smaller */
+                        }
+                        
+                        .input-group-modern .input-group-text i {
+                            font-size: 0.75rem;
+                        }
+
+                        /* Card Headers */
+                        .card-premium .card-header {
+                            display: flex;
+                            align-items: center;
+                            min-height: 54px; /* Reduced from 60px */
+                            padding: 0 1.25rem;
+                        }
+
+                        /* Profit Card Premium */
+                        .profit-card {
+                            background: linear-gradient(135deg, #1e1e2d 0%, #151521 100%);
+                            border-radius: 1rem;
+                        }
+                        
+                        .profit-card.positive { background: linear-gradient(135deg, #50cd89 0%, #299351 100%); }
+                        .profit-card.negative { background: linear-gradient(135deg, #f1416c 0%, #d9214e 100%); }
+
+                        .profit-icon {
+                            width: 38px;
+                            height: 38px;
+                            background: rgba(255, 255, 255, 0.15);
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.1rem;
+                        }
+
+                        .profit-amount {
+                            font-size: 1.5rem;
+                            font-weight: 600 !important;
+                            line-height: 1.2;
+                        }
+
+                        /* Hover Effect for Inventory Cards */
+                        .hover-shadow-md:hover {
+                            transform: translateY(-3px);
+                            box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important;
+                        }
+
+                        /* Breadcrumb Styling */
+                        .breadcrumb-item a { color: #7e8299; font-weight: 600; font-size: 0.75rem; }
+                        .breadcrumb-item.active { color: #3f4254; font-weight: 600; font-size: 0.75rem; }
+
+                        /* Inventory Fields Alignment */
+                        .inventory-grid .form-label {
+                            min-height: 2.25rem;
+                            display: flex;
+                            align-items: flex-end;
+                            margin-bottom: 0.5rem !important;
+                            line-height: 1.1;
+                        }
+
+                        /* Responsive spacing */
+                        @media (max-width: 991px) {
+                            .sticky-footer-actions {
+                                padding: 1rem;
+                            }
+                        }
+                    </style>
+                </div>
+            </div>
+
+            <!-- Right Column: Image -->
+            <div class="col-lg-4">
+                <div class="vstack gap-4">
+                    <!-- Image Card -->
+                    <div class="card card-premium shadow-sm border-0 h-100">
+                        <div class="card-header border-0 py-4" style="background: linear-gradient(135deg, rgba(137,80,252,0.05) 0%, transparent 100%);">
+                            <h3 class="h5 mb-0 d-flex align-items-center gap-3 text-dark fw-bold">
+                                <span class="badge badge-soft-info p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; border-radius: 12px;">
+                                    <i class="fas fa-image fs-5"></i>
+                                </span>
+                                Image du Produit
+                            </h3>
+                        </div>
+                        <div class="card-body p-4 text-center d-flex flex-column justify-content-between">
+                            <div>
+                                <div id="imagePreviewContainer"
+                                    class="mb-3 w-100 rounded-4 border-2 border-dashed d-flex flex-column align-items-center justify-content-center overflow-hidden position-relative bg-light shadow-inner"
+                                    style="height: 320px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-color: #e2e8f0;">
+                                    {% if form.instance.image %}
+                                    <img src="{{ form.instance.image.url }}" alt="Aperçu" class="w-100 h-100 object-fit-contain p-2" id="imagePreview">
+                                    {% else %}
+                                    <img src="" alt="Aperçu" class="w-100 h-100 object-fit-contain p-2 d-none" id="imagePreview">
+                                    <div id="imagePlaceholder" class="text-center p-3">
+                                        <div class="symbol symbol-70px symbol-circle bg-white shadow-sm mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                                            <i class="fas fa-cloud-upload-alt fs-2 text-primary"></i>
+                                        </div>
+                                        <p class="text-dark fw-boldest mb-1">Ajouter une image</p>
+                                        <small class="text-muted fw-bold">Glissez ou cliquez ici</small>
+                                    </div>
+                                    {% endif %}
+                                    <div class="image-overlay"></div>
+                                </div>
+
+                                <label for="{{ form.image.id_for_label }}" class="btn btn-primary fw-boldest w-100 py-3 shadow-sm rounded-3">
+                                    <i class="fas fa-camera me-2"></i>{% if form.instance.image %}Modifier l'image{% else %}Sélectionner l'image{% endif %}
+                                </label>
+                                <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}" class="d-none" accept="image/*" onchange="previewImage(this)">
+                            </div>
+                            <div class="mt-4 p-3 bg-light rounded-3 text-start">
+                                <h6 class="smallest fw-boldest text-uppercase text-muted ls-1 mb-2">Spécifications</h6>
+                                <ul class="list-unstyled mb-0 smallest fw-bold text-gray-700">
+                                    <li class="mb-1"><i class="fas fa-check-circle text-success me-2"></i>Ratio 1:1 recommandé</li>
+                                    <li class="mb-1"><i class="fas fa-check-circle text-success me-2"></i>Format JPG, PNG, WEBP</li>
+                                    <li><i class="fas fa-check-circle text-success me-2"></i>Taille max: 5Mo</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Section -->
+            {% if inventory_formset %}
+            <div class="col-12 mt-2">
+                <div class="card card-premium shadow-sm border-0">
+                    <div class="card-header border-0 py-3" style="background: linear-gradient(135deg, rgba(246,78,96,0.05) 0%, transparent 100%);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="h6 mb-0 d-flex align-items-center gap-2 text-dark fw-bold">
+                                <span class="badge badge-soft-danger p-1 d-flex align-items-center justify-content-center shadow-xs" style="width: 32px; height: 32px; border-radius: 8px;">
+                                    <i class="fas fa-warehouse fs-6"></i>
+                                </span>
+                                Stock par Emplacement
+                            </h3>
+                            <span class="badge bg-light text-dark border-0 shadow-xs fw-bold px-3 py-2 rounded-3 smallest">{{ inventory_formset.total_form_count }} Point(s) de vente</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        {{ inventory_formset.management_form }}
+                        <div class="row g-4">
+                            {% for inv_form in inventory_formset %}
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card h-100 border-0 shadow-xs hover-shadow-md transition-all rounded-4" style="background-color: #fcfcfd;">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center gap-3 mb-4">
+                                            <div class="symbol symbol-45 symbol-label bg-white shadow-sm rounded-3">
+                                                <i class="fas fa-map-marked-alt text-primary fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-boldest text-gray-800">
+                                                    {% if inv_form.instance.point_of_sale %}
+                                                        {{ inv_form.instance.point_of_sale.name }}
+                                                    {% else %}
+                                                        {{ inv_form.initial.point_of_sale.name }}
+                                                    {% endif %}
+                                                </h6>
+                                                <span class="badge bg-light-primary text-primary smallest fw-boldest text-uppercase">Point de Distribution</span>
+                                            </div>
+                                        </div>
+                                        {{ inv_form.id }}
+                                        <div class="d-none">{{ inv_form.point_of_sale }}</div>
+                                        <div class="row g-3 inventory-grid">
+                                            <div class="col-6">
+                                                {{ inv_form.quantity|as_crispy_field }}
+                                            </div>
+                                            <div class="col-6">
+                                                {{ inv_form.reorder_level|as_crispy_field }}
+                                            </div>
+                                            <div class="col-12">
+                                                {{ inv_form.location|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Footer Actions Spacer -->
+            <div class="footer-spacer"></div>
+
+            <!-- Sticky Actions -->
+            <div class="sticky-footer-actions">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <div class="d-none d-md-block text-muted small">
+                        Dernière modification : {{ product.updated_at|date:"d/m/Y H:i"|default:"---" }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'inventory:product_list' %}" class="btn btn-light-danger fw-bold px-4">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-bold px-5 shadow-sm">
+                            <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const purchaseInput = document.getElementById('{{ form.purchase_price.id_for_label }}');
+        const purchaseDisplay = document.getElementById('{{ form.purchase_price.id_for_label }}_display');
+        const marginInput = document.getElementById('{{ form.margin.id_for_label }}');
+        const marginDisplay = document.getElementById('{{ form.margin.id_for_label }}_display');
+        const sellingInput = document.getElementById('{{ form.selling_price.id_for_label }}');
+        const sellingDisplay = document.getElementById('{{ form.selling_price.id_for_label }}_display');
+        
+        const wPurchaseInput = document.getElementById('{{ form.wholesale_purchase_price.id_for_label }}');
+        const wPurchaseDisplay = document.getElementById('{{ form.wholesale_purchase_price.id_for_label }}_display');
+        const wSellingInput = document.getElementById('{{ form.wholesale_selling_price.id_for_label }}');
+        const wSellingDisplay = document.getElementById('{{ form.wholesale_selling_price.id_for_label }}_display');
+        const wMarginInput = document.getElementById('{{ form.wholesale_margin.id_for_label }}');
+        const wMarginDisplay = document.getElementById('{{ form.wholesale_margin.id_for_label }}_display');
+        const unitsInput = document.getElementById('id_units_per_box');
+
+        const profitDisplay = document.getElementById('profitDisplay');
+        const profitCard = document.querySelector('.profit-card');
+        const marginPercentage = document.getElementById('marginPercentage');
+        const marginProgressBar = document.getElementById('marginProgressBar');
+
+        // Format number with thousand separators
+        function formatNumber(value) {
+            if (!value || isNaN(value)) return '';
+            return new Intl.NumberFormat('fr-FR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        // Parse formatted number back to float
+        function parseFormattedNumber(value) {
+            if (!value) return 0;
+            // Remove spaces and replace comma with dot
+            const cleaned = value.replace(/\s/g, '').replace(',', '.');
+            return parseFloat(cleaned) || 0;
+        }
+
+        // Format currency for display
+        function formatCurrency(value) {
+            if (!value || isNaN(value)) return '0.00 GNF';
+            return formatNumber(value) + ' GNF';
+        }
+
+        // Update display fields from hidden inputs
+        function updateDisplayFields() {
+            if (purchaseInput.value) {
+                purchaseDisplay.value = formatNumber(purchaseInput.value);
+            }
+            if (sellingInput.value) {
+                sellingDisplay.value = formatNumber(sellingInput.value);
+            }
+            if (marginInput.value) {
+                marginDisplay.value = formatNumber(marginInput.value);
+            }
+            if (wPurchaseInput.value) {
+                wPurchaseDisplay.value = formatNumber(wPurchaseInput.value);
+            }
+            if (wSellingInput.value) {
+                wSellingDisplay.value = formatNumber(wSellingInput.value);
+            }
+            if (wMarginInput.value) {
+                wMarginDisplay.value = formatNumber(wMarginInput.value);
+            }
+        }
+
+        // Sync display to hidden input
+        function syncDisplayToInput(displayField, hiddenField) {
+            displayField.addEventListener('input', function() {
+                const rawValue = parseFormattedNumber(this.value);
+                hiddenField.value = rawValue;
+                calculatePrices();
+            });
+
+            displayField.addEventListener('blur', function() {
+                // Reformat on blur
+                if (this.value) {
+                    this.value = formatNumber(parseFormattedNumber(this.value));
+                }
+            });
+        }
+
+        function calculatePrices() {
+            const purchase = parseFloat(purchaseInput.value) || 0;
+            const selling = parseFloat(sellingInput.value) || 0;
+            const units = parseInt(unitsInput.value) || 1;
+            
+            const wPurchase = parseFloat(wPurchaseInput.value) || 0;
+            const wSelling = parseFloat(wSellingInput.value) || 0;
+
+            // Auto-fill wholesale purchase if detail purchase changes and wholesale is empty
+            if (purchase > 0 && wPurchase === 0) {
+                const autoWPur = purchase * units;
+                wPurchaseInput.value = autoWPur.toFixed(2);
+                wPurchaseDisplay.value = formatNumber(autoWPur);
+            }
+            
+            // Auto-fill wholesale selling if detail selling changes and wholesale is empty
+            if (selling > 0 && wSelling === 0) {
+                const autoWSel = selling * units;
+                wSellingInput.value = autoWSel.toFixed(2);
+                wSellingDisplay.value = formatNumber(autoWSel);
+            }
+
+            // Recalculate margins
+            const margin = selling - purchase;
+            marginInput.value = margin.toFixed(2);
+            marginDisplay.value = formatNumber(margin);
+
+            const wMargin = (parseFloat(wSellingInput.value) || 0) - (parseFloat(wPurchaseInput.value) || 0);
+            wMarginInput.value = wMargin.toFixed(2);
+            wMarginDisplay.value = formatNumber(wMargin);
+
+            // Calculate margin percentage
+            let marginPercent = 0;
+            if (purchase > 0) {
+                marginPercent = (margin / purchase) * 100;
+            }
+
+            // Update profit display
+            if (selling > 0 || purchase > 0) {
+                profitDisplay.textContent = formatCurrency(margin);
+                
+                // Update profit card styling
+                profitCard.classList.remove('positive', 'negative');
+                if (margin > 0) {
+                    profitCard.classList.add('positive');
+                } else if (margin < 0) {
+                    profitCard.classList.add('negative');
+                }
+
+                // Update margin percentage badge
+                marginPercentage.textContent = marginPercent.toFixed(1) + '%';
+
+                // Update progress bar
+                const progressValue = Math.min(Math.max(marginPercent, 0), 100);
+                marginProgressBar.style.width = progressValue + '%';
+                marginProgressBar.setAttribute('aria-valuenow', progressValue);
+
+                // Color the progress bar based on margin
+                marginProgressBar.className = 'progress-bar progress-bar-animated';
+                if (marginPercent < 10) {
+                    marginProgressBar.classList.add('bg-danger');
+                } else if (marginPercent < 25) {
+                    marginProgressBar.classList.add('bg-warning');
+                } else {
+                    marginProgressBar.classList.add('bg-success');
+                }
+            } else {
+                profitDisplay.textContent = '---';
+                marginPercentage.textContent = '0%';
+                marginProgressBar.style.width = '0%';
+                profitCard.classList.remove('positive', 'negative');
+            }
+        }
+
+        // Initialize
+        if (purchaseInput && marginInput && sellingInput) {
+            // Sync display fields to hidden inputs
+            syncDisplayToInput(purchaseDisplay, purchaseInput);
+            syncDisplayToInput(sellingDisplay, sellingInput);
+            syncDisplayToInput(wPurchaseDisplay, wPurchaseInput);
+            syncDisplayToInput(wSellingDisplay, wSellingInput);
+            
+            unitsInput.addEventListener('input', calculatePrices);
+
+            // Initial display update
+            updateDisplayFields();
+            calculatePrices();
+        }
+    });
+
+    // Image Preview Function
+    function previewImage(input) {
+        const preview = document.getElementById('imagePreview');
+        const placeholder = document.getElementById('imagePlaceholder');
+        const container = document.getElementById('imagePreviewContainer');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                if (placeholder) placeholder.classList.add('d-none');
+                container.classList.add('border-primary'); // Bootstrap class
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

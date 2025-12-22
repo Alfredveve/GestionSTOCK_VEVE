@@ -1,0 +1,816 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load static %}
+
+{% block title %}Tableau de Bord - GestionSTOCK{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transition-3d {
+        transition: all 0.3s ease-in-out;
+    }
+    .transition-3d:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: none;
+        color: #7e8299;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #009ef7;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 158, 247, 0.3);
+    }
+    .pagination .page-link:hover {
+        background-color: #f1faff;
+        color: #009ef7;
+    }
+    .table thead th {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05rem;
+    }
+    .card-label {
+        letter-spacing: -0.02rem;
+    }
+    
+    /* New side-accent card styles */
+    .status-card {
+        border-left: 5px solid transparent;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background-color: #f9f9f9;
+        border-radius: 12px !important;
+    }
+    .status-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .status-card.paid { border-left-color: #50cd89; background-color: #e8fff3; }
+    .status-card.sent { border-left-color: #009ef7; background-color: #f1faff; }
+    .status-card.cancelled { border-left-color: #f1416c; background-color: #fff5f8; }
+    .status-card.draft { border-left-color: #7e8299; background-color: #f5f8fa; }
+
+    /* Sales Progress Bar */
+    .sales-progress {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #eff2f5;
+        overflow: hidden;
+    }
+    .sales-progress-bar {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #009ef7, #50cd89);
+    }
+    
+    .top-sales-item {
+        transition: background-color 0.2s;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .top-sales-item:hover {
+        background-color: #f9f9f9;
+    }
+    .top-sales-rank {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 0.85rem;
+        font-weight: 800;
+        background-color: #f1faff;
+        color: #009ef7;
+        margin-right: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #ffae00); color: white; }
+    .rank-2 { background: linear-gradient(135deg, #c0c0c0, #95a5a6); color: white; }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="d-flex align-items-center mb-4">
+        <div class="symbol symbol-50px me-3">
+            <div class="symbol-label" style="background: rgba(255,255,255,0.2);">
+                <i class="bi bi-box-seam text-white fs-1"></i>
+            </div>
+        </div>
+        <h1 class="text-white fw-bolder my-0 fs-1">E-Stock</h1>
+    </div>
+
+    <!-- Navigation Tabs within Hero -->
+    <div class="hero-nav d-flex overflow-auto">
+        <a href="#" class="nav-link active">Gestion de stock</a>
+        <a href="{% url 'inventory:invoice_list' %}" class="nav-link">Vente</a>
+        <a href="{% url 'inventory:invoice_create' %}" class="nav-link">Facturation</a>
+        <a href="{% url 'inventory:payment_list' %}" class="nav-link">Suivi de paiements</a>
+        <a href="{% url 'inventory:reports' %}" class="nav-link">Rapports</a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-5 mb-xl-8" style="margin-top: -30px;">
+    <!-- Valeur Stock (Blue) -->
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card card-stats card-color-blue text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-graph-up text-white fs-3 me-2"></i>
+                    <div class="fw-bold fs-7 opacity-75">Valeur Stock</div>
+                </div>
+                <div class="fs-4 fw-bolder">{{ total_stock_value|format_currency }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bénéfice Estimé (Purple) -->
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card card-stats card-color-purple text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-cash-coin text-white fs-3 me-2"></i>
+                    <div class="fw-bold fs-7 opacity-75">Bénéfice Estimé</div>
+                </div>
+                <div class="fs-4 fw-bolder">{{ total_estimated_profit|format_currency }}</div>
+                <div class="small opacity-50 mt-1" style="font-size: 0.75rem;">Potentiel sur stock actuel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ventes totales (Green) -->
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card card-stats card-color-green text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-wallet2 text-white fs-3 me-2"></i>
+                    <div class="fw-bold fs-7 opacity-75">Ventes totales</div>
+                </div>
+                <div class="fs-4 fw-bolder">{{ total_sales|format_currency }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commandes en attente (Cyan) -->
+    <div class="col-12 col-md-6 col-xl-6">
+        <div class="card card-stats card-color-cyan text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-box-seam text-white fs-3 me-2"></i>
+                    <div class="fw-bold fs-7 opacity-75">Commandes en attente</div>
+                </div>
+                <div class="fs-2x fw-bolder">{{ pending_orders }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Produits (Orange) -->
+    <div class="col-12 col-md-6 col-xl-6">
+        <div class="card card-stats card-color-orange text-white h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-tags text-white fs-3 me-2"></i>
+                    <div class="fw-bold fs-7 opacity-75">Total Produits</div>
+                </div>
+                <div class="fs-2x fw-bolder">{{ total_products }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="row g-3 mb-xl-8 mb-5 mt-5">
+    <div class="col-12 col-md-4">
+        <a href="{% url 'inventory:product_create' %}" class="btn btn-action card-color-green w-100 py-3 shadow-sm">
+            <i class="bi bi-plus-lg fs-3 me-2"></i>
+            <span class="fs-6 fw-bold">Ajouter un produit</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a href="{% url 'inventory:invoice_create' %}" class="btn btn-action card-color-orange w-100 py-3 shadow-sm">
+            <i class="bi bi-file-text fs-3 me-2"></i>
+            <span class="fs-6 fw-bold">Créer une facture</span>
+        </a>
+    </div>
+    <div class="col-12 col-md-4">
+        <a href="{% url 'inventory:movement_create' %}" class="btn btn-action card-color-blue w-100 py-3 shadow-sm">
+            <i class="bi bi-cart-plus fs-3 me-2"></i>
+            <span class="fs-6 fw-bold">Enregistrer une vente</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="row g-5 g-xl-8 mb-5 mb-xl-10">
+    <!-- Left Column: Sales & Invoices -->
+    <div class="col-xl-8">
+        <!-- Activités Récentes des Ventes -->
+        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm border-0 transition-3d">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">🛍️ Activités Récentes des Ventes</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Flux de facturation en temps réel</span>
+                </h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'inventory:invoice_list' %}" class="btn btn-sm btn-light-primary fw-bold">Voir tout</a>
+                </div>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted bg-light">
+                                <th class="ps-4 min-w-100px rounded-start">Facture</th>
+                                <th class="min-w-150px">Client</th>
+                                <th class="min-w-100px">Date</th>
+                                <th class="min-w-100px text-end">Montant</th>
+                                <th class="min-w-100px text-end pe-4 rounded-end">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in recent_sales %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{% url 'inventory:invoice_detail' invoice.pk %}" class="text-dark fw-bolder text-hover-primary fs-6">{{ invoice.invoice_number }}</a>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-bold fs-6">{{ invoice.client.name }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted fw-bold d-block fs-7">{{ invoice.date_issued|date:"d M Y" }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-dark fw-bolder d-block fs-6">{{ invoice.total_amount|format_currency }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if invoice.status == 'paid' %}
+                                    <span class="badge badge-light-success px-3 py-2">Payée</span>
+                                    {% elif invoice.status == 'sent' %}
+                                    <span class="badge badge-light-primary px-3 py-2">Envoyée</span>
+                                    {% elif invoice.status == 'cancelled' %}
+                                    <span class="badge badge-light-danger px-3 py-2">Annulée</span>
+                                    {% else %}
+                                    <span class="badge badge-light-secondary px-3 py-2">Brouillon</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-10">Aucune vente récente</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modern Pagination -->
+                {% if recent_sales.has_other_pages %}
+                <div class="d-flex flex-stack flex-wrap pt-5">
+                    <div class="fs-6 fw-bold text-gray-700">Affichage de 5 sur {{ recent_sales.paginator.count }}</div>
+                    <ul class="pagination">
+                        {% if recent_sales.has_previous %}
+                        <li class="page-item"><a href="?page_sales={{ recent_sales.previous_page_number }}" class="page-link"><i class="bi bi-chevron-left"></i></a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ recent_sales.number }}</span></li>
+                        {% if recent_sales.has_next %}
+                        <li class="page-item"><a href="?page_sales={{ recent_sales.next_page_number }}" class="page-link"><i class="bi bi-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Invoice Status -->
+    <div class="col-xl-4">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm border-0">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">📋 État des Factures</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Résumé par statut</span>
+                </h3>
+            </div>
+            <div class="card-body pt-5">
+                {% for stat in invoice_stats %}
+                <div class="d-flex align-items-center status-card {{ stat.status }} p-4 mb-4">
+                    <div class="flex-grow-1 me-2">
+                        <a href="{% url 'inventory:invoice_list' %}?status={{ stat.status }}" class="fw-bolder text-gray-800 text-hover-primary fs-6">{{ stat.label }}</a>
+                        <div class="d-flex align-items-center mt-1">
+                            <span class="text-muted fw-bold fs-7 me-2">{{ stat.total|format_currency }}</span>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge {% if stat.status == 'paid' %}badge-light-success{% elif stat.status == 'sent' %}badge-light-primary{% elif stat.status == 'cancelled' %}badge-light-danger{% else %}badge-light-secondary{% endif %} fw-bolder px-3 py-1">{{ stat.count }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Evolution Chart -->
+<div class="row g-5 g-xl-8 mb-5 mb-xl-10">
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm border-0">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">📊 Évolution du Chiffre d'Affaires</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Historique des revenus sur les 12 derniers mois</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="chart-container" style="height: 350px; position: relative;">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8 mb-5 mb-xl-10">
+    <!-- Wholesale vs Retail Chart -->
+    <div class="col-xl-7">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100 shadow-sm border-0">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">📦 Analyse Gros vs Détail</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Top 5 produits les plus vendus par type</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="productSalesTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Distribution (kept but updated) -->
+    <div class="col-xl-5">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100 shadow-sm border-0">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">🎨 Stock par Catégorie</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Répartition globale des produits</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8 mb-5 mb-xl-10">
+    <!-- Stock Distribution by Store (Table) -->
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">Répartition du Stock</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Par magasin</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px">Magasin</th>
+                                <th class="min-w-100px text-center">Quantité</th>
+                                <th class="min-w-100px text-end">Valeur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pos in stock_by_pos %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-45px me-5">
+                                            <span class="symbol-label font-weight-bold bg-light-info text-info">{{ pos.name|slice:":1" }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-start flex-column">
+                                            <a href="#" class="text-dark fw-bolder text-hover-primary fs-6">{{ pos.name }}</a>
+                                            <span class="text-muted fw-bold d-block fs-7">{{ pos.code }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-light text-dark fw-bolder">{{ pos.total_items }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-dark fw-bolder">{{ pos.total_value|format_currency }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Aucun stock disponible</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Products (Table) -->
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100 shadow-sm border-0">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">🏆 Top Ventes</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Articles les plus performants</span>
+                </h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'inventory:invoice_list' %}" class="btn btn-sm btn-light-primary fw-bold">Détails</a>
+                </div>
+            </div>
+            <div class="card-body pt-5">
+                {% for item in top_selling_items %}
+                <div class="top-sales-item d-flex align-items-center mb-6 p-3">
+                    <div class="top-sales-rank rank-{{ forloop.counter }}">{{ forloop.counter }}</div>
+                    
+                    <div class="symbol symbol-50px symbol-circle me-5 shadow-sm border border-2 border-white">
+                        {% if item.product__image and item.product__image != "" %}
+                        <div class="symbol-label" style="background-image:url('/media/{{ item.product__image }}'); background-size: cover; background-position: center;"></div>
+                        {% else %}
+                        <div class="symbol-label bg-light-primary text-primary fw-bold text-uppercase fs-4">
+                            {{ item.product__name|slice:":1" }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap mb-1">
+                            <a href="{% url 'inventory:product_detail' item.product__id %}" class="text-gray-900 text-hover-primary fs-6 fw-bolder me-2">{{ item.product__name }}</a>
+                            <div class="text-end">
+                                <span class="text-dark fw-bolder d-block">{{ item.total_revenue|format_currency }}</span>
+                                <span class="badge badge-light-success fw-bold fs-8">{{ item.total_sold }} vendus</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-muted fw-bold fs-7">SKU: {{ item.product__sku }}</span>
+                        </div>
+                        
+                        <!-- Mini progress bar to visualize relative sales -->
+                        <div class="sales-progress mt-2 w-100 shadow-sm" style="height: 8px;">
+                            {% with max_sold=top_selling_items.0.total_sold %}
+                            <div class="sales-progress-bar" style="width: {% widthratio item.total_sold max_sold 100 %}%"></div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-10">
+                    <i class="bi bi-cart-x fs-3x text-muted mb-5 d-block"></i>
+                    <p class="text-muted fs-6">Aucune vente enregistrée pour le moment</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8 mb-5 mb-xl-10">
+    <!-- Low Stock Products (Alert) -->
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100 shadow-sm border-0 transition-3d">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">⚠️ Stock Faible</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Réapprovisionnement nécessaire</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted bg-light">
+                                <th class="ps-4 min-w-150px rounded-start">Produit</th>
+                                <th class="min-w-100px text-center">En Stock</th>
+                                <th class="min-w-100px text-center pe-4 rounded-end">Seuil</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inventory in low_stock_products %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{% url 'inventory:product_detail' inventory.product.pk %}" class="text-dark fw-bolder text-hover-primary fs-6">{{ inventory.product.name }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-light-danger fw-bolder px-3 py-1">{{ inventory.quantity }}</span>
+                                </td>
+                                <td class="text-center pe-4">
+                                    <span class="text-muted fw-bold">{{ inventory.reorder_level }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-5">Tout est sous contrôle</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                {% if low_stock_products.has_other_pages %}
+                <div class="d-flex flex-stack flex-wrap pt-3">
+                    <ul class="pagination pagination-sm">
+                        {% if low_stock_products.has_previous %}
+                        <li class="page-item"><a href="?page_low_stock={{ low_stock_products.previous_page_number }}" class="page-link"><i class="bi bi-chevron-left"></i></a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ low_stock_products.number }}</span></li>
+                        {% if low_stock_products.has_next %}
+                        <li class="page-item"><a href="?page_low_stock={{ low_stock_products.next_page_number }}" class="page-link"><i class="bi bi-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Returned Products (Alert) -->
+    <div class="col-xl-6">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 h-100">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">Produits Retournés</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Derniers retours</span>
+                </h3>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted">
+                                <th class="min-w-150px">Produit</th>
+                                <th class="min-w-100px text-center">Quantité</th>
+                                <th class="min-w-100px text-end">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movement in returned_products %}
+                            <tr>
+                                <td>
+                                    <a href="#" class="text-dark fw-bolder text-hover-primary fs-6">{{ movement.product.name }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-light-danger fw-bolder">{{ movement.quantity }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="text-muted fw-bold">{{ movement.created_at|date:"d/m/Y" }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Aucun retour récent</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5 g-xl-8">
+    <!-- Latest Stock Movements -->
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm border-0 transition-3d">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 text-dark">🔄 Derniers Mouvements</span>
+                    <span class="text-muted mt-1 fw-bold fs-7">Historique global des stocks</span>
+                </h3>
+                <div class="card-toolbar">
+                    <a href="{% url 'inventory:movement_list' %}" class="btn btn-sm btn-light-primary fw-bold">Journal complet</a>
+                </div>
+            </div>
+            <div class="card-body py-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                        <thead>
+                            <tr class="fw-bolder text-muted bg-light">
+                                <th class="ps-4 min-w-150px rounded-start">Produit</th>
+                                <th class="min-w-100px">Type</th>
+                                <th class="min-w-100px text-center">Quantité</th>
+                                <th class="min-w-150px">Lieu</th>
+                                <th class="min-w-150px text-end pe-4 rounded-end">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movement in recent_movements %}
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="text-dark fw-bolder fs-6">{{ movement.product.name }}</span>
+                                </td>
+                                <td>
+                                    {% if movement.movement_type == 'entry' %}
+                                    <span class="badge badge-light-success">Entrée</span>
+                                    {% elif movement.movement_type == 'exit' %}
+                                    <span class="badge badge-light-danger">Sortie</span>
+                                    {% elif movement.movement_type == 'transfer' %}
+                                    <span class="badge badge-light-info">Transfert</span>
+                                    {% else %}
+                                    <span class="badge badge-light-warning">{{ movement.get_movement_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bolder text-dark">{{ movement.quantity }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted fw-bold">{{ movement.from_point_of_sale.name }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <span class="text-muted fw-bold">{{ movement.created_at|date:"d M, H:i" }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-10">Aucun mouvement récent</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                {% if recent_movements.has_other_pages %}
+                <div class="d-flex flex-stack flex-wrap pt-5">
+                    <div class="fs-6 fw-bold text-gray-700">Affichage de 5 sur {{ recent_movements.paginator.count }}</div>
+                    <ul class="pagination">
+                        {% if recent_movements.has_previous %}
+                        <li class="page-item"><a href="?page_movements={{ recent_movements.previous_page_number }}" class="page-link"><i class="bi bi-chevron-left"></i></a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ recent_movements.number }}</span></li>
+                        {% if recent_movements.has_next %}
+                        <li class="page-item"><a href="?page_movements={{ recent_movements.next_page_number }}" class="page-link"><i class="bi bi-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Common configurations for premium look
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20,
+                    font: { size: 12, family: 'Inter, sans-serif' }
+                }
+            },
+            tooltip: {
+                backgroundColor: '#181c32',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: { size: 13, weight: 'bold' },
+                bodyFont: { size: 12 }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: '#eff2f5', drawBorder: false },
+                ticks: { font: { size: 11 } }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 11 } }
+            }
+        }
+    };
+
+    // 1. Monthly Revenue Chart (Area Chart)
+    fetch("{% url 'inventory:api_monthly_revenue' %}")
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 158, 247, 0.4)');
+            gradient.addColorStop(1, 'rgba(0, 158, 247, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Chiffre d\'Affaires',
+                        data: data.data,
+                        borderColor: '#009ef7',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#009ef7',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            ...chartOptions.plugins.tooltip,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Total: ' + context.parsed.y.toLocaleString() + ' GNF';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    // 2. Product Sales Type Chart (Grouped Bar)
+    fetch("{% url 'inventory:api_product_sales_type' %}")
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('productSalesTypeChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Ventes Détail',
+                            data: data.retail,
+                            backgroundColor: '#50cd89', // Metronic Success
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Ventes Gros',
+                            data: data.wholesale,
+                            backgroundColor: '#7239ea', // Metronic Purple
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    ...chartOptions,
+                    indexAxis: 'y', // Horizontal bars for better readability of product names
+                }
+            });
+        });
+
+    // 3. Category Chart (Doughnut) - Kept and updated for style
+    const ctxCategory = document.getElementById('categoryChart');
+    if (ctxCategory) {
+        new Chart(ctxCategory, {
+            type: 'doughnut',
+            data: {
+                labels: [{% for c in category_data %}"{{ c.name|escapejs }}",{% endfor %}],
+                datasets: [{
+                    label: 'Nombre de produits',
+                    data: [{% for c in category_data %}{{ c.count }},{% endfor %}],
+                    backgroundColor: [
+                        '#009ef7', '#50cd89', '#f1416c', '#ffc700', '#7239ea', '#47be7d'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 15 }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

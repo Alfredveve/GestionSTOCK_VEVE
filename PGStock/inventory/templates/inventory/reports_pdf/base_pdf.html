@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+            @bottom-right {
+                content: "Page " counter(page) " sur " counter(pages);
+                font-size: 8pt;
+                color: #7E8299;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9pt;
+            color: #181C32;
+            line-height: 1.4;
+        }
+
+        /* Colors */
+        .text-primary { color: #009EF7; }
+        .text-success { color: #50CD89; }
+        .text-danger { color: #F1416C; }
+        .text-warning { color: #FFC700; }
+        .text-muted { color: #7E8299; }
+        
+        .bg-light { background-color: #F9F9F9; }
+
+        /* Header Section */
+        .header-container {
+            border-bottom: 2px solid #F1F1F4;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header-table {
+            width: 100%;
+            border: none;
+        }
+
+        .company-name {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #181C32;
+            margin: 0;
+        }
+
+        .report-title {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #009EF7;
+            text-align: right;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .info-strip {
+            background-color: #F4F6FA;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-table {
+            width: 100%;
+            font-size: 8.5pt;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background-color: #F1F1F4;
+        }
+
+        th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: bold;
+            color: #3F4254;
+            text-transform: uppercase;
+            font-size: 8pt;
+            border-bottom: 1px solid #E4E6EF;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #EFF2F5;
+            vertical-align: middle;
+        }
+
+        tr.row-even {
+            background-color: #FAFAFB;
+        }
+
+        /* Utilities */
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: bold; }
+        
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 7.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-light-success { background-color: #E8FFF3; color: #50CD89; }
+        .badge-light-danger { background-color: #FFF5F8; color: #F1416C; }
+        .badge-light-primary { background-color: #F1FAFF; color: #009EF7; }
+        
+        .footer {
+            position: fixed;
+            bottom: -0.5cm;
+            left: 0;
+            right: 0;
+            border-top: 1px solid #EFF2F5;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 8pt;
+            color: #B5B5C3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <table class="header-table">
+            <tr>
+                <td style="border:none; padding:0;">
+                    <div class="company-name">{{ company_settings.company_name|default:"GestionSTOCK" }}</div>
+                    <div class="text-muted" style="font-size:8pt;">
+                        {{ company_settings.address|default:"" }}<br>
+                        {{ company_settings.phone|default:"" }} | {{ company_settings.email|default:"" }}
+                    </div>
+                </td>
+                <td style="border:none; padding:0; text-align:right; vertical-align:top;">
+                    <div class="report-title">{{ report_title }}</div>
+                    <div class="text-muted" style="font-size:8pt;">Réf: {{ generated_at|date:"Ymd-Hi" }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="info-strip">
+        <table class="info-table">
+            <tr>
+                <td style="border:none; padding:0;">
+                    <strong>Généré le:</strong> {{ generated_at|date:"d F Y à H:i" }}
+                </td>
+                <td style="border:none; padding:0; text-align:right;">
+                    {% if start_date %}
+                        <strong>Période:</strong> Du {{ start_date|date:"d/m/Y" }} {% if end_date %} au {{ end_date|date:"d/m/Y" }}{% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        Document généré par {{ company_settings.company_name|default:"GestionSTOCK" }} &copy; {% now "Y" %}
+    </div>
+</body>
+</html>

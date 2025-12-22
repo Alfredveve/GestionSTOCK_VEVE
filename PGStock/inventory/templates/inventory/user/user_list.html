@@ -1,0 +1,293 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Gestion des utilisateurs - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-body-emphasis d-flex align-items-center gap-2">
+                <i class="fas fa-users-cog text-primary"></i> Utilisateurs
+            </h1>
+            <p class="text-secondary mt-1 mb-0">Gérez les comptes utilisateurs et permissions</p>
+        </div>
+        <a href="{% url 'inventory:user_create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="fas fa-user-plus"></i> Nouvel utilisateur
+        </a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary small text-uppercase mb-2">Total Utilisateurs</h6>
+                    <div class="d-flex align-items-center">
+                        <span class="h2 fw-bold mb-0">{{ total_users }}</span>
+                        <i class="fas fa-users ms-auto text-primary-emphasis opacity-50 fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary small text-uppercase mb-2">Actifs</h6>
+                    <div class="d-flex align-items-center">
+                        <span class="h2 fw-bold mb-0 text-success">{{ active_users_count }}</span>
+                        <i class="fas fa-user-check ms-auto text-success-emphasis opacity-50 fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-secondary h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary small text-uppercase mb-2">Inactifs</h6>
+                    <div class="d-flex align-items-center">
+                        <span class="h2 fw-bold mb-0 text-secondary">{{ inactive_users_count }}</span>
+                        <i class="fas fa-user-slash ms-auto text-secondary-emphasis opacity-50 fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary small text-uppercase mb-2">Superusers</h6>
+                    <div class="d-flex align-items-center">
+                        <span class="h2 fw-bold mb-0 text-warning">{{ superuser_count }}</span>
+                        <i class="fas fa-user-shield ms-auto text-warning-emphasis opacity-50 fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center">
+                <form method="get" class="d-flex gap-2 flex-grow-1" style="max-width: 500px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-end-0">
+                            <i class="fas fa-search text-secondary"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0"
+                            placeholder="Rechercher par nom, email..." value="{{ request.GET.q }}">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                    </div>
+                    {% if request.GET.q %}
+                    <a href="{% url 'inventory:user_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                </form>
+
+                <div class="btn-group" role="group">
+                    <a href="{% url 'inventory:user_list' %}"
+                        class="btn btn-outline-secondary {% if not request.GET.status %}active{% endif %}">Tous</a>
+                    <a href="{% url 'inventory:user_list' %}?status=active"
+                        class="btn btn-outline-secondary {% if request.GET.status == 'active' %}active{% endif %}">Actifs</a>
+                    <a href="{% url 'inventory:user_list' %}?status=inactive"
+                        class="btn btn-outline-secondary {% if request.GET.status == 'inactive' %}active{% endif %}">Inactifs</a>
+                    <a href="{% url 'inventory:user_list' %}?status=superuser"
+                        class="btn btn-outline-secondary {% if request.GET.status == 'superuser' %}active{% endif %}">Admins</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Grid -->
+    {% if users %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        {% for user in users %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-shadow">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="flex-shrink-0">
+                        {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}"
+                            class="rounded-circle object-fit-cover" width="64" height="64">
+                        {% else %}
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold fs-3"
+                            style="width: 64px; height: 64px;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                        <h5 class="card-title fw-bold mb-1 text-truncate">{{ user.username }}</h5>
+                        <p class="card-text text-secondary small mb-1 text-truncate">
+                            <i class="fas fa-envelope me-1"></i> {{ user.email|default:"Aucun email" }}
+                        </p>
+                        {% if user.get_full_name %}
+                        <p class="card-text text-secondary small mb-2 text-truncate">
+                            <i class="fas fa-user me-1"></i> {{ user.get_full_name }}
+                        </p>
+                        {% endif %}
+
+                        <div class="d-flex flex-wrap gap-1 mt-2">
+                            {% if user.is_superuser %}
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle">Superuser</span>
+                            {% endif %}
+                            {% if user.is_active %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                            {% else %}
+                            <span
+                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Inactif</span>
+                            {% endif %}
+                            {% for group in user.groups.all %}
+                            <span class="badge bg-info-subtle text-info border border-info-subtle">{{ group.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'inventory:user_update' user.pk %}" class="btn btn-icon btn-light-warning btn-sm" title="Modifier">
+                            <i class="fas fa-pencil-alt fs-5"></i>
+                        </a>
+                        {% if user != request.user %}
+                        <a href="{% url 'inventory:user_delete' user.pk %}" class="btn btn-icon btn-light-danger btn-sm"
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')" title="Supprimer">
+                            <i class="fas fa-trash-alt fs-5"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-5 pb-5">
+        <!-- Results Info -->
+        <div class="d-flex align-items-center text-gray-600 fw-semibold fs-6">
+            <div class="badge badge-light-primary fw-bold me-2 fs-7 p-2">
+                {{ users.start_index }} - {{ users.end_index }}
+            </div>
+            <span>sur <span class="text-gray-900 fw-bold mx-1">{{ users.paginator.count }}</span> résultats</span>
+        </div>
+
+        <!-- Modern Pagination Controls -->
+        <nav aria-label="Navigation des pages" class="d-flex justify-content-end">
+            <ul class="pagination pagination-modern mb-0 gap-1">
+                <!-- Previous -->
+                {% if users.has_previous %}
+                <li class="page-item">
+                    <a href="?page={{ users.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                <!-- Page Numbers logic -->
+                {% for i in users.paginator.page_range %}
+                    {% if users.paginator.num_pages <= 7 %}
+                        <li class="page-item {% if users.number == i %}active{% endif %}">
+                            <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link shadow-sm {% if users.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                {{ i }}
+                            </a>
+                        </li>
+                    {% else %}
+                        {% if i == 1 or i == users.paginator.num_pages %}
+                            <li class="page-item {% if users.number == i %}active{% endif %}">
+                                <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link shadow-sm {% if users.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                        {% elif i >= users.number|add:'-2' and i <= users.number|add:'2' %}
+                            <li class="page-item {% if users.number == i %}active{% endif %}">
+                                <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link shadow-sm {% if users.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                        {% elif i == users.number|add:'-3' or i == users.number|add:'3' %}
+                            <li class="page-item disabled">
+                                <span class="page-link shadow-sm text-muted border-0 bg-transparent">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next -->
+                {% if users.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ users.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-3">
+            <i class="fas fa-user-slash fa-3x text-body-tertiary"></i>
+        </div>
+        <h3 class="h5 text-body-secondary">Aucun utilisateur trouvé</h3>
+        <p class="text-body-tertiary">Modifiez vos filtres de recherche.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+    }
+
+    .transition-shadow {
+        transition: all .2s ease-in-out;
+    }
+
+    /* Modern Pagination */
+    .pagination-modern .page-link {
+        border-radius: 0.5rem;
+        margin: 0 2px;
+        border: none;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: white;
+    }
+
+    .pagination-modern .page-item:not(.active) .page-link:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        color: #009EF7 !important;
+    }
+    
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.35) !important;
+        transform: scale(1.05);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

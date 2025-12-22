@@ -1,0 +1,207 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load static %}
+
+{% block title %}Bon de Réception {{ receipt.receipt_number }}{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            background: white;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .sheet {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-shadow: none;
+            max-width: none;
+        }
+    }
+
+    .sheet {
+        background: white;
+        max-width: 210mm;
+        min-height: 297mm;
+        margin: 2rem auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+
+<!-- Action Bar -->
+<div class="max-w-4xl mx-auto mb-6 flex justify-between items-center no-print px-4">
+    <a href="{% url 'inventory:receipt_list' %}" class="btn btn-ghost gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Retour
+    </a>
+    <div class="flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Imprimer
+        </button>
+        {% if receipt.status == 'draft' %}
+        <a href="{% url 'inventory:receipt_update' receipt.pk %}" class="btn btn-secondary text-white">Modifier</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modern Receipt Sheet -->
+<div class="sheet relative overflow-hidden text-slate-800 font-sans">
+    <!-- Header -->
+    <div class="bg-emerald-900 text-white p-12 flex justify-between items-start">
+        <div>
+            <div class="flex items-center gap-3 mb-6">
+                <div
+                    class="w-10 h-10 bg-emerald-500 text-white flex items-center justify-center rounded-lg font-bold text-xl">
+                    GS</div>
+                <h1 class="text-2xl font-bold tracking-tight">GestionSTOCK</h1>
+            </div>
+            <div
+                class="inline-block px-3 py-1 rounded border border-emerald-700 bg-emerald-800/50 text-xs font-mono uppercase tracking-widest text-emerald-300">
+                Bon de Réception
+            </div>
+        </div>
+        <div class="text-right">
+            <div class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-2">Référence</div>
+            <h2 class="text-4xl font-black tracking-tight mb-6">{{ receipt.receipt_number }}</h2>
+
+            <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div class="text-emerald-400">Date</div>
+                <div class="font-bold">{{ receipt.date_received|date:'d/m/Y' }}</div>
+
+                <div class="text-emerald-400">Dépôt</div>
+                <div class="font-bold whitespace-nowrap">{{ receipt.point_of_sale.name }}</div>
+
+                <div class="text-emerald-400">Statut</div>
+                <div>
+                    {% if receipt.status == 'validated' %}
+                    <span class="text-green-400 font-bold uppercase">Validé</span>
+                    {% else %}
+                    <span class="text-yellow-400 font-bold uppercase">Brouillon</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-12">
+        <!-- Supplier & Logistics Grid -->
+        <div class="grid grid-cols-2 gap-8 mb-12">
+            <div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Fournisseur</p>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">{{ receipt.supplier.name }}</h3>
+                <div class="text-sm text-slate-600 space-y-1">
+                    {% if receipt.supplier.address %}<p>{{ receipt.supplier.address }}</p>{% endif %}
+                    {% if receipt.supplier.contact %}<p>{{ receipt.supplier.contact }}</p>{% endif %}
+                    {% if receipt.supplier.phone %}<p>{{ receipt.supplier.phone }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Infos Logistiques</p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="block text-slate-500 text-xs">Ref. Fournisseur</span>
+                        <span class="font-mono font-bold">{{ receipt.supplier_reference|default:"-" }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-500 text-xs">Réceptionné par</span>
+                        <span class="font-bold">{{ receipt.created_by.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="mb-12 rounded-lg border border-slate-200 overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="text-left py-3 px-4 font-bold text-slate-700 uppercase text-xs tracking-wider w-1/2">
+                            Désignation</th>
+                        <th
+                            class="text-center py-3 px-4 font-bold text-slate-700 uppercase text-xs tracking-wider border-l border-slate-200">
+                            Qté</th>
+                        <th
+                            class="text-right py-3 px-4 font-bold text-slate-700 uppercase text-xs tracking-wider border-l border-slate-200">
+                            P.U.</th>
+                        <th
+                            class="text-right py-3 px-4 font-bold text-slate-700 uppercase text-xs tracking-wider border-l border-slate-200">
+                            Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% for item in items %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4">
+                            <span class="font-bold text-slate-800 block">{{ item.product.name }}</span>
+                            <span class="text-xs font-mono text-slate-500 mt-0.5 block">{{ item.product.sku }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-center font-mono text-slate-600 border-l border-slate-100">{{
+                            item.quantity }}</td>
+                        <td class="px-4 py-3 text-right font-mono text-slate-600 border-l border-slate-100">
+                            {{ item.unit_cost|format_currency:company_settings.currency }}
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono font-bold text-slate-900 border-l border-slate-100">
+                            {{ item.total|format_currency:company_settings.currency }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-slate-50 border-t-2 border-slate-200">
+                    <tr>
+                        <td colspan="3" class="py-4 px-4 text-right uppercase font-bold text-slate-500 text-xs">Total
+                            Global</td>
+                        <td
+                            class="py-4 px-4 text-right font-mono text-lg font-black text-slate-900 border-l border-slate-200">
+                            {{ receipt.total_amount|format_currency:company_settings.currency }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-8 items-start print-break-inside-avoid">
+            <div class="w-1/2">
+                {% if receipt.notes %}
+                <div class="border-l-2 border-slate-300 pl-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase mb-1">Observations</h4>
+                    <p class="text-sm text-slate-600 italic">{{ receipt.notes|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="w-1/2 grid grid-cols-2 gap-4">
+                <div class="border border-slate-200 rounded p-3 h-24 relative bg-gray-50/50">
+                    <span class="absolute top-2 left-3 text-[10px] uppercase font-bold text-slate-400">Visa
+                        Magasinier</span>
+                </div>
+                <div class="border border-slate-200 rounded p-3 h-24 relative bg-gray-50/50">
+                    <span class="absolute top-2 left-3 text-[10px] uppercase font-bold text-slate-400">Visa
+                        Livreur</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

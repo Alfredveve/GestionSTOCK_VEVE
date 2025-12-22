@@ -1,0 +1,228 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load static %}
+
+{% block title %}Facture {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            background: white;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .sheet {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-shadow: none;
+            max-width: none;
+        }
+
+        .print-break-inside-avoid {
+            break-inside: avoid;
+        }
+    }
+
+    .sheet {
+        background: white;
+        max-width: 210mm;
+        min-height: 297mm;
+        margin: 2rem auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+
+<!-- Action Bar -->
+<div class="max-w-4xl mx-auto mb-6 flex justify-between items-center no-print px-4">
+    <a href="{% url 'inventory:invoice_list' %}" class="btn btn-ghost gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Retour
+    </a>
+    <div class="flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Imprimer
+        </button>
+        {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
+        <a href="{% url 'inventory:payment_create' invoice.pk %}" class="btn btn-success text-white">Encaisser</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modern Invoice Sheet -->
+<div class="sheet relative overflow-hidden text-slate-800 font-sans">
+    <!-- Header Banner -->
+    <div class="bg-slate-900 text-white p-12 flex justify-between items-start">
+        <div>
+            <div class="flex items-center gap-3 mb-6">
+                <div
+                    class="w-10 h-10 bg-primary text-white flex items-center justify-center rounded-lg font-bold text-xl">
+                    GS</div>
+                <h1 class="text-2xl font-bold tracking-tight">GestionSTOCK</h1>
+            </div>
+            <div class="text-slate-400 text-sm space-y-1">
+                <p>{{ company_settings.address|default:"Adresse de l'entreprise" }}</p>
+                <p>{{ company_settings.phone|default:"+224 000 000 000" }}</p>
+                <p>{{ company_settings.email|default:"contact@gestionstock.com" }}</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Facture N°</div>
+            <h2 class="text-4xl font-black tracking-tight mb-6">{{ invoice.invoice_number }}</h2>
+
+            <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div class="text-slate-400">Date d'émission</div>
+                <div class="font-bold">{{ invoice.date_issued|date:'d/m/Y' }}</div>
+
+                <div class="text-slate-400">Date d'échéance</div>
+                <div class="font-bold">{{ invoice.date_due|date:'d/m/Y' }}</div>
+
+                <div class="text-slate-400">Statut</div>
+                <div>
+                    {% if invoice.status == 'paid' %}
+                    <span class="text-green-400 font-bold uppercase">Payée</span>
+                    {% elif invoice.status == 'cancelled' %}
+                    <span class="text-red-400 font-bold uppercase">Annulée</span>
+                    {% else %}
+                    <span class="text-yellow-400 font-bold uppercase">{{ invoice.get_status_display }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-12">
+        <!-- Client Info -->
+        <div class="mb-12">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Facturé à</p>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">{{ invoice.client.name }}</h3>
+            <div class="text-slate-600 space-y-1">
+                {% if invoice.client.address %}<p>{{ invoice.client.address }}</p>{% endif %}
+                {% if invoice.client.phone %}<p>{{ invoice.client.phone }}</p>{% endif %}
+                {% if invoice.client.email %}<p>{{ invoice.client.email }}</p>{% endif %}
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="mb-12">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b-2 border-slate-900">
+                        <th class="text-left py-4 font-bold text-slate-900 uppercase text-xs tracking-wider w-1/2">
+                            Description</th>
+                        <th class="text-center py-4 font-bold text-slate-900 uppercase text-xs tracking-wider">Qté</th>
+                        <th class="text-right py-4 font-bold text-slate-900 uppercase text-xs tracking-wider">Prix Unit.
+                        </th>
+                        <th class="text-right py-4 font-bold text-slate-900 uppercase text-xs tracking-wider">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for item in items %}
+                    <tr>
+                        <td class="py-4 pr-4">
+                            <p class="font-bold text-slate-800">{{ item.product.name }}</p>
+                            {% if item.product.description %}
+                            <p class="text-sm text-slate-500 mt-1">{{ item.product.description }}</p>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-4 text-center font-mono text-slate-600">{{ item.quantity }}</td>
+                        <td class="px-4 py-4 text-right font-mono text-slate-600">
+                            {{ item.unit_price|format_currency:company_settings.currency }}
+                        </td>
+                        <td class="pl-4 py-4 text-right font-mono font-bold text-slate-900">
+                            {{ item.get_total|format_currency:company_settings.currency }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not items %}
+            <div class="py-12 text-center text-slate-400 italic bg-slate-50 rounded mt-4">Aucun article</div>
+            {% endif %}
+        </div>
+
+        <!-- Totals -->
+        <div class="flex justify-end mb-12 print-break-inside-avoid">
+            <div class="w-1/2 lg:w-1/3">
+                <div class="space-y-3 pb-6 border-b border-slate-200">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Sous-total</span>
+                        <span class="font-mono">{{ invoice.subtotal|format_currency:company_settings.currency }}</span>
+                    </div>
+                    {% if invoice.tax_rate > 0 %}
+                    <div class="flex justify-between text-slate-600">
+                        <span>TVA ({{ invoice.tax_rate }}%)</span>
+                        <span class="font-mono">
+                            {{ invoice.tax_amount|format_currency:company_settings.currency }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="pt-6 flex justify-between items-center">
+                    <span class="font-bold text-xl text-slate-900">Total TTC</span>
+                    <span class="font-black text-3xl text-primary font-mono">
+                        {{ invoice.total_amount|format_currency:company_settings.currency }}
+                    </span>
+                </div>
+
+                {% if invoice.get_amount_paid > 0 %}
+                <div class="mt-6 bg-slate-50 rounded p-4 space-y-2">
+                    <div class="flex justify-between text-sm font-bold text-green-600">
+                        <span>Déjà payé</span>
+                        <span>{{ invoice.get_amount_paid|format_currency:company_settings.currency }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-bold text-red-500">
+                        <span>Reste à payer</span>
+                        <span>{{ invoice.get_remaining_amount|format_currency:company_settings.currency }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notes & Footer -->
+        <div class="flex gap-8 items-end print-break-inside-avoid">
+            <div class="w-2/3">
+                {% if invoice.notes %}
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <h4 class="text-xs font-bold text-yellow-700 uppercase mb-1">Notes</h4>
+                    <p class="text-sm text-yellow-800 italic">{{ invoice.notes|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Signatures -->
+            <div class="w-full mt-12 grid grid-cols-2 gap-8 print-break-inside-avoid">
+                <div class="text-center">
+                    <div class="border-b border-slate-300 pb-2 mb-2"></div>
+                    <p class="text-xs font-bold uppercase text-slate-400">Signature Client</p>
+                </div>
+                <div class="text-center">
+                    <div class="border-b border-slate-300 pb-2 mb-2"></div>
+                    <p class="text-xs font-bold uppercase text-slate-400">Signature Responsable</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

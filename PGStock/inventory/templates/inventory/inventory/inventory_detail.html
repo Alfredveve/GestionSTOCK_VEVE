@@ -1,0 +1,233 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}Détail Inventaire - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-6 gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'inventory:inventory_list' %}" class="btn btn-icon btn-light btn-sm me-2" title="Retour">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                    {{ inventory.product.name }}
+                </h1>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-white opacity-75 fs-6 fw-semibold">SKU: {{ inventory.product.sku }}</span>
+                    <span class="bullet bullet-dot bg-white opacity-50 mx-2"></span>
+                    {% if inventory.get_status == 'in_stock' %}
+                    <span class="badge badge-light-success fw-bold">En Stock</span>
+                    {% elif inventory.get_status == 'low_stock' %}
+                    <span class="badge badge-light-warning fw-bold">Stock Faible</span>
+                    {% else %}
+                    <span class="badge badge-light-danger fw-bold">Rupture</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventory:product_detail' inventory.product.pk %}" class="btn btn-secondary fw-bold btn-sm">
+                <i class="fas fa-eye me-2"></i> Voir Produit
+            </a>
+            <a href="{% url 'inventory:movement_create' %}?product={{ inventory.product.id }}" class="btn btn-primary fw-bold btn-sm">
+                <i class="fas fa-plus-circle me-2"></i> Nouveau Mouvement
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-5 mb-6">
+        <!-- Stock Information -->
+        <div class="col-md-6 col-lg-7">
+            <div class="card card-flush h-100 shadow-sm">
+                <div class="card-header pt-5">
+                    <h3 class="card-title align-items-center flex-row">
+                        <span class="symbol symbol-30px me-2">
+                            <span class="symbol-label bg-light-primary">
+                                <i class="fas fa-cubes text-primary fs-3"></i>
+                            </span>
+                        </span>
+                        <span class="fw-bold text-gray-800">État du Stock</span>
+                    </h3>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="row g-5">
+                        <div class="col-sm-6 text-center text-sm-start">
+                            <div class="d-flex flex-column">
+                                <span class="text-gray-400 fw-semibold fs-6 mb-1">Quantité Disponible</span>
+                                <div class="d-flex align-items-center justify-content-center justify-content-sm-start">
+                                    <span class="fs-2x fw-bold text-gray-800 me-2 lh-1">{{ inventory.quantity }}</span>
+                                    <span class="badge badge-light fs-7 fw-bold">Unités</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-center text-sm-start">
+                            <div class="d-flex flex-column">
+                                <span class="text-gray-400 fw-semibold fs-6 mb-1">Emplacement</span>
+                                <span class="fs-4 fw-bold text-gray-800">{{ inventory.location|default:"Non défini" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-center text-sm-start">
+                            <div class="d-flex flex-column">
+                                <span class="text-gray-400 fw-semibold fs-6 mb-1">Seuil d'alerte</span>
+                                <span class="fs-4 fw-bold text-gray-800">{{ inventory.reorder_level }} <small class="fs-6 text-muted fw-normal">unités</small></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-center text-sm-start">
+                            <div class="d-flex flex-column">
+                                <span class="text-gray-400 fw-semibold fs-6 mb-1">Dernière mise à jour</span>
+                                <span class="fs-4 fw-bold text-gray-800">{{ inventory.last_updated|date:"d M Y, H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Valuation Information -->
+        <div class="col-md-6 col-lg-5">
+            <div class="card card-flush h-100 shadow-sm">
+                <div class="card-header pt-5">
+                    <h3 class="card-title align-items-center flex-row">
+                        <span class="symbol symbol-30px me-2">
+                            <span class="symbol-label bg-light-success">
+                                <i class="fas fa-money-bill-wave text-success fs-3"></i>
+                            </span>
+                        </span>
+                        <span class="fw-bold text-gray-800">Valorisation</span>
+                    </h3>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="d-flex flex-column gap-4">
+                        <div class="d-flex justify-content-between align-items-center border-bottom border-gray-200 pb-3">
+                            <span class="text-gray-600 fw-semibold">Prix Unitaire (Vente)</span>
+                            <span class="fw-bold text-gray-800 fs-5">
+                                {{ inventory.product.selling_price|format_currency:company_settings.currency }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center border-bottom border-gray-200 pb-3">
+                            <span class="text-gray-600 fw-semibold">Prix d'Achat (Moyen)</span>
+                            <span class="fw-bold text-gray-600 fs-5">
+                                {{ inventory.product.purchase_price|format_currency:company_settings.currency }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pt-2">
+                            <span class="text-gray-800 fw-bold fs-5">Valeur Totale du Stock</span>
+                            <span class="fw-bolder text-success fs-3">
+                                {{ inventory.quantity|multiply:inventory.product.selling_price|format_currency:company_settings.currency }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="separator separator-dashed my-5"></div>
+                    
+                    <div class="d-flex flex-column">
+                        <span class="text-gray-400 fw-bold fs-7 mb-2 text-uppercase">Point de Vente</span>
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-35px me-3">
+                                <span class="symbol-label bg-light-info text-info fw-bold">
+                                    {{ inventory.point_of_sale.name|slice:":1" }}
+                                </span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <a href="#" class="text-gray-800 text-hover-primary fs-6 fw-bold">{{ inventory.point_of_sale.name }}</a>
+                                <span class="text-muted fw-semibold fs-7">{{ inventory.point_of_sale.code }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movement History -->
+    <div class="card card-flush shadow-sm">
+        <div class="card-header pt-6">
+            <h3 class="card-title align-items-center flex-row">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-light-warning">
+                        <i class="fas fa-history text-warning fs-3"></i>
+                    </span>
+                </span>
+                <span class="fw-bold text-gray-800">Historique des Mouvements</span>
+            </h3>
+            <div class="card-toolbar">
+                <a href="{% url 'inventory:movement_list' %}?search={{ inventory.product.sku }}" class="btn btn-sm btn-light-primary fw-bold">
+                    Tout voir
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            {% if movements %}
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5">
+                    <thead>
+                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-125px">Date</th>
+                            <th class="min-w-100px">Type</th>
+                            <th class="min-w-70px">Quantité</th>
+                            <th class="min-w-100px">Référence</th>
+                            <th class="min-w-150px">Notes</th>
+                            <th class="min-w-100px">Utilisateur</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-semibold text-gray-600">
+                        {% for movement in movements %}
+                        <tr>
+                            <td>{{ movement.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if movement.movement_type == 'entry' %}
+                                <span class="badge badge-light-success">Entrée</span>
+                                {% elif movement.movement_type == 'exit' %}
+                                <span class="badge badge-light-danger">Sortie</span>
+                                {% elif movement.movement_type == 'return' %}
+                                <span class="badge badge-light-primary">Retour</span>
+                                {% elif movement.movement_type == 'adjustment' %}
+                                <span class="badge badge-light-warning">Ajustement</span>
+                                {% else %}
+                                <span class="badge badge-light-secondary">{{ movement.get_movement_type_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if movement.movement_type == 'entry' or movement.movement_type == 'return' %}
+                                <span class="text-success fw-bold">+{{ movement.quantity }}</span>
+                                {% else %}
+                                <span class="text-danger fw-bold">-{{ movement.quantity }}</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="text-gray-800 fw-bold">{{ movement.reference|default:"-" }}</span></td>
+                            <td><span class="text-gray-500">{{ movement.notes|default:"-"|truncatechars:50 }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="symbol symbol-circle symbol-25px me-2">
+                                        <div class="symbol-label bg-light-primary text-primary fs-8 fw-bold">
+                                            {{ movement.user.username|slice:":1"|upper }}
+                                        </div>
+                                    </div>
+                                    <span>{{ movement.user.username }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-6 my-10">
+                <span class="svg-icon svg-icon-2tx svg-icon-primary me-4">
+                    <i class="fas fa-info-circle fs-1"></i>
+                </span>
+                <div class="d-flex flex-stack flex-grow-1">
+                    <div class="fw-semibold">
+                        <h4 class="text-gray-900 fw-bold">Aucun mouvement</h4>
+                        <div class="fs-6 text-gray-700">Il n'y a pas encore d'historique de mouvement pour ce produit dans cet inventaire.</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

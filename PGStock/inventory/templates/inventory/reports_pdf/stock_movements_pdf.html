@@ -1,0 +1,42 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_extras %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Date/Heure</th>
+                <th style="width: 25%;">Produit</th>
+                <th class="text-center" style="width: 15%;">Type</th>
+                <th class="text-right" style="width: 10%;">Quantité</th>
+                <th style="width: 20%;">Point de Vente</th>
+                <th style="width: 15%;">Utilisateur</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movement in stock_movements %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>{{ movement.created_at|date:"d/m/Y H:i" }}</td>
+                <td class="font-bold">{{ movement.product_name }}</td>
+                <td class="text-center">
+                    <span class="badge 
+                        {% if 'Entrée' in movement.type_display %}badge-light-success
+                        {% elif 'Sortie' in movement.type_display %}badge-light-danger
+                        {% elif 'Transfert' in movement.type_display %}badge-light-primary
+                        {% elif 'Retour' in movement.type_display %}badge-light-warning
+                        {% else %}badge-light-primary{% endif %}">
+                        {{ movement.type_display }}
+                    </span>
+                </td>
+                <td class="text-right font-bold">{{ movement.quantity }}</td>
+                <td>{{ movement.point_of_sale }}</td>
+                <td>{{ movement.user_name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted" style="padding: 40px;">Aucun mouvement de stock trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

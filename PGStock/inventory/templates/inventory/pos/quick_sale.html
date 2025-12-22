@@ -1,0 +1,406 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Vente Rapide (POS) - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        <!-- Left Column: Product Selection -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="fas fa-search me-2 text-primary"></i>Recherche Produits
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <select id="category-filter" class="form-select form-select-sm border-0 bg-light" style="width: 150px;">
+                                <option value="">Toutes catégories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="input-group mb-4 shadow-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-white border-0 ps-3">
+                            <i class="fas fa-barcode text-muted"></i>
+                        </span>
+                        <input type="text" id="product-search" class="form-control border-0 py-2" placeholder="Scannez un code ou tapez le nom du produit...">
+                    </div>
+
+                    <div id="product-list" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 overflow-auto" style="max-height: 60vh;">
+                        <!-- Products will be loaded here via JS -->
+                        <div class="col-12 text-center py-5 text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3 opacity-25"></i>
+                            <p>Commencez à taper pour rechercher des produits</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Cart & Checkout -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100 flex-column d-flex">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-shopping-cart me-2 text-success"></i>Panier
+                    </h5>
+                    <button class="btn btn-sm btn-outline-danger border-0 rounded-pill" onclick="cart.clear()">
+                        <i class="fas fa-trash-alt me-1"></i>Vider
+                    </button>
+                </div>
+                
+                <!-- Client Selection -->
+                <div class="px-4 mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Client</label>
+                    <div class="d-flex gap-2">
+                        <select id="client-select" class="form-select border-0 bg-light select2">
+                            <option value="">Sélectionner un client...</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }} {% if client.phone %}({{ client.phone }}){% endif %}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary rounded-circle" data-bs-toggle="modal" data-bs-target="#newClientModal">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body p-0 flex-grow-1 overflow-auto" style="max-height: 40vh;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light sticky-top">
+                            <tr>
+                                <th class="ps-4 py-3 small text-muted text-uppercase fw-bold border-0">Produit</th>
+                                <th class="py-3 small text-muted text-uppercase fw-bold border-0 text-center" style="width: 120px;">Qté</th>
+                                <th class="py-3 small text-muted text-uppercase fw-bold border-0 text-end">Total</th>
+                                <th class="pe-4 py-3 border-0" style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                            <!-- Cart items will be added here -->
+                        </tbody>
+                    </table>
+                    
+                    <div id="empty-cart-msg" class="text-center py-5 text-muted">
+                        <i class="fas fa-shopping-basket fa-2x mb-2 opacity-25"></i>
+                        <p class="small mb-0">Votre panier est vide</p>
+                    </div>
+                </div>
+
+                <!-- Summary & Checkout -->
+                <div class="card-footer bg-white border-top-0 p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Sous-total</span>
+                        <span id="summary-subtotal" class="fw-bold">0.00 GNF</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="mb-0 fw-bold">Total</h4>
+                        <h4 id="summary-total" class="mb-0 fw-bold text-primary">0.00 GNF</h4>
+                    </div>
+                    <button id="checkout-btn" class="btn btn-success btn-lg w-full rounded-pill py-3 fw-bold" disabled onclick="checkout()">
+                        <i class="fas fa-check-circle me-2"></i>VALIDER LA VENTE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Client Modal -->
+<div class="modal fade" id="newClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Nouveau Client</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="new-client-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select name="client_type" class="form-select">
+                            <option value="individual">Particulier</option>
+                            <option value="company">Entreprise</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Téléphone</label>
+                        <input type="text" name="phone" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary px-4" onclick="saveNewClient()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast for notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="pos-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-message"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .select2-container .select2-selection--single {
+        border: none !important;
+        background-color: #f8f9fa !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+</style>
+
+<script>
+    const cart = {
+        items: [],
+        add(product, isWholesale = false) {
+            const existing = this.items.find(i => i.id === product.id && i.isWholesale === isWholesale);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                this.items.push({
+                    id: product.id,
+                    name: product.name,
+                    price: isWholesale ? product.wholesale_price : product.price,
+                    isWholesale: isWholesale,
+                    quantity: 1
+                });
+            }
+            this.render();
+            showToast(`Produit ajouté : ${product.name}`, 'success');
+        },
+        remove(index) {
+            this.items.splice(index, 1);
+            this.render();
+        },
+        updateQty(index, qty) {
+            if (qty < 1) return;
+            this.items[index].quantity = parseInt(qty);
+            this.render();
+        },
+        clear() {
+            this.items = [];
+            this.render();
+        },
+        get total() {
+            return this.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+        },
+        render() {
+            const container = document.getElementById('cart-items');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            container.innerHTML = '';
+            
+            if (this.items.length === 0) {
+                emptyMsg.classList.remove('d-none');
+                checkoutBtn.disabled = true;
+            } else {
+                emptyMsg.classList.add('d-none');
+                checkoutBtn.disabled = false;
+                
+                this.items.forEach((item, index) => {
+                    container.innerHTML += `
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">${item.name}</div>
+                                <div class="small text-muted">${item.isWholesale ? 'En Gros' : 'Détail'} • ${item.price.toLocaleString()} GNF</div>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm rounded-pill overflow-hidden border mx-auto" style="width: 100px;">
+                                    <button class="btn btn-white border-0 px-2" onclick="cart.updateQty(${index}, ${item.quantity - 1})">-</button>
+                                    <input type="number" class="form-control border-0 text-center qty-input bg-white" value="${item.quantity}" onchange="cart.updateQty(${index}, this.value)">
+                                    <button class="btn btn-white border-0 px-2" onclick="cart.updateQty(${index}, ${item.quantity + 1})">+</button>
+                                </div>
+                            </td>
+                            <td class="text-end fw-bold">${(item.price * item.quantity).toLocaleString()}</td>
+                            <td class="pe-4 text-end">
+                                <button class="btn btn-sm text-danger border-0" onclick="cart.remove(${index})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            document.getElementById('summary-subtotal').innerText = `${this.total.toLocaleString()} GNF`;
+            document.getElementById('summary-total').innerText = `${this.total.toLocaleString()} GNF`;
+        }
+    };
+
+    // Product Search Logic
+    const productSearch = document.getElementById('product-search');
+    const categoryFilter = document.getElementById('category-filter');
+    let searchTimeout;
+
+    productSearch.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(searchProducts, 300);
+    });
+
+    categoryFilter.addEventListener('change', searchProducts);
+
+    async function searchProducts() {
+        const query = productSearch.value;
+        const category = categoryFilter.value;
+        const container = document.getElementById('product-list');
+        
+        const response = await fetch(`{% url 'inventory:api_pos_search_products' %}?q=${query}&category=${category}`);
+        const data = await response.json();
+        
+        container.innerHTML = '';
+        if (data.results.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-5">Aucun produit trouvé</div>';
+            return;
+        }
+
+        data.results.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'col';
+            card.innerHTML = `
+                <div class="card h-100 product-card border shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-light text-dark border">${p.sku}</span>
+                            <span class="small text-muted">Stock: ${p.stock}</span>
+                        </div>
+                        <h6 class="fw-bold mb-3">${p.name}</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick='cart.add(${JSON.stringify(p)}, false)'>
+                                Détail: ${p.price.toLocaleString()}
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick='cart.add(${JSON.stringify(p)}, true)'>
+                                Gros (${p.units_per_box}): ${p.wholesale_price.toLocaleString()}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Checkout Logic
+    async function checkout() {
+        const clientId = document.getElementById('client-select').value;
+        if (!clientId) {
+            showToast('Veuillez sélectionner un client', 'warning');
+            return;
+        }
+
+        const btn = document.getElementById('checkout-btn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>En cours...';
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    client_id: clientId,
+                    items: cart.items.map(i => ({
+                        product_id: i.id,
+                        quantity: i.quantity,
+                        is_wholesale: i.is_wholesale
+                    }))
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                showToast(result.message, 'success');
+                cart.clear();
+                // Rediriger ou imprimer ? Pour l'instant on reste sur la page
+                setTimeout(() => {
+                    if (confirm('Vente réussie! Souhaitez-vous voir la facture ?')) {
+                        window.location.href = `/invoices/${result.invoice_id}/`;
+                    }
+                }, 1000);
+            } else {
+                showToast(result.message, 'danger');
+            }
+        } catch (e) {
+            showToast('Une erreur est survenue', 'danger');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+    // Quick Client Save
+    async function saveNewClient() {
+        const form = document.getElementById('new-client-form');
+        const formData = new FormData(form);
+        
+        const response = await fetch("{% url 'inventory:api_pos_create_client' %}", {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            const select = document.getElementById('client-select');
+            const option = new Option(data.name, data.id, true, true);
+            select.add(option);
+            $(select).trigger('change');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newClientModal'));
+            modal.hide();
+            form.reset();
+            showToast('Client créé avec succès', 'success');
+        } else {
+            alert(data.message);
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const toastEl = document.getElementById('pos-toast');
+        const toastMsg = document.getElementById('toast-message');
+        
+        toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+        toastEl.classList.add(`bg-${type}`);
+        toastMsg.innerText = message;
+        
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
+    // Initial Search
+    searchProducts();
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Réinitialiser les données - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div class="card bg-stone-800 border-2 border-red-600 shadow-2xl">
+        <div class="card-header text-center border-b border-stone-700 p-6 bg-red-900/20">
+            <h2 class="card-title text-red-500 font-bold text-3xl">⚠️ ZONE DE DANGER</h2>
+            <p class="text-stone-300 mt-2">Réinitialisation complète des données</p>
+        </div>
+        <div class="card-body p-8">
+            <div class="alert alert-error mb-6">
+                <i class="fas fa-exclamation-triangle text-2xl mr-2"></i>
+                <span class="font-bold">ATTENTION : CETTE ACTION EST IRRÉVERSIBLE !</span>
+            </div>
+
+            <p class="mb-4 text-stone-200 text-lg">
+                Vous êtes sur le point de supprimer <strong>TOUTES</strong> les données commerciales de l'application :
+            </p>
+
+            <ul class="list-disc pl-6 mb-6 text-stone-400 space-y-1">
+                <li>Tous les produits et stocks</li>
+                <li>Toutes les factures et devis</li>
+                <li>Tous les mouvements de stock</li>
+                <li>Tous les clients et fournisseurs</li>
+                <li>Tout l'historique des ventes et achats</li>
+            </ul>
+
+            <p class="mb-6 text-stone-300 italic">
+                Les comptes utilisateurs, les paramètres de l'entreprise, les catégories et les points de vente seront
+                CONSERVÉS.
+            </p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text text-stone-300">Pour confirmer, veuillez taper <strong>RESET</strong>
+                            ci-dessous :</span>
+                    </label>
+                    <input type="text" name="confirm"
+                        class="input input-bordered input-error w-full bg-stone-900 text-white"
+                        placeholder="Tapez RESET ici..." required>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <a href="{% url 'inventory:settings' %}" class="flex-1 btn btn-ghost text-stone-300">
+                        Annuler
+                    </a>
+                    <button type="submit" class="flex-1 btn btn-error text-white font-bold">
+                        💣 TOUT EFFACER
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

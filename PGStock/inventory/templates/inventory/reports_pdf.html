@@ -1,0 +1,100 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_tags %}
+
+{% block content %}
+<div class="summary-box" style="background-color: #f8f9fa; border: 1px solid #e1e3ea; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <div style="font-size: 14pt; font-weight: bold; color: #181c32; margin-bottom: 15px; border-bottom: 1px solid #e1e3ea; padding-bottom: 10px;">
+        Résumé Global
+    </div>
+    <table style="border: none;">
+        <tr>
+            <td style="border: none; padding: 5px 0;">
+                <span style="color: #7e8299;">Valeur du Stock :</span>
+                <strong style="color: #181c32;">{{ total_stock_value }} {{ company_settings.currency|default:"GNF" }}</strong>
+            </td>
+            <td style="border: none; padding: 5px 0;">
+                <span style="color: #7e8299;">Ventes Totales :</span>
+                <strong style="color: #50cd89;">{{ total_sales }} {{ company_settings.currency|default:"GNF" }}</strong>
+            </td>
+        </tr>
+        <tr>
+            <td style="border: none; padding: 5px 0;">
+                <span style="color: #7e8299;">Total Produits :</span>
+                <strong style="color: #181c32;">{{ total_products }}</strong>
+            </td>
+            <td style="border: none; padding: 5px 0;">
+                <span style="color: #7e8299;">Ventes en Attente :</span>
+                <strong style="color: #f1416c;">{{ pending_sales_amount }} {{ company_settings.currency|default:"GNF" }}</strong>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div style="margin-bottom: 30px;">
+    <div style="font-size: 12pt; font-weight: bold; color: #181c32; margin-bottom: 10px;">État du Stock (Top 50)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Catégorie</th>
+                <th style="text-align: center;">Quantité</th>
+                <th style="text-align: right;">Prix Unitaire</th>
+                <th style="text-align: right;">Valeur Totale</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in inventories %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>{{ inv.product_name }}</td>
+                <td><span class="badge badge-light-primary">{{ inv.category_name }}</span></td>
+                <td style="text-align: center;">{{ inv.quantity }}</td>
+                <td style="text-align: right;">{{ inv.unit_price }} {{ company_settings.currency|default:"GNF" }}</td>
+                <td style="text-align: right;"><strong>{{ inv.total_value }} {{ company_settings.currency|default:"GNF" }}</strong></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #7e8299; padding: 20px;">Aucune donnée d'inventaire disponible</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <div style="font-size: 12pt; font-weight: bold; color: #181c32; margin-bottom: 10px;">Dernières Ventes (Top 20)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Facture</th>
+                <th>Client</th>
+                <th style="text-align: right;">Montant</th>
+                <th style="text-align: center;">Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>{{ invoice.invoice_date }}</td>
+                <td><span class="badge badge-light-primary">{{ invoice.invoice_number }}</span></td>
+                <td>{{ invoice.client_name }}</td>
+                <td style="text-align: right;"><strong>{{ invoice.total_amount }} {{ company_settings.currency|default:"GNF" }}</strong></td>
+                <td style="text-align: center;">
+                    {% if invoice.status == 'paid' %}
+                        <span class="badge badge-light-success">Payée</span>
+                    {% elif invoice.status == 'partial' %}
+                        <span class="badge badge-light-warning">Partielle</span>
+                    {% else %}
+                        <span class="badge badge-light-primary">{{ invoice.status_display }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: #7e8299; padding: 20px;">Aucune vente enregistrée sur cette période</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,545 @@
+/* ============================================
+   METRONIC PREMIUM THEME - CORE STYLES
+   ============================================ */
+:root {
+    /* --- METRONIC PALETTE --- */
+    --kt-primary: #3699ff;
+    --kt-primary-active: #187de4;
+    --kt-secondary: #e4e6ef;
+    --kt-secondary-active: #b5b5c3;
+
+    --kt-success: #1bc5bd;
+    --kt-info: #8950fc;
+    --kt-warning: #ffa800;
+    --kt-danger: #f64e60;
+    --kt-dark: #181c32;
+    --kt-light: #ffffff;
+
+    /* --- SEMANTIC COLORS --- */
+    --text-dark: #3f4254;
+    --text-muted: #b5b5c3;
+    --text-white: #ffffff;
+
+    --bg-body: #f3f6f9;
+    --bg-card: #ffffff;
+    --bg-hover: #f3f6f9;
+
+    --border-color: #ebedf3;
+    --input-border: #e4e6ef;
+
+    /* --- SHADOWS --- */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 0.1rem 1rem 0.25rem rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 0.5rem 1.5rem 0.5rem rgba(0, 0, 0, 0.075);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+
+    /* --- TYPOGRAPHY --- */
+    --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 1rem;
+    --font-weight-bold: 600;
+    --line-height-base: 1.5;
+
+    /* --- BORDERS --- */
+    --border-radius-sm: 0.42rem;
+    --border-radius: 0.42rem;
+    --border-radius-lg: 0.85rem;
+    --border-radius-xl: 1rem;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+body {
+    font-family: var(--font-family-base);
+    background-color: var(--bg-body);
+    color: var(--text-dark);
+    font-size: 13px;
+    /* Metronic often uses slightly smaller, denser text, or 14px */
+    font-weight: 400;
+    line-height: var(--line-height-base);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+a {
+    color: var(--kt-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--kt-primary-active);
+    text-decoration: none;
+}
+
+/* ============================================
+   CARDS (PORTLETS)
+   ============================================ */
+.card {
+    background-color: var(--bg-card);
+    border: 0;
+    border-radius: var(--border-radius-sm);
+    box-shadow: 0px 0px 30px 0px rgba(82, 63, 105, 0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding: 2rem 2.25rem;
+    background-color: transparent;
+    min-height: 70px;
+    border-top-left-radius: var(--border-radius-sm);
+    border-top-right-radius: var(--border-radius-sm);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-title small {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    font-weight: 400;
+}
+
+.card-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    padding: 2rem 2.25rem;
+    flex: 1 1 auto;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    outline: none !important;
+    vertical-align: middle;
+    font-weight: 600;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--kt-primary);
+    border-color: var(--kt-primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus {
+    background-color: var(--kt-primary-active) !important;
+    border-color: var(--kt-primary-active) !important;
+    color: #ffffff !important;
+}
+
+/* Light Buttons */
+.btn-light-primary {
+    color: var(--kt-primary);
+    background-color: rgba(54, 153, 255, 0.1);
+    border-color: transparent;
+}
+
+.btn-light-primary:hover {
+    color: #ffffff;
+    background-color: var(--kt-primary);
+}
+
+.btn-light-success {
+    color: var(--kt-success);
+    background-color: rgba(27, 197, 189, 0.1);
+    border-color: transparent;
+}
+
+.btn-light-success:hover {
+    color: #ffffff;
+    background-color: var(--kt-success);
+}
+
+.btn-light-danger {
+    color: var(--kt-danger);
+    background-color: rgba(246, 78, 96, 0.1);
+    border-color: transparent;
+}
+
+.btn-light-danger:hover {
+    color: #ffffff;
+    background-color: var(--kt-danger);
+}
+
+.btn-light-warning {
+    color: var(--kt-warning);
+    background-color: rgba(255, 168, 0, 0.1);
+    border-color: transparent;
+}
+
+.btn-light-warning:hover {
+    color: #ffffff;
+    background-color: var(--kt-warning);
+}
+
+.btn-light-info {
+    color: var(--kt-info);
+    background-color: rgba(137, 80, 252, 0.1);
+    border-color: transparent;
+}
+
+.btn-light-info:hover {
+    color: #ffffff;
+    background-color: var(--kt-info);
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    vertical-align: top;
+    border-color: var(--border-color);
+}
+
+.table thead th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05rem;
+    border-bottom-width: 1px;
+    padding: 0.75rem 0.75rem;
+    vertical-align: middle;
+    background-color: #f3f6f9;
+    /* Slight header bg */
+    border-top: 0 !important;
+}
+
+.table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px dashed var(--border-color);
+    /* Metronic style dashed lines */
+}
+
+/* ============================================
+   BADGES (LABELS)
+   ============================================ */
+.badge {
+    padding: 0.5rem 0.75rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    line-height: 1;
+}
+
+.badge-light-primary {
+    color: var(--kt-primary);
+    background-color: rgba(54, 153, 255, 0.1);
+}
+
+.badge-light-success {
+    color: var(--kt-success);
+    background-color: rgba(27, 197, 189, 0.1);
+}
+
+.badge-light-warning {
+    color: var(--kt-warning);
+    background-color: rgba(255, 168, 0, 0.1);
+}
+
+.badge-light-danger {
+    color: var(--kt-danger);
+    background-color: rgba(246, 78, 96, 0.1);
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+.fw-bold {
+    font-weight: 600 !important;
+}
+
+.fw-bolder {
+    font-weight: 700 !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-dark {
+    color: var(--text-dark) !important;
+}
+
+.symbol {
+    display: inline-block;
+    flex-shrink: 0;
+    position: relative;
+    border-radius: var(--border-radius-sm);
+}
+
+.symbol.symbol-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--text-dark);
+    background-color: var(--bg-hover);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    border-radius: var(--border-radius-sm);
+}
+
+.symbol-50.symbol-label {
+    width: 50px;
+    height: 50px;
+}
+
+/* Dashboard Specifics */
+
+/* ============================================
+   NEW DASHBOARD STYLES (E-STOCK)
+   ============================================ */
+
+/* Hero Section */
+.hero-section {
+    background: #00a65a;
+    /* Fallback */
+    background: linear-gradient(135deg, #00a65a 0%, #00c0ef 100%);
+    /* Green to Cyan Gradient (Custom) */
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    /* Emerald Green */
+    border-radius: 12px;
+    padding: 2rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 205, 172, 0.2);
+}
+
+.hero-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    margin-right: 0.75rem;
+    background-color: #2b2b40;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.hero-nav .nav-link:hover {
+    background-color: #3b3b50;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.hero-nav .nav-link.active {
+    background-color: #2b2b40;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Stats Cards with Gradients */
+.card-stats {
+    border: 0;
+    border-radius: 12px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+}
+
+.card-stats:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-stats .card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.bg-gradient-blue {
+    background: linear-gradient(135deg, #3699ff 0%, #2F80ED 100%);
+}
+
+.bg-gradient-purple {
+    background: linear-gradient(135deg, #8950fc 0%, #7337EE 100%);
+}
+
+.bg-gradient-green {
+    background: linear-gradient(135deg, #1bc5bd 0%, #0BB7AF 100%);
+    /* Teal actually */
+}
+
+/* Real Green for Sales if needed, but image uses a teal-ish green for one and pure green for another? 
+   Let's approximate the image: 
+   - Value Stock: Blue
+   - Benefit: Purple
+   - Sales: Green/Teal
+   - Orders: Darker Teal
+   - Products: Orange 
+*/
+.bg-gradient-teal {
+    background: linear-gradient(135deg, #17c964 0%, #0fac4e 100%);
+    /* More standard green */
+}
+
+.bg-gradient-cyan {
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+}
+
+.bg-gradient-orange {
+    background: linear-gradient(135deg, #ffa800 0%, #ff6c00 100%);
+}
+
+.bg-gradient-dark-teal {
+    background: linear-gradient(135deg, #1fa2ff 0%, #12d8fa 0%, #009ef7 100%);
+    /* Just a nice blue-cyan */
+}
+
+/* Adjusting to image specific approximating colors */
+.card-color-blue {
+    background-color: #3699ff !important;
+    background-image: linear-gradient(315deg, #3699ff 0%, #0062E6 74%) !important;
+}
+
+.card-color-purple {
+    background-color: #8950fc !important;
+    background-image: linear-gradient(315deg, #8950fc 0%, #6c19ff 74%) !important;
+}
+
+.card-color-green {
+    background-color: #1bc5bd !important;
+    background-image: linear-gradient(315deg, #1bc5bd 0%, #0fab9e 74%) !important;
+}
+
+.card-color-cyan {
+    background-color: #00d2ff !important;
+    background-image: linear-gradient(315deg, #009ef7 0%, #007bc4 74%) !important;
+}
+
+.card-color-orange {
+    background-color: #ffa800 !important;
+    background-image: linear-gradient(315deg, #ffa800 0%, #ff5e00 74%) !important;
+}
+
+/* Action Buttons */
+.btn-action {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    transition: transform 0.2s;
+    border: 0;
+}
+
+.btn-action:hover {
+    color: white;
+    transform: translateY(-2px);
+    filter: brightness(110%);
+}
+
+.btn-action i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+/* Form Control Solid */
+.form-control-solid {
+    background-color: #f5f8fa;
+    border-color: #f5f8fa;
+    color: #5e6278;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.form-control-solid:active,
+.form-control-solid.active,
+.form-control-solid:focus,
+.form-control-solid.focus {
+    background-color: #eef3f7;
+    border-color: #eef3f7;
+    color: #5e6278;
+}
+
+/* Table Enhancements */
+/* ============================================
+   CUSTOM SPACERS (Metronic-like)
+   ============================================ */
+@media(min-width: 1200px) {
+    .g-xl-8,
+    .gy-xl-8 {
+        --bs-gutter-y: 5rem;
+    }
+
+    .g-xl-8,
+    .gx-xl-8 {
+        --bs-gutter-x: 5rem;
+    }
+
+    .mb-xl-8 {
+        margin-bottom: 5rem !important;
+    }
+}
+@media (max-width: 767.98px) {
+    .hero-section {
+        padding: 1.5rem;
+    }
+
+    .hero-nav {
+        padding-bottom: 0.5rem;
+    }
+
+    .card-stats {
+        min-height: auto;
+    }
+
+    /* Improve chart container height on mobile */
+    .chart-container {
+        height: 250px !important;
+    }
+}

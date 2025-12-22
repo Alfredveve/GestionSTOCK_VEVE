@@ -1,0 +1,348 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+{% load static %}
+
+{% block title %}Bon de Réception {{ receipt.receipt_number }}{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+    .font-elegant {
+        font-family: 'Playfair Display', serif;
+    }
+
+    @media print {
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        html,
+        body {
+            width: 210mm;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .sheet {
+            width: 100%;
+            min-height: auto;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            page-break-after: avoid;
+        }
+
+        /* Force nice looking tables in print */
+        .table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa !important;
+        }
+    }
+
+    .sheet {
+        background: white;
+        max-width: 210mm;
+        min-height: 297mm;
+        margin: 2rem auto;
+        padding: 15mm;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+</style>
+
+<!-- Action Bar -->
+<div class="container d-flex justify-content-between align-items-center mb-4 no-print">
+    <a href="{% url 'inventory:receipt_list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary d-flex align-items-center gap-2">
+            <i class="fas fa-print"></i> Imprimer
+        </button>
+        {% if receipt.status == 'draft' %}
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">
+            <i class="fas fa-plus me-1"></i> Ajouter Article
+        </button>
+        <a href="{% url 'inventory:receipt_update' receipt.pk %}" class="btn btn-secondary text-white">
+            <i class="fas fa-edit me-1"></i> Modifier
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Elegant Receipt Sheet -->
+<div class="sheet text-dark">
+    <!-- Elegant Header -->
+    <header class="text-center mb-5 border-bottom border-3 pb-4">
+        <div class="mb-2 small fw-bold text-uppercase text-muted letter-spacing-3">Document Officiel</div>
+        <h1 class="display-4 font-elegant fw-bold text-dark mb-2 text-uppercase">Bon de Réception</h1>
+        <div class="mx-auto my-4 bg-dark" style="width: 100px; height: 1px;"></div>
+        <div class="text-center">
+            <span class="fs-5 font-monospace text-secondary">Ref: {{ receipt.receipt_number }}</span>
+        </div>
+    </header>
+
+    <!-- Info Grid -->
+    <div class="row mb-5 justify-content-between">
+        <div class="col-5">
+            <h3 class="font-elegant h5 fw-bold text-dark mb-3 border-bottom d-inline-block pb-1">Fournisseur</h3>
+            <div class="text-secondary">
+                <p class="fs-5 fw-bold font-elegant text-dark mb-1">{{ receipt.supplier.name }}</p>
+                {% if receipt.supplier.address %}<p class="mb-0">{{ receipt.supplier.address }}</p>{% endif %}
+                {% if receipt.supplier.contact_person %}<p class="mb-0">Att: {{ receipt.supplier.contact_person }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="col-5 text-end">
+            <h3 class="font-elegant h5 fw-bold text-dark mb-3 border-bottom d-inline-block pb-1">Informations</h3>
+            <div class="vstack gap-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary small text-uppercase">Date</span>
+                    <span class="fw-medium font-monospace">{{ receipt.date_received|date:'d/m/Y' }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary small text-uppercase">Dépôt</span>
+                    <span class="fw-medium">{{ receipt.point_of_sale.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary small text-uppercase">Ref. Ext</span>
+                    <span class="fw-medium text-truncate" style="max-width: 150px;">{{ receipt.supplier_reference|default:"-" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elegant Table -->
+    <div class="mb-5 table-responsive">
+        <table class="table table-borderless align-middle">
+            <thead class="bg-light border-top border-bottom">
+                <tr>
+                    <th class="py-3 ps-4 font-elegant fw-bold text-dark text-uppercase small" style="width: 40%">
+                        Désignation</th>
+                    <th class="py-3 text-center font-elegant fw-bold text-dark text-uppercase small" style="width: 15%">Qté</th>
+                    <th class="py-3 text-end font-elegant fw-bold text-dark text-uppercase small" style="width: 20%">P.U.</th>
+                    <th class="py-3 pe-4 text-end font-elegant fw-bold text-dark text-uppercase small" style="width: 25%">Total</th>
+                </tr>
+            </thead>
+            <tbody class="border-bottom">
+                {% for item in items %}
+                <tr>
+                    <td class="py-3 ps-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-dark d-block">{{ item.product.name }}</span>
+                            {% if item.is_wholesale %}
+                            <span class="badge badge-light-primary fw-bold fs-9 px-2 py-0">GROS</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted font-monospace">{{ item.product.sku }}</small>
+                    </td>
+                    <td class="py-3 text-center font-monospace">{{ item.quantity }}</td>
+                    <td class="py-3 text-end font-monospace">{{ item.unit_cost|format_currency }}</td>
+                    <td class="py-3 pe-4 text-end font-monospace fw-bold">{{ item.total|format_currency }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="py-3 text-end font-elegant fw-bold text-dark text-uppercase h5 mb-0 pt-4">Montant Total</td>
+                    <td class="py-3 pe-4 text-end font-monospace fw-bold h5 mb-0 pt-4">{{ receipt.total_amount|format_currency }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Checkers -->
+    <div class="mt-5 p-4 border rounded bg-light print-keep-together">
+        <h4 class="font-elegant fw-bold text-center text-dark mb-4 text-uppercase small">Contrôle & Validation</h4>
+        <div class="row">
+            <div class="col-4 text-center">
+                <p class="small text-muted text-uppercase mb-4">Magasinier</p>
+                <div class="border-bottom w-75 mx-auto mb-2"></div>
+                <p class="small text-muted fst-italic">Signé</p>
+            </div>
+            <div class="col-4 text-center">
+                <p class="small text-muted text-uppercase mb-4">Livreur</p>
+                <div class="border-bottom w-75 mx-auto mb-2"></div>
+            </div>
+            <div class="col-4 text-center">
+                <p class="small text-muted text-uppercase mb-4">Administration</p>
+                <div class="border-bottom w-75 mx-auto mb-2"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if receipt.notes %}
+    <div class="mt-5 text-center px-5">
+        <p class="small text-muted text-uppercase mb-2 letter-spacing-2">Observations</p>
+        <p class="font-elegant fst-italic text-secondary">{{ receipt.notes }}</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-600px">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+            <div class="modal-header border-0 pb-0 pt-6 px-6">
+                <div class="d-flex align-items-center">
+                    <span class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-3">
+                        <i class="fas fa-box-open fs-2 text-primary"></i>
+                    </span>
+                    <h3 class="modal-title fw-bold text-dark">Ajouter un Article</h3>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body pt-4 px-6 pb-6">
+                <form method="post" action="{% url 'inventory:receipt_detail' receipt.pk %}" id="addItemForm" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger d-flex align-items-center p-4 mb-5">
+                        <i class="fas fa-exclamation-circle fs-2 text-danger me-3"></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-danger small text-uppercase fw-bold">Erreur</h4>
+                            <span class="small">{{ form.non_field_errors|join:", " }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-5">
+                        <label for="{{ form.product.id_for_label }}" class="form-label required fw-bold fs-6 text-gray-900">Produit</label>
+                        <div class="input-group input-group-solid">
+                            <span class="input-group-text bg-light border-0 border-end-0">
+                                <i class="fas fa-barcode fs-5 text-primary"></i>
+                            </span>
+                            {{ form.product }}
+                        </div>
+                        {% if form.product.errors %}
+                            <div class="invalid-feedback d-block mt-2">{{ form.product.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label required fw-bold fs-6 text-gray-900">Quantité</label>
+                            <div class="input-group input-group-solid">
+                                <span class="input-group-text bg-light border-0 border-end-0">
+                                    <i class="fas fa-cubes fs-5 text-info"></i>
+                                </span>
+                                {{ form.quantity }}
+                            </div>
+                            {% if form.quantity.errors %}
+                                <div class="invalid-feedback d-block mt-2">{{ form.quantity.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.unit_cost.id_for_label }}" class="form-label required fw-bold fs-6 text-gray-900">Coût Unitaire</label>
+                            <div class="input-group input-group-solid">
+                                <span class="input-group-text bg-light border-0 border-end-0">
+                                    <i class="fas fa-money-bill-wave fs-5 text-success"></i>
+                                    <span class="ms-1 small text-muted">GNF</span>
+                                </span>
+                                {{ form.unit_cost }}
+                            </div>
+                            {% if form.unit_cost.errors %}
+                                <div class="invalid-feedback d-block mt-2">{{ form.unit_cost.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Option Gros -->
+                    <div class="mb-8 p-4 rounded bg-light border border-dashed border-primary">
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            {{ form.is_wholesale }}
+                            <label class="form-check-label fw-bold text-gray-800 fs-6" for="id_is_wholesale">
+                                Réception par Carton (Gros)
+                            </label>
+                        </div>
+                        <div class="text-muted fs-7 mt-1">Le stock sera ajouté par unité (Qté × Unités/Carton).</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end pt-3 border-top border-gray-100">
+                        <button type="button" class="btn btn-light btn-active-light-primary me-3" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        const productSelect = $('#id_product');
+        const unitCostInput = $('#id_unit_cost');
+        const isWholesaleInput = $('#id_is_wholesale');
+        let currentProductData = null;
+
+        // Initialize Select2 when modal is opened
+        $('#addItemModal').on('shown.bs.modal', function () {
+            // Check if Select2 is already initialized to avoid double init
+             if (!productSelect.data('select2')) {
+                productSelect.select2({
+                    dropdownParent: $('#addItemModal'),
+                    width: '100%',
+                    placeholder: "Sélectionner un produit",
+                    allowClear: true,
+                    language: "fr"
+                });
+            }
+        });
+
+        productSelect.on('change', function() {
+            const productId = $(this).val();
+            if (!productId) return;
+
+            fetch(`/inventory/api/product/${productId}/info/`)
+                .then(response => response.json())
+                .then(data => {
+                    currentProductData = data;
+                    updateCost();
+                });
+        });
+
+        function updateCost() {
+            if (!currentProductData) return;
+            const isWholesale = isWholesaleInput.is(':checked');
+            unitCostInput.val(isWholesale ? currentProductData.wholesale_purchase_price : currentProductData.purchase_price);
+        }
+
+        isWholesaleInput.on('change', updateCost);
+
+        // Focus quantity when product is selected
+        productSelect.on('select2:select', function (e) {
+             $('#id_quantity').focus();
+        });
+
+        // Auto open modal if there are form errors (server-side validation)
+        {% if form.errors %}
+            var myModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+            myModal.show();
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends 'inventory/base.html' %}
+{% load inventory_extras %}
+
+{% block title %}{{ supplier.name }} - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 fw-bold text-body-emphasis mb-1">{{ supplier.name }}</h1>
+            <p class="text-body-secondary mb-0">Partenaire Fournisseur</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventory:supplier_update' supplier.pk %}"
+                class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'inventory:supplier_list' %}"
+                class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Supplier Info -->
+        <div class="col-md-6 col-lg-5">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h3 class="h5 mb-0 d-flex align-items-center gap-2">
+                        <span
+                            class="badge bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-building"></i>
+                        </span>
+                        Coordonnées
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-user me-2"></i>Contact</span>
+                            <span class="fw-medium">{{ supplier.contact_person|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-envelope me-2"></i>Email</span>
+                            <span class="fw-medium">{{ supplier.email|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted"><i class="fas fa-phone me-2"></i>Téléphone</span>
+                            <span class="fw-medium">{{ supplier.phone|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <span class="text-muted d-block mb-1"><i
+                                    class="fas fa-map-marker-alt me-2"></i>Adresse</span>
+                            <span class="fw-medium d-block ms-4">{{ supplier.address|default:"-" }}</span>
+                            <span class="fw-medium d-block ms-4">{{ supplier.city|default:"" }}</span>
+                            <span class="fw-medium d-block ms-4">{{ supplier.country }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linked Products -->
+        <div class="col-md-6 col-lg-7">
+            <div class="card h-100 shadow-sm border-0">
+                <div
+                    class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h3 class="h5 mb-0 d-flex align-items-center gap-2">
+                        <span
+                            class="badge bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-boxes"></i>
+                        </span>
+                        Produits Fournis
+                    </h3>
+                    <span class="badge bg-secondary rounded-pill">{{ products.count }}</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if products %}
+                    <ul class="list-group list-group-flush overflow-auto" style="max-height: 300px;">
+                        {% for product in products %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                            <a href="{% url 'inventory:product_detail' product.pk %}"
+                                class="text-decoration-none text-body fw-medium">
+                                {{ product.name }}
+                            </a>
+                            <a href="{% url 'inventory:product_detail' product.pk %}"
+                                class="btn btn-sm btn-light border rounded-circle"
+                                style="width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                <i class="fas fa-chevron-right small"></i>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="p-4 text-center">
+                        <p class="text-muted mb-0">Aucun produit associé à ce fournisseur.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Receipts -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-transparent border-bottom py-3">
+            <h3 class="h5 mb-0 d-flex align-items-center gap-2">
+                <span
+                    class="badge bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
+                    style="width: 32px; height: 32px;">
+                    <i class="fas fa-truck-loading"></i>
+                </span>
+                Bons de Réception Récents
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            {% if receipts %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3 small text-uppercase text-muted">Numéro</th>
+                            <th class="px-4 py-3 small text-uppercase text-muted">Date</th>
+                            <th class="px-4 py-3 small text-uppercase text-muted">Statut</th>
+                            <th class="px-4 py-3 small text-uppercase text-muted text-end">Montant</th>
+                            <th class="px-4 py-3 small text-uppercase text-muted text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for receipt in receipts %}
+                        <tr>
+                            <td class="px-4 fw-medium">{{ receipt.receipt_number }}</td>
+                            <td class="px-4">{{ receipt.date_received }}</td>
+                            <td class="px-4">
+                                {% if receipt.status == 'COMPLETED' %}
+                                <span
+                                    class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Complété</span>
+                                {% elif receipt.status == 'PENDING' %}
+                                <span
+                                    class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3">En
+                                    Attente</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-secondary-subtle text-secondary border border-secondary rounded-pill px-3">{{
+                                    receipt.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 text-end fw-bold">{{
+                                receipt.total_amount|format_currency:company_settings.currency }}</td>
+                            <td class="px-4 text-end">
+                                <a href="{% url 'inventory:receipt_detail' receipt.pk %}"
+                                    class="btn btn-sm btn-light border">
+                                    Voir <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-5 text-center">
+                <p class="text-muted mb-0">Aucun bon de réception trouvé.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

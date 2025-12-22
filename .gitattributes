@@ -1,0 +1,33 @@
+# Normalisation des fins de ligne
+* text=auto
+
+# Fichiers Python
+*.py text eol=lf
+
+# Fichiers de configuration
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+
+# Templates Django
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# Fichiers binaires
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary

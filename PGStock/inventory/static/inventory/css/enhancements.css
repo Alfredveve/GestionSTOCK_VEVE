@@ -1,0 +1,272 @@
+/* ============================================
+   NAVBAR ENHANCEMENTS - USER AVATAR
+   ============================================ */
+
+/* Enhanced User Avatar Styles */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid rgba(255, 255, 255, 0.85);
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1) translateY(-2px);
+    border-color: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+    border: 2.5px solid rgba(255, 255, 255, 0.85);
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+}
+
+.user-avatar-placeholder:hover {
+    transform: scale(1.1) translateY(-2px);
+    border-color: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Online Status Badge */
+.nav-user {
+    position: relative;
+}
+
+.nav-user::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    border-radius: 50%;
+    border: 2.5px solid white;
+    bottom: 0;
+    right: 0;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.75;
+        transform: scale(1.15);
+    }
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Enhanced Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    padding: 0.6rem;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 1002;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-menu-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+.mobile-menu-toggle.active {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--primary);
+}
+
+.mobile-menu-toggle.active span {
+    background: var(--primary);
+}
+
+/* ============================================
+   ENHANCED RESPONSIVE DESIGN
+   ============================================ */
+
+/* Mobile Enhancements */
+@media (max-width: 768px) {
+    .navbar-nav {
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        animation: slideDown var(--transition-base) ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .navbar-nav>li {
+        border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    }
+
+    .navbar-nav>li:last-child {
+        border-bottom: none;
+    }
+
+    .nav-link {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+
+    .nav-link:active {
+        background: rgba(99, 102, 241, 0.2);
+    }
+
+    /* Enhanced Mobile Dropdowns */
+    .dropdown-menu {
+        margin-bottom: var(--spacing-sm);
+        border-left: 3px solid var(--primary);
+        background: rgba(51, 65, 85, 0.3);
+        animation: slideIn var(--transition-base) ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            max-height: 0;
+        }
+
+        to {
+            opacity: 1;
+            max-height: 500px;
+        }
+    }
+
+    .dropdown-menu a {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .dropdown-arrow {
+        font-size: 0.8rem;
+    }
+
+    /* Adjust online status badge position on mobile */
+    .navbar-nav.active .nav-user::after {
+        top: 14px;
+        left: 34px;
+    }
+
+    /* Better touch targets for tables */
+    .table-container {
+        margin: 0 calc(-1 * var(--spacing-md));
+        padding: 0 var(--spacing-md);
+    }
+
+    /* Sticky first column for better mobile table UX */
+    .table th:first-child,
+    .table td:first-child {
+        position: sticky;
+        left: 0;
+        background: var(--bg-card);
+        z-index: 1;
+    }
+
+    /* Disable hover effects on mobile */
+    .card:hover {
+        transform: none;
+    }
+
+    /* Better touch targets for buttons */
+    .btn {
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    /* Prevent zoom on iOS */
+    .form-input,
+    .form-select,
+    .form-textarea {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
+    /* Enhanced user avatar on mobile */
+    .nav-user .user-name {
+        max-width: none;
+    }
+
+    .nav-user .user-avatar,
+    .nav-user .user-avatar-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Better pagination on mobile */
+    .page-link {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Small Mobile Optimizations */
+@media (max-width: 480px) {
+
+    /* Slightly larger avatar on very small screens for better visibility */
+    .nav-user .user-avatar,
+    .nav-user .user-avatar-img {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Adjust online badge position */
+    .nav-user::after {
+        width: 8px;
+        height: 8px;
+        top: 6px;
+        left: 26px;
+    }
+}

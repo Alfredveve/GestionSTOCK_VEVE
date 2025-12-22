@@ -1,0 +1,659 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Mouvements de Stock - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-white fw-bold d-flex align-items-center mb-1 gap-2">
+                <span class="symbol symbol-30px me-2">
+                    <span class="symbol-label bg-white text-info rounded-circle">
+                        <i class="fas fa-exchange-alt fs-5"></i>
+                    </span>
+                </span>
+                Mouvements de Stock
+            </h1>
+            <span class="text-white opacity-75 fs-6 fw-bold">Historique complet des mouvements</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+            <a href="{% url 'inventory:export_stock_movements_excel' %}?{{ url_params }}"
+                class="btn btn-custom btn-white btn-active-light-success text-success fw-bold btn-sm">
+                <i class="fas fa-file-excel me-2"></i> Excel
+            </a>
+            <a href="{% url 'inventory:export_stock_movements_pdf' %}?{{ url_params }}"
+                class="btn btn-custom btn-white btn-active-light-danger text-danger fw-bold btn-sm">
+                <i class="fas fa-file-pdf me-2"></i> PDF
+            </a>
+            <a href="{% url 'inventory:movement_create' %}" class="btn btn-primary fw-bold btn-sm">
+                <i class="fas fa-plus me-2"></i> Nouveau Mouvement
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card card-flush shadow-sm">
+        <!-- Card Header: Title & Search/Filter Bar -->
+        <div class="card-header border-0 pt-6 flex-wrap">
+            <!-- Title -->
+            <div class="card-title">
+                <h3 class="fw-bold text-gray-800">Détails des mouvements</h3>
+            </div>
+            <!-- Search & Filter Toolbar -->
+            <div class="card-toolbar d-flex align-items-center gap-3 flex-wrap">
+                <form method="get" id="filter-form" class="d-flex align-items-center gap-3 flex-wrap">
+                    <!-- Search Input -->
+                    <div class="position-relative search-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-search fs-6 text-primary"></i>
+                        </span>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control form-control-sm modern-input" 
+                               placeholder="Rechercher (produit, réf, notes)..."
+                               value="{{ search_query|default:'' }}" 
+                               autocomplete="off" />
+                    </div>
+                    
+                    <!-- Date Start Input -->
+                    <div class="position-relative date-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-calendar-alt fs-6 text-success"></i>
+                        </span>
+                        <input type="date" 
+                               name="start_date" 
+                               class="form-control form-control-sm modern-input date-input" 
+                               placeholder="Date début"
+                               value="{{ start_date|default:'' }}" />
+                    </div>
+
+                    <!-- Date End Input -->
+                    <div class="position-relative date-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-calendar-check fs-6 text-warning"></i>
+                        </span>
+                        <input type="date" 
+                               name="end_date" 
+                               class="form-control form-control-sm modern-input date-input" 
+                               placeholder="Date fin"
+                               value="{{ end_date|default:'' }}" />
+                    </div>
+
+                    <!-- User Filter Dropdown -->
+                    <div class="position-relative user-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-user fs-6 text-dark"></i>
+                        </span>
+                        <select name="user" 
+                                id="user_select" 
+                                class="form-select form-select-sm modern-select">
+                            <option value="">Tous les utilisateurs</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if selected_user == user.id %}selected{% endif %}>
+                                {{ user.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Product Filter Dropdown -->
+                    <div class="position-relative product-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-box fs-6 text-primary"></i>
+                        </span>
+                        <select name="product" 
+                                id="product_select" 
+                                class="form-select form-select-sm modern-select">
+                            <option value="">Tous les produits</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}" {% if selected_product == product.id %}selected{% endif %}>
+                                {{ product.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Type Filter Dropdown -->
+                    <div class="position-relative type-field">
+                        <span class="position-absolute translate-middle-y top-50 ms-3" style="z-index: 10;">
+                            <i class="fas fa-filter fs-6 text-info"></i>
+                        </span>
+                        <select name="type" 
+                                id="type_select" 
+                                class="form-select form-select-sm modern-select">
+                            <option value="">Tous les types</option>
+                            <option value="entry" {% if movement_type == 'entry' %}selected{% endif %}>📥 Entrée</option>
+                            <option value="exit" {% if movement_type == 'exit' %}selected{% endif %}>📤 Sortie</option>
+                            <option value="adjustment" {% if movement_type == 'adjustment' %}selected{% endif %}>⚙️ Ajustement</option>
+                            <option value="transfer" {% if movement_type == 'transfer' %}selected{% endif %}>🔄 Transfert</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Button -->
+                    <button type="submit" class="btn btn-primary btn-sm modern-btn-filter">
+                        <i class="fas fa-search me-2"></i>
+                        Filtrer
+                    </button>
+
+                    <!-- Reset Filter Button -->
+                    {% if search_query or movement_type or start_date or end_date or specific_date %}
+                    <a href="{% url 'inventory:movement_list' %}" 
+                       class="btn btn-light-danger btn-sm modern-btn-reset"
+                       title="Réinitialiser les filtres">
+                        <i class="fas fa-times me-1"></i>
+                        Effacer
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body pt-0">
+            {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5">
+                    <thead>
+                        <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                            <th class="min-w-100px">Date</th>
+                            <th class="min-w-150px">Produit</th>
+                            <th class="min-w-100px">Type</th>
+                            <th class="min-w-70px">Quantité</th>
+                            <th class="min-w-100px">Référence</th>
+                            <th class="min-w-150px">Notes</th>
+                            <th class="min-w-100px">Utilisateur</th>
+                            <th class="text-end min-w-70px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-semibold text-gray-600">
+                        <style>
+                            .table-font-12 td, .table-font-12 td span, .table-font-12 td a, .table-font-12 td div {
+                                font-size: 12px !important;
+                            }
+                        </style>
+                        {% for movement in page_obj %}
+                        <tr class="table-font-12">
+                            <td>
+                                <span class="text-gray-800 fw-bold">{{ movement.created_at|date:"d/m/Y" }}</span>
+                                <span class="text-muted d-block">{{ movement.created_at|date:"H:i" }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="ms-0">
+                                        <a href="{% url 'inventory:movement_detail' movement.pk %}" class="text-gray-800 text-hover-primary fw-bold">
+                                            {{ movement.product.name }}
+                                        </a>
+                                        <div class="text-muted">{{ movement.product.sku }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if movement.movement_type == 'entry' %}
+                                <span class="badge badge-light-success">Entrée</span>
+                                {% elif movement.movement_type == 'exit' %}
+                                <span class="badge badge-light-danger">Sortie</span>
+                                {% elif movement.movement_type == 'transfer' %}
+                                <span class="badge badge-light-warning">Transfert</span>
+                                {% else %}
+                                <span class="badge badge-light-info">{{ movement.get_movement_type_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-gray-800 fw-bold">{{ movement.quantity }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted">{{ movement.reference|default:"-" }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted text-truncate d-block" style="max-width: 200px;" title="{{ movement.notes }}">
+                                    {{ movement.notes|default:"-"|truncatewords:8 }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="badge badge-secondary fw-bold text-dark">
+                                    {% if movement.user %}
+                                        {{ movement.user.username }}
+                                    {% else %}
+                                        Système
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'inventory:movement_detail' movement.pk %}" class="btn btn-icon btn-light-primary btn-sm w-30px h-30px" title="Voir détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        <div class="card-footer bg-transparent border-top-0 pt-0 pb-4">
+            {% if page_obj.has_other_pages %}
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <!-- Results Info -->
+                <div class="d-flex align-items-center text-gray-600 fw-semibold fs-6">
+                    <div class="badge badge-light-primary fw-bold me-2 fs-7 p-2">
+                        {{ page_obj.start_index }} - {{ page_obj.end_index }}
+                    </div>
+                    <span>sur <span class="text-gray-900 fw-bold mx-1">{{ page_obj.paginator.count }}</span> résultats</span>
+                </div>
+
+                <!-- Modern Pagination Controls -->
+                <nav aria-label="Navigation des pages" class="d-flex justify-content-end">
+                    <ul class="pagination pagination-modern mb-0 gap-1">
+                        <!-- Previous -->
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.previous_page_number }}{% if url_params %}&{{ url_params }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-left"></i></span>
+                        </li>
+                        {% endif %}
+
+                        <!-- Page Numbers logic -->
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if page_obj.paginator.num_pages <= 7 %}
+                                <!-- Show all if few pages -->
+                                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                    <a href="?page={{ i }}{% if url_params %}&{{ url_params }}{% endif %}" class="page-link shadow-sm {% if page_obj.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                        {{ i }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- Complex logic for many pages -->
+                                {% if i == 1 or i == page_obj.paginator.num_pages %}
+                                    <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                        <a href="?page={{ i }}{% if url_params %}&{{ url_params }}{% endif %}" class="page-link shadow-sm {% if page_obj.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                            {{ i }}
+                                        </a>
+                                    </li>
+                                {% elif i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+                                    <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                        <a href="?page={{ i }}{% if url_params %}&{{ url_params }}{% endif %}" class="page-link shadow-sm {% if page_obj.number == i %}text-white{% else %}text-dark fw-bold{% endif %}">
+                                            {{ i }}
+                                        </a>
+                                    </li>
+                                {% elif i == page_obj.number|add:'-3' or i == page_obj.number|add:'3' %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link shadow-sm text-muted border-0 bg-transparent">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Next -->
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.next_page_number }}{% if url_params %}&{{ url_params }}{% endif %}" class="page-link shadow-sm text-dark fw-bold">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link shadow-sm bg-light text-muted border-0"><i class="fas fa-chevron-right"></i></span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-10">
+                <div class="mb-5">
+                    <span class="symbol symbol-75px">
+                        <span class="symbol-label bg-light-info text-info">
+                            <i class="fas fa-clipboard-list fs-1"></i>
+                        </span>
+                    </span>
+                </div>
+                <h3 class="fw-bold fs-2 text-gray-800 mb-2">Aucun mouvement trouvé</h3>
+                <p class="text-muted fs-6 mb-5">Enregistrez votre premier mouvement de stock.</p>
+                <a href="{% url 'inventory:movement_create' %}" class="btn btn-primary fw-bold">
+                    <i class="fas fa-plus me-2"></i> Enregistrer un mouvement
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ========== MODERN FILTER STYLES ========== */
+    
+    /* Search Field */
+    .search-field {
+        min-width: 220px;
+    }
+    
+    .search-field .modern-input {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(0, 158, 247, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+    }
+    
+    .search-field .modern-input:focus {
+        border-color: #009EF7;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(0, 158, 247, 0.15), 0 0 0 4px rgba(0, 158, 247, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Date Fields */
+    .date-field {
+        min-width: 180px;
+    }
+    
+    .date-field .modern-input {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        color: #3F4254;
+    }
+    
+    .date-field .modern-input:focus {
+        border-color: #10b981;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15), 0 0 0 4px rgba(16, 185, 129, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Date input calendar icon styling */
+    .date-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    
+    .date-input::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+    
+    /* Type Field */
+    .type-field {
+        min-width: 180px;
+    }
+    
+    .type-field .modern-select {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .type-field .modern-select:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15), 0 0 0 4px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .type-field .modern-select:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 3px 12px rgba(59, 130, 246, 0.12);
+    }
+    
+    /* Filter Button */
+    .modern-btn-filter {
+        padding: 0.5rem 1.75rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.25);
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modern-btn-filter:hover {
+        background: linear-gradient(135deg, #0095E8 0%, #0086D0 100%);
+        box-shadow: 0 6px 20px rgba(0, 158, 247, 0.35);
+        transform: translateY(-2px);
+    }
+    
+    .modern-btn-filter:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 158, 247, 0.2);
+    }
+    
+    /* Reset Button */
+    .modern-btn-reset {
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(145deg, #ffffff 0%, #fee2e2 100%);
+        border: 2px solid #fecaca;
+        color: #dc2626;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .modern-btn-reset:hover {
+        background: linear-gradient(145deg, #fee2e2 0%, #fecaca 100%);
+        border-color: #dc2626;
+        color: #991b1b;
+        box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .modern-btn-reset:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .search-field,
+        .date-field,
+        .type-field,
+        .user-field,
+        .product-field {
+            min-width: 100%;
+        }
+        
+        .modern-btn-filter,
+        .modern-btn-reset {
+            width: 100%;
+        }
+    }
+
+    /* User Field */
+    .user-field {
+        min-width: 220px;
+    }
+    
+    .user-field .modern-select {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08); /* Default shadow */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .user-field .modern-select:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15), 0 0 0 4px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Product Field */
+    .product-field {
+        min-width: 220px;
+    }
+    
+    .product-field .modern-select {
+        padding-left: 2.8rem;
+        border-radius: 0.75rem;
+        border: 2px solid #E1E8ED;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        box-shadow: 0 2px 8px rgba(0, 158, 247, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .product-field .modern-select:focus {
+        border-color: #009EF7;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(0, 158, 247, 0.15), 0 0 0 4px rgba(0, 158, 247, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    /* Icon Colors in Fields */
+    .search-field i.text-primary {
+        color: #009EF7 !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 158, 247, 0.2));
+    }
+    
+    .date-field i.text-success {
+        color: #10b981 !important;
+        filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2));
+    }
+    
+    .date-field i.text-warning {
+        color: #f59e0b !important;
+        filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.2));
+    }
+    
+    .type-field i.text-info {
+        color: #3b82f6 !important;
+        filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
+    }
+
+    .user-field i.text-dark {
+        color: #3F4254 !important;
+        filter: drop-shadow(0 2px 4px rgba(63, 66, 84, 0.2));
+    }
+
+    .product-field i.text-primary {
+        color: #009EF7 !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 158, 247, 0.2));
+    }
+
+    /* ========== EXISTING PAGINATION STYLES ========== */
+    
+    /* Custom Export Buttons */
+    .btn-custom {
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button Hover Effects */
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.3);
+    }
+
+    .btn-light-danger {
+        transition: all 0.3s ease;
+    }
+
+    .btn-light-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+    }
+
+    /* Search and Filter Enhancements */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #009EF7;
+        box-shadow: 0 0 0 0.2rem rgba(0, 158, 247, 0.15);
+    }
+
+    /* Table Enhancements */
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F5F8FA;
+        transform: scale(1.001);
+    }
+
+    /* Pagination Outline Style overrides */
+    .pagination-modern .page-link {
+        border-radius: 0.5rem;
+        margin: 0 2px;
+        border: none;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: white;
+    }
+
+    .pagination-modern .page-item:not(.active) .page-link:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        color: #009EF7 !important;
+    }
+    
+    .pagination-modern .page-item.active .page-link {
+        background: linear-gradient(135deg, #009EF7 0%, #0095E8 100%);
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 158, 247, 0.35) !important;
+        transform: scale(1.05);
+    }
+
+    .pagination-modern .page-item.disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+
+<script>
+    // Auto-submit search on Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.form.submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

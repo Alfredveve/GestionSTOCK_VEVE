@@ -1,0 +1,37 @@
+{% extends 'inventory/reports_pdf/base_pdf.html' %}
+{% load inventory_extras %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">Date</th>
+                <th style="width: 15%;">N° Facture</th>
+                <th style="width: 18%;">Client</th>
+                <th style="width: 25%;">Produit</th>
+                <th class="text-center" style="width: 7%;">Qté</th>
+                <th class="text-right" style="width: 12%;">Prix Unit.</th>
+                <th class="text-right" style="width: 13%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% with currency=company_settings.currency %}
+            {% for item in sales_activities %}
+            <tr class="{% cycle '' 'row-even' %}">
+                <td>{{ item.invoice.date_issued|date:"d/m/Y" }}</td>
+                <td><span class="badge badge-light-primary">{{ item.invoice.invoice_number }}</span></td>
+                <td>{{ item.invoice.client.name }}</td>
+                <td class="font-bold">{{ item.product.name }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right text-muted">{{ item.unit_price|format_currency:currency }}</td>
+                <td class="text-right text-success font-bold">{{ item.total|format_currency:currency }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted" style="padding: 40px;">Aucune activité de vente trouvée.</td>
+            </tr>
+            {% endfor %}
+            {% endwith %}
+        </tbody>
+    </table>
+{% endblock %}

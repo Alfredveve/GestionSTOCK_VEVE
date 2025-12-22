@@ -1,0 +1,34 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Supprimer Produit - GestionSTOCK{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="max-width: 500px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title" style="color: var(--danger);">⚠️ Confirmation de Suppression</h2>
+        </div>
+        <div class="card-body">
+            <p class="text-center mb-3">
+                Êtes-vous sûr de vouloir supprimer le produit <strong>{{ product.name }}</strong> ({{ product.sku }}) ?
+            </p>
+            
+            <div class="alert alert-warning">
+                <strong>Attention !</strong> Cette action est irréversible. Toutes les données associées (inventaire, mouvements) seront également supprimées.
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="flex gap-2">
+                    <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary" style="flex: 1;">
+                        ❌ Annuler
+                    </a>
+                    <button type="submit" class="btn btn-danger" style="flex: 1;">
+                        🗑️ Supprimer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
