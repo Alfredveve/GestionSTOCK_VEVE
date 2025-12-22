@@ -449,7 +449,10 @@ class StockMovement(models.Model):
                 
                 stock_after_movement = current_quantity - self.quantity
                 
-                if stock_after_movement < min_quantity:
+                # [FIX] Autoriser les corrections/annulations même si en dessous du stock minimum
+                is_correction = self.notes and ("Correction" in self.notes or "Annulation" in self.notes)
+                
+                if stock_after_movement < min_quantity and not is_correction:
                     raise ValidationError(
                         f"❌ Opération refusée au {self.from_point_of_sale.code}: "
                         f"Cette sortie ramènerait le stock à {stock_after_movement} unité(s), "
@@ -1104,8 +1107,14 @@ class Quote(models.Model):
         ('converted', 'Converti en facture'),
     ]
     
+    QUOTE_TYPES = [
+        ('retail', 'Vente au détail'),
+        ('wholesale', 'Vente en gros'),
+    ]
+    
     quote_number = models.CharField(max_length=50, unique=True, verbose_name="Numéro de devis")
     client = models.ForeignKey(Client, on_delete=models.PROTECT, verbose_name="Client")
+    quote_type = models.CharField(max_length=20, choices=QUOTE_TYPES, default='retail', verbose_name="Type de devis")
     date_issued = models.DateField(verbose_name="Date d'émission")
     valid_until = models.DateField(verbose_name="Date de validité")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Statut")
@@ -1159,6 +1168,7 @@ class Quote(models.Model):
         # Créer la facture
         invoice = Invoice.objects.create(
             client=self.client,
+            invoice_type=self.quote_type,
             date_issued=self.date_issued,
             date_due=self.valid_until,
             status='draft',
@@ -1181,6 +1191,7 @@ class Quote(models.Model):
                 product=quote_item.product,
                 quantity=quote_item.quantity,
                 unit_price=quote_item.unit_price,
+                is_wholesale=quote_item.is_wholesale,
                 discount=quote_item.discount,
                 total=quote_item.total
             )
@@ -1198,6 +1209,7 @@ class QuoteItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Produit")
     quantity = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Quantité")
     unit_price = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Prix unitaire")
+    is_wholesale = models.BooleanField(default=False, verbose_name="Vendu en gros lot")
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Remise (%)")
     total = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Total")
 

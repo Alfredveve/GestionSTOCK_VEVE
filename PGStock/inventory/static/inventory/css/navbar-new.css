@@ -255,13 +255,13 @@
    ============================================ */
 
 /* Adjust user profile container position */
-.navbar-nav.ms-auto {
+.navbar-collapse > .ms-auto {
     margin-right: 0 !important;
 }
 
 @media (min-width: 992px) {
-    .navbar-nav.ms-auto {
-        margin-right: 1.5rem !important; /* Move profile left from right edge */
+    .navbar-collapse > .ms-auto {
+        margin-right: 5rem !important; /* Move profile significantly left from right edge */
     }
 }
 
@@ -414,6 +414,12 @@
 .user-info-header .text-muted {
     color: #6b7280 !important; /* Gray 500 */
     font-size: 0.8rem;
+}
+
+/* Center email in dropdown */
+.user-email-centered {
+    text-align: center;
+    width: 100%;
 }
 
 /* Online Badge - Pill */

@@ -45,7 +45,9 @@ class InvoiceService(BaseService):
         user: User,
         items_data: List[Dict[str, Any]],
         status: str = 'draft',
-        invoice_type: str = 'standard',
+        invoice_type: str = 'retail',
+        date_issued: Optional[Any] = None,
+        date_due: Optional[Any] = None,
         apply_tax: bool = False,
         tax_rate: Decimal = Decimal('0'),
         notes: str = ""
@@ -96,6 +98,8 @@ class InvoiceService(BaseService):
                     created_by=user,
                     status=status,
                     invoice_type=invoice_type,
+                    date_issued=date_issued or datetime.now().date(),
+                    date_due=date_due or datetime.now().date(),
                     apply_tax=apply_tax,
                     tax_rate=tax_rate,
                     notes=notes
@@ -526,7 +530,7 @@ class InvoiceService(BaseService):
                 'quantity': quote_item.quantity,
                 'unit_price': quote_item.unit_price,
                 'discount': quote_item.discount,
-                'is_wholesale': False
+                'is_wholesale': quote_item.is_wholesale
             })
         
         # Business Rule: Cannot convert empty quote
@@ -540,6 +544,11 @@ class InvoiceService(BaseService):
             user=user,
             items_data=items_data,
             status='draft',
+            invoice_type=quote.quote_type,
+            date_issued=quote.date_issued,
+            date_due=quote.valid_until,
+            apply_tax=quote.tax_rate > 0,
+            tax_rate=quote.tax_rate,
             notes=f"Converti du devis {quote.quote_number}"
         )
         

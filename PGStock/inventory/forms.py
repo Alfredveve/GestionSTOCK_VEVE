@@ -443,9 +443,24 @@ class InvoiceItemForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # Make discount field optional
         self.fields['discount'].required = False
+
+    def clean_discount(self):
+        discount = self.cleaned_data.get('discount')
+        
+        if discount is None:
+            return 0
+            
+        if self.user:
+            from .permissions import validate_discount
+            is_valid, error_message = validate_discount(self.user, discount)
+            if not is_valid:
+                raise ValidationError(error_message)
+                
+        return discount
 
 
 
@@ -498,9 +513,10 @@ class QuoteForm(forms.ModelForm):
     """Formulaire de devis"""
     class Meta:
         model = Quote
-        fields = ['client', 'date_issued', 'valid_until', 'status', 'tax_rate', 'notes']
+        fields = ['client', 'quote_type', 'date_issued', 'valid_until', 'status', 'tax_rate', 'notes']
         widgets = {
             'client': forms.Select(attrs={'class': 'form-select form-select-solid form-select-lg', 'data-placeholder': 'Sélectionner un client'}),
+            'quote_type': forms.Select(attrs={'class': 'form-select form-select-solid'}),
             'date_issued': forms.DateInput(attrs={'class': 'form-control form-control-solid', 'type': 'date'}),
             'valid_until': forms.DateInput(attrs={'class': 'form-control form-control-solid', 'type': 'date'}),
             'status': forms.Select(attrs={'class': 'form-select form-select-solid'}),
@@ -524,9 +540,10 @@ class QuoteItemForm(forms.ModelForm):
     """Formulaire de ligne de devis"""
     class Meta:
         model = QuoteItem
-        fields = ['product', 'quantity', 'unit_price', 'discount']
+        fields = ['product', 'is_wholesale', 'quantity', 'unit_price', 'discount']
         widgets = {
             'product': forms.Select(attrs={'class': INPUT_CLASSES}),
+            'is_wholesale': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'quantity': forms.NumberInput(attrs={
                 'class': INPUT_CLASSES, 
                 'min': '1',
@@ -554,7 +571,7 @@ QuoteItemFormSet = inlineformset_factory(
     Quote,
     QuoteItem,
     form=QuoteItemForm,
-    fields=['product', 'quantity', 'unit_price', 'discount'],
+    fields=['product', 'is_wholesale', 'quantity', 'unit_price', 'discount'],
     extra=1,
     can_delete=True
 )

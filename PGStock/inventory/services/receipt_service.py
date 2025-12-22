@@ -226,37 +226,41 @@ class ReceiptService(BaseService):
         self.log_info(f"Item removed from receipt {receipt.receipt_number}")
     
     @transaction.atomic
-    def cancel_receipt(
-        self,
-        receipt: Receipt,
-        user: User
-    ) -> Receipt:
+    def validate_and_add_stock(self, receipt: Receipt):
         """
-        Cancel a receipt and reverse all stock entries.
-        
-        Args:
-            receipt: Receipt to cancel
-            user: User performing the operation
+        Valide un bon de réception et ajoute le stock en vérifiant qu'il n'est pas vide.
+        """
+        if not receipt.receiptitem_set.exists():
+            raise ServiceException("Action refusée : Ce bon de réception ne contient aucun produit.")
             
-        Returns:
-            Updated Receipt
+        receipt.add_stock()
+        receipt.status = 'validated'
+        receipt.save()
+        
+        self.log_info(f"Receipt {receipt.receipt_number} validated and stock added.")
+
+    @transaction.atomic
+    def change_status(self, receipt: Receipt, new_status: str, user: User):
         """
-        # Reverse stock for all items
-        items = receipt.receiptitem_set.all()
-        for item in items:
-            self.stock_service.process_exit(
-                product=item.product,
-                quantity=item.quantity,
-                point_of_sale=receipt.point_of_sale,
-                user=user,
-                reference=f"Annulation {receipt.receipt_number}",
-                notes=f"Annulation du bon de réception {receipt.receipt_number}"
-            )
+        Change le statut d'un bon avec validation des règles métier.
+        """
+        old_status = receipt.status
+        if new_status == old_status:
+            return
+
+        # Règle : Pas de validation/réception si le bon est vide
+        if new_status in ['received', 'validated'] and old_status == 'draft':
+            if not receipt.receiptitem_set.exists():
+                raise ServiceException("Action refusée : Impossible de valider ou recevoir un bon sans articles.")
+            
+            if not receipt.stock_added:
+                receipt.add_stock()
         
-        # Mark as cancelled (if you have a status field)
-        # receipt.status = 'cancelled'
-        # receipt.save()
-        
-        self.log_info(f"Receipt {receipt.receipt_number} cancelled")
-        
-        return receipt
+        # Règle : Retour au brouillon annule le stock
+        elif new_status == 'draft' and old_status in ['received', 'validated']:
+            if receipt.stock_added:
+                receipt.revert_stock()
+
+        receipt.status = new_status
+        receipt.save()
+        self.log_info(f"Receipt {receipt.receipt_number} status changed to {new_status}")

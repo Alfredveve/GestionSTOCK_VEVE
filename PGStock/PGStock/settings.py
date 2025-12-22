@@ -183,23 +183,35 @@ LOGOUT_REDIRECT_URL = 'inventory:login'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
-# En développement, utilisez le backend console pour voir les emails dans le terminal
-# En production, utilisez le backend SMTP avec un mot de passe d'application Gmail
-if DEBUG:
-    # Backend console par défaut pour le développement - les emails s'affichent dans le terminal
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    # Optionnel: écrire les e-mails dans des fichiers pour les inspecter sans les envoyer
-    # Activez via la variable d'environnement `EMAIL_FILE_BASED=True` (ex: dans .env)
-    if config('EMAIL_FILE_BASED', default=False, cast=bool):
-        EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-        EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
-else:
-    # Backend SMTP pour la production
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# En développement, on utilise le backend console par défaut pour voir les emails dans le terminal
+# Pour PROD, choisissez "console" ou "smtp" dans .env
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+
+# Configuration SMTP (Gmail / Outlook)
+# ==============================================================================
+# OPTION A: GMAIL
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'votre@gmail.com'
+# EMAIL_HOST_PASSWORD = 'votre-app-password'  # Générer un mot de passe d'application
+
+# OPTION B: OUTLOOK / OFFICE 365
+# EMAIL_HOST = 'smtp.office365.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'votre@outlook.com'
+# EMAIL_HOST_PASSWORD = 'votre-password'
+
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+
+# Expéditeur par défaut
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER or 'noreply@gestionstock.com')
+
+# Timeout pour éviter de bloquer l'application si le serveur SMTP ne répond pas
+EMAIL_TIMEOUT = 10  # secondes
