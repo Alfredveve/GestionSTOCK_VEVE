@@ -266,19 +266,150 @@
             totalForms.value = forms.length;
         }
 
+        // Function to safely parse and validate numeric values
+        function safeParseFloat(value, defaultValue = 0) {
+            const parsed = parseFloat(value);
+            return (!isNaN(parsed) && isFinite(parsed)) ? parsed : defaultValue;
+        }
+
+        // Function to escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Function to setup auto-fill for a product select element
+        function setupProductAutoFill(productSelect) {
+            if (!productSelect) return;
+
+            // Remove existing listeners to prevent duplicates
+            const newProductSelect = productSelect.cloneNode(true);
+            productSelect.parentNode.replaceChild(newProductSelect, productSelect);
+
+            newProductSelect.addEventListener('change', function() {
+                const productId = this.value;
+                const row = this.closest('.item-row');
+                
+                if (!row) return;
+
+                const unitPriceInput = row.querySelector('input[name*="unit_price"]');
+                const isWholesaleInput = row.querySelector('input[name*="is_wholesale"]');
+                
+                if (!productId || !unitPriceInput) {
+                    return;
+                }
+
+                // Show loading state
+                const originalValue = unitPriceInput.value;
+                unitPriceInput.disabled = true;
+                unitPriceInput.style.opacity = '0.5';
+
+                // Fetch product information
+                fetch(`/inventory/api/product/${encodeURIComponent(productId)}/info/`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Validate response data
+                        if (data.error) {
+                            console.error('API Error:', escapeHtml(data.error));
+                            throw new Error(data.error);
+                        }
+
+                        // Determine which price to use (wholesale or retail)
+                        const isWholesale = isWholesaleInput ? isWholesaleInput.checked : false;
+                        let price;
+
+                        if (isWholesale) {
+                            price = safeParseFloat(data.wholesale_selling_price, 0);
+                        } else {
+                            price = safeParseFloat(data.selling_price, 0);
+                        }
+
+                        // Validate price is positive
+                        if (price <= 0) {
+                            console.warn('Product price is zero or negative');
+                        }
+
+                        // Set the unit price with proper formatting
+                        unitPriceInput.value = price.toFixed(2);
+                        
+                        // Visual feedback
+                        unitPriceInput.style.transition = 'all 0.3s ease';
+                        unitPriceInput.style.backgroundColor = '#d4edda';
+                        setTimeout(() => {
+                            unitPriceInput.style.backgroundColor = '';
+                        }, 1500);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching product info:', error);
+                        // Restore original value on error
+                        unitPriceInput.value = originalValue;
+                        
+                        // Show error feedback
+                        unitPriceInput.style.transition = 'all 0.3s ease';
+                        unitPriceInput.style.backgroundColor = '#f8d7da';
+                        setTimeout(() => {
+                            unitPriceInput.style.backgroundColor = '';
+                        }, 2000);
+                    })
+                    .finally(() => {
+                        // Re-enable input
+                        unitPriceInput.disabled = false;
+                        unitPriceInput.style.opacity = '1';
+                    });
+            });
+
+            // Setup wholesale checkbox listener if it exists
+            const row = newProductSelect.closest('.item-row');
+            if (row) {
+                const isWholesaleInput = row.querySelector('input[name*="is_wholesale"]');
+                if (isWholesaleInput) {
+                    // Remove existing listeners
+                    const newIsWholesaleInput = isWholesaleInput.cloneNode(true);
+                    isWholesaleInput.parentNode.replaceChild(newIsWholesaleInput, isWholesaleInput);
+
+                    newIsWholesaleInput.addEventListener('change', function() {
+                        // Trigger product change to update price
+                        const productSelect = row.querySelector('select[name*="product"]');
+                        if (productSelect && productSelect.value) {
+                            productSelect.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            }
+        }
+
+        // Setup auto-fill for existing rows
+        function setupExistingRows() {
+            const existingRows = itemsContainer.querySelectorAll('.item-row');
+            existingRows.forEach(row => {
+                const productSelect = row.querySelector('select[name*="product"]');
+                if (productSelect) {
+                    setupProductAutoFill(productSelect);
+                }
+            });
+        }
+
+        // Initialize existing rows
+        setupExistingRows();
+
         // Add Item
         addItemBtn.addEventListener('click', function () {
             const formIdx = totalForms.value;
             const newForm = emptyFormTemplate.replace(/__prefix__/g, formIdx);
             itemsContainer.insertAdjacentHTML('beforeend', newForm);
             
-            // Re-initialize any plugins if needed (e.g., select2)
+            // Setup auto-fill for the new row
             const newRow = itemsContainer.lastElementChild;
-            const newSelects = newRow.querySelectorAll('select');
-            newSelects.forEach(select => {
-                 // Example: if using Select2, re-init here
-                 // $(select).select2();
-            });
+            const newProductSelect = newRow.querySelector('select[name*="product"]');
+            if (newProductSelect) {
+                setupProductAutoFill(newProductSelect);
+            }
 
             updateFormIndices();
         });

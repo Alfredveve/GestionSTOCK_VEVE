@@ -110,8 +110,8 @@
 
     <!-- Navigation Tabs within Hero -->
     <div class="hero-nav d-flex overflow-auto">
-        <a href="#" class="nav-link active">Gestion de stock</a>
         <a href="{% url 'inventory:invoice_list' %}" class="nav-link">Vente</a>
+        <a href="{% url 'inventory:quick_sale' %}" class="nav-link text-warning fw-bold"><i class="fas fa-bolt me-1"></i>Vente Rapide</a>
         <a href="{% url 'inventory:invoice_create' %}" class="nav-link">Facturation</a>
         <a href="{% url 'inventory:payment_list' %}" class="nav-link">Suivi de paiements</a>
         <a href="{% url 'inventory:reports' %}" class="nav-link">Rapports</a>
@@ -202,9 +202,9 @@
         </a>
     </div>
     <div class="col-12 col-md-4">
-        <a href="{% url 'inventory:movement_create' %}" class="btn btn-action card-color-blue w-100 py-3 shadow-sm">
-            <i class="bi bi-cart-plus fs-3 me-2"></i>
-            <span class="fs-6 fw-bold">Enregistrer une vente</span>
+        <a href="{% url 'inventory:quick_sale' %}" class="btn btn-action card-color-blue w-100 py-3 shadow-sm">
+            <i class="fas fa-bolt fs-3 me-2"></i>
+            <span class="fs-6 fw-bold">Vente Rapide (POS)</span>
         </a>
     </div>
 </div>

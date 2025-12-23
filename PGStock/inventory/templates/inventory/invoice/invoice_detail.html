@@ -156,9 +156,9 @@
     }
 
     .table-modern td {
-        padding: 1.25rem 1rem;
+        padding: 0.75rem 1rem;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .product-name {
@@ -184,18 +184,25 @@
     .total-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.75rem;
-        font-size: 0.95rem;
-        opacity: 0.8;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.75rem;
+        color: white;
+        white-space: nowrap;
+        gap: 1rem;
     }
 
     .total-final {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding-top: 1.25rem;
-        margin-top: 1.25rem;
-        font-size: 1.5rem;
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
         font-weight: 800;
-        opacity: 1;
+        white-space: nowrap;
+        gap: 1rem;
     }
 
     .note-section {
@@ -222,8 +229,11 @@
     </a>
     <div class="d-flex gap-3">
         <button onclick="window.print()" class="btn-action bg-dark text-white shadow-sm">
-            <i class="fas fa-print"></i> Imprimer
+            <i class="fas fa-print"></i> Imprimer A4
         </button>
+        <a href="{% url 'inventory:invoice_receipt' invoice.pk %}" target="_blank" class="btn-action bg-secondary text-white shadow-sm">
+            <i class="fas fa-receipt"></i> Ticket (POS)
+        </a>
         {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
         <button class="btn-action bg-primary text-white shadow-lg" 
                 id="addPaymentBtn"
@@ -244,7 +254,7 @@
                 <div class="logo-container shadow-sm">
                    <i class="fas fa-building text-white fs-1"></i>
                 </div>
-                <h2 class="fw-800 text-dark mb-1">{{ company_settings.name|default:"Labouré est Génie" }}</h2>
+                <h2 class="fw-800 text-dark mb-1 fs-4">{{ company_settings.name|default:"Labouré est Génie" }}</h2>
                 <p class="text-muted small mb-0">Expertise & Qualité au service de votre gestion.</p>
             </div>
             <div class="col-5">
@@ -322,7 +332,7 @@
                             <span class="text-muted">—</span>
                         {% endif %}
                     </td>
-                    <td class="text-end pe-4 fw-800 text-dark">{{ item.get_total|format_currency }}</td>
+                    <td class="text-end pe-4 fw-800 text-dark font-monospace">{{ item.get_total|format_currency }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -340,15 +350,15 @@
                 <div class="totals-card shadow-lg">
                     <div class="total-row">
                         <span>Sous-total</span>
-                        <span>{{ invoice.subtotal|format_currency }}</span>
+                        <span class="fw-bold font-monospace small">{{ invoice.subtotal|format_currency }}</span>
                     </div>
                     <div class="total-row">
                         <span>Taxes ({{ invoice.tax_rate }}%)</span>
-                        <span>{{ invoice.tax_amount|format_currency }}</span>
+                        <span class="fw-bold font-monospace small">{{ invoice.tax_amount|format_currency }}</span>
                     </div>
                     <div class="total-final d-flex justify-content-between align-items-center">
                         <span class="small fw-600 text-uppercase">Total TTC</span>
-                        <span>{{ invoice.total_amount|format_currency }}</span>
+                        <span class="font-monospace">{{ invoice.total_amount|format_currency }}</span>
                     </div>
                 </div>
             </div>

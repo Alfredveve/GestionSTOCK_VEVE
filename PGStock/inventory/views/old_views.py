@@ -87,9 +87,7 @@ from ..permissions import (
     is_admin, is_superuser_or_admin, is_staff_or_above,
 
     get_user_role, get_user_pos, filter_queryset_by_pos,
-
-    can_modify_object, can_delete_object, validate_discount
-
+    can_modify_object, can_delete_object, validate_discount, can_view_finances
 )
 
 
@@ -250,27 +248,22 @@ def password_reset_request(request):
             
 
             # Send email
-
-            send_mail(
-
-                subject='Réinitialisation de votre mot de passe',
-
-                message=f'Votre code de vérification est : {code}. Ce code expire dans 15 minutes.',
-
-                from_email=settings.DEFAULT_FROM_EMAIL,
-
-                recipient_list=[email],
-
-                fail_silently=False,
-
-            )
-
+            try:
+                send_mail(
+                    subject='Réinitialisation de votre mot de passe',
+                    message=f'Votre code de vérification est : {code}. Ce code expire dans 15 minutes.',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                messages.success(request, f'Un email contenant le code a été envoyé à {email}. Vérifiez votre dossier spam.')
+            except Exception as e:
+                # Log l'erreur pour le débogage mais ne pas bloquer l'utilisateur
+                print(f"Erreur d'envoi d'email: {str(e)}")
+                messages.error(request, 'Erreur lors de l\'envoi de l\'email. Contactez l\'administrateur si le problème persiste.')
             
-
             # Store email in session for next step
-
             request.session['reset_email'] = email
-
             return redirect('inventory:password_reset_verify')
 
     else:
@@ -702,43 +695,34 @@ def dashboard(request):
     
 
     # Bénéfice estimé
-
-    total_estimated_profit = Product.objects.aggregate(
-
-        total=Sum((F('selling_price') - F('purchase_price')) * F('inventory__quantity'))
-
-    )['total'] or Decimal('0.00')
-
+    total_estimated_profit = Decimal('0.00')
+    if can_view_finances(request.user):
+        total_estimated_profit = Product.objects.aggregate(
+            total=Sum((F('selling_price') - F('purchase_price')) * F('inventory__quantity'))
+        )['total'] or Decimal('0.00')
     
-
     # Ventes
-
-    total_sales = Invoice.objects.filter(status='paid').aggregate(
-
+    invoices_qs = Invoice.objects.all()
+    invoices_qs = filter_queryset_by_pos(invoices_qs, request.user, 'point_of_sale')
+    
+    total_sales = invoices_qs.filter(status='paid').aggregate(
         total=Sum('total_amount')
-
     )['total'] or Decimal('0.00')
-
     
-
-    pending_orders = Invoice.objects.filter(status='sent').count()
-
+    pending_orders = invoices_qs.filter(status='sent').count()
     
-
     # Mouvements récents
-
-    recent_movements = StockMovement.objects.select_related('product', 'user').order_by('-created_at')[:10]
-
+    movements_qs = StockMovement.objects.all()
+    movements_qs = filter_queryset_by_pos(movements_qs, request.user, 'from_point_of_sale')
+    recent_movements = movements_qs.select_related('product', 'user').order_by('-created_at')[:10]
     
-
     # Produits en stock faible
-
-    low_stock_products = Inventory.objects.filter(
-
+    inventory_qs = Inventory.objects.all()
+    inventory_qs = filter_queryset_by_pos(inventory_qs, request.user, 'point_of_sale')
+    
+    low_stock_products = inventory_qs.filter(
         quantity__lte=F('reorder_level'),
-
         quantity__gt=0
-
     ).select_related('product')[:10]
 
     # Produits retournés (derniers 10)
@@ -768,60 +752,47 @@ def dashboard(request):
     
 
     for status, label, css_class in statuses:
-
-        stats = Invoice.objects.filter(status=status).aggregate(
-
+        stats = invoices_qs.filter(status=status).aggregate(
             count=Count('id'),
-
             total=Coalesce(Sum('total_amount'), Decimal('0.00'))
-
         )
-
         invoice_stats.append({
-
             'label': label,
-
             'status': status,
-
             'css_class': css_class,
-
             'count': stats['count'],
-
-            'total': stats['total']
-
+            'total': stats['total'] if can_view_finances(request.user) else Decimal('0.00')
         })
 
     
 
     # Produits défectueux (derniers 10)
-
-    defective_products = StockMovement.objects.filter(
-
+    defective_products = movements_qs.filter(
         movement_type='defective'
-
     ).select_related('product').order_by('-created_at')[:10]
-
+    
     # Activités récentes des ventes
-    recent_sales_list = Invoice.objects.filter(
+    recent_sales_list = invoices_qs.filter(
         status__in=['sent', 'paid']
     ).select_related('client').order_by('-date_issued', '-created_at')
     
     # Mouvements récents
-    recent_movements_list = StockMovement.objects.select_related('product', 'user', 'from_point_of_sale').order_by('-created_at')
+    recent_movements_list = movements_qs.select_related('product', 'user', 'from_point_of_sale').order_by('-created_at')
 
     # Produits en stock faible
-    low_stock_products_list = Inventory.objects.filter(
+    low_stock_products_list = inventory_qs.filter(
         quantity__lte=F('reorder_level'),
         quantity__gt=0
     ).select_related('product', 'point_of_sale')
 
     # Produits retournés
-    returned_products_list = StockMovement.objects.filter(
+    returned_products_list = movements_qs.filter(
         movement_type='return'
     ).select_related('product').order_by('-created_at')
 
     # Pagination for all lists
     p_sales = Paginator(recent_sales_list, 5)
+
     p_movements = Paginator(recent_movements_list, 5)
     p_low_stock = Paginator(low_stock_products_list, 5)
     p_returns = Paginator(returned_products_list, 5)
@@ -842,6 +813,13 @@ def dashboard(request):
         total_value=Coalesce(Sum(F('inventory__quantity') * F('inventory__product__selling_price')), Decimal('0.00')),
         total_profit=Coalesce(Sum(F('inventory__quantity') * (F('inventory__product__selling_price') - F('inventory__product__purchase_price'))), Decimal('0.00'))
     ).filter(is_active=True)
+    
+    if not is_admin(request.user) and not request.user.is_superuser:
+        user_pos = get_user_pos(request.user)
+        if user_pos:
+            stock_by_pos = stock_by_pos.filter(id=user_pos.id)
+        else:
+            stock_by_pos = PointOfSale.objects.none()
 
     # Répartition par catégorie
     category_data = Category.objects.annotate(
@@ -862,8 +840,8 @@ def dashboard(request):
         'total_clients': total_clients,
         'low_stock_count': low_stock_count,
         'out_of_stock_count': out_of_stock_count,
-        'total_stock_value': total_stock_value,
-        'total_sales': total_sales,
+        'total_stock_value': total_stock_value if can_view_finances(request.user) else Decimal('0.00'),
+        'total_sales': total_sales if can_view_finances(request.user) else Decimal('0.00'),
         'pending_orders': pending_orders,
         'recent_movements': recent_movements,
         'low_stock_products': low_stock_products,
@@ -872,7 +850,7 @@ def dashboard(request):
         'defective_products': defective_products,
         'recent_sales': recent_sales,
         'stock_by_pos': stock_by_pos,
-        'total_estimated_profit': total_estimated_profit,
+        'total_estimated_profit': total_estimated_profit if can_view_finances(request.user) else Decimal('0.00'),
         'category_data': list(category_data),
         'top_selling_items': top_selling_items,
     }
@@ -1428,10 +1406,16 @@ def product_list(request):
         'inventory_set__point_of_sale'
 
     ).annotate(
-
         total_stock_annotated=Coalesce(Sum('inventory__quantity'), 0)
-
     ).all()
+    
+    # Filtrage par point de vente pour STAFF (Visibilité: Point de Vente uniquement)
+    if not is_admin(request.user) and not request.user.is_superuser:
+        user_pos = get_user_pos(request.user)
+        if user_pos:
+            products = products.filter(inventory__point_of_sale=user_pos).distinct()
+        else:
+            products = Product.objects.none()
 
     
 
@@ -1684,8 +1668,21 @@ def product_detail(request, pk):
     # inventory = product.get_inventory()  # Deprecated single inventory
     inventories = product.inventory_set.select_related('point_of_sale').all()
     
+    # Filtrage par point de vente pour STAFF
+    if not is_admin(request.user) and not request.user.is_superuser:
+        user_pos = get_user_pos(request.user)
+        if user_pos:
+            inventories = inventories.filter(point_of_sale=user_pos)
+            
     # Pagination des mouvements
     movements_list = StockMovement.objects.filter(product=product).order_by('-created_at')
+    
+    # Filtrage par point de vente pour STAFF
+    if not is_admin(request.user) and not request.user.is_superuser:
+        user_pos = get_user_pos(request.user)
+        if user_pos:
+            movements_list = movements_list.filter(Q(from_point_of_sale=user_pos) | Q(to_point_of_sale=user_pos))
+            
     paginator = Paginator(movements_list, 10) # 10 par page
     page = request.GET.get('page')
     movements = paginator.get_page(page)
@@ -1799,7 +1796,7 @@ def inventory_list(request):
             points_of_sale = PointOfSale.objects.none()
 
     # Pagination
-    paginator = Paginator(inventories, 10)  # 10 items per page
+    paginator = Paginator(inventories, 5)  # 5 items per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -1916,7 +1913,7 @@ def export_inventory_pdf(request):
             inventories = inventories.filter(point_of_sale_id=pos_id)
             
         context = {
-            'report_title': 'Rapport d\'Inventaire',
+            'report_title': "Rapport d'Inventaire",
             'inventories': inventories[:500],
             'company_settings': Settings.objects.first(),
             'generated_at': timezone.now(),
@@ -2316,7 +2313,7 @@ def invoice_list(request):
     # Tri par date décroissante
     invoices = invoices.order_by('-date_issued', '-created_at')
 
-    paginator = Paginator(invoices, 10)
+    paginator = Paginator(invoices, 5)
     page = request.GET.get('page')
     invoices = paginator.get_page(page)
 
@@ -2338,7 +2335,7 @@ def invoice_create(request):
     """Créer une facture"""
     if request.method == 'POST':
         form = InvoiceForm(request.POST)
-        formset = InvoiceItemFormSet(request.POST)
+        formset = InvoiceItemFormSet(request.POST, form_kwargs={'user': request.user})
         
         if form.is_valid() and formset.is_valid():
             invoice = form.save(commit=False)
@@ -2378,7 +2375,7 @@ def invoice_create(request):
         if hasattr(request.user, 'profile') and request.user.profile.point_of_sale:
             initial_data['point_of_sale'] = request.user.profile.point_of_sale
         form = InvoiceForm(initial=initial_data)
-        formset = InvoiceItemFormSet()
+        formset = InvoiceItemFormSet(form_kwargs={'user': request.user})
     
     return render(request, 'inventory/invoice/invoice_form.html', {
         'form': form,
@@ -2470,7 +2467,7 @@ def invoice_update(request, pk):
     
     if request.method == 'POST':
         form = InvoiceForm(request.POST, instance=invoice)
-        formset = InvoiceItemFormSet(request.POST, instance=invoice)
+        formset = InvoiceItemFormSet(request.POST, instance=invoice, form_kwargs={'user': request.user})
         
         if form.is_valid() and formset.is_valid():
             invoice = form.save()
@@ -2517,7 +2514,7 @@ def invoice_update(request, pk):
             return redirect('inventory:invoice_detail', pk=pk)
     else:
         form = InvoiceForm(instance=invoice)
-        formset = InvoiceItemFormSet(instance=invoice)
+        formset = InvoiceItemFormSet(instance=invoice, form_kwargs={'user': request.user})
     
     return render(request, 'inventory/invoice/invoice_form.html', {
         'form': form,
@@ -2529,7 +2526,7 @@ def invoice_update(request, pk):
 
 
 
-@admin_required
+@superuser_required
 
 def invoice_delete(request, pk):
 
@@ -2571,7 +2568,7 @@ def invoice_add_item(request, pk):
 
     if request.method == 'POST':
 
-        form = InvoiceItemForm(request.POST)
+        form = InvoiceItemForm(request.POST, user=request.user)
 
         if form.is_valid():
 
@@ -2625,7 +2622,7 @@ def invoice_add_item(request, pk):
 
     else:
 
-        form = InvoiceItemForm()
+        form = InvoiceItemForm(user=request.user)
 
     
 
@@ -2733,6 +2730,14 @@ def quote_list(request):
     
 
     quotes = Quote.objects.select_related('client', 'created_by').all()
+    
+    # Filtrage par point de vente pour STAFF (basé sur le créateur)
+    if not is_admin(request.user) and not request.user.is_superuser:
+        user_pos = get_user_pos(request.user)
+        if user_pos:
+            quotes = quotes.filter(created_by__profile__point_of_sale=user_pos)
+        else:
+            quotes = Quote.objects.none()
 
     
 
@@ -2860,7 +2865,7 @@ def quote_update(request, pk):
 
 
 
-@admin_required
+@superuser_required
 
 def quote_delete(request, pk):
 
@@ -3789,24 +3794,21 @@ def reports_view(request):
 
 
 
-@login_required
-
+@staff_required
 def payment_list(request):
-
     """Liste des paiements et suivi des factures"""
-
     payments = Payment.objects.select_related('invoice', 'invoice__client').all()
-
     
+    # Filtrage par point de vente pour STAFF
+    payments = filter_queryset_by_pos(payments, request.user, 'invoice__point_of_sale')
 
     # Factures avec solde à payer
-
+    invoices_qs = Invoice.objects.filter(status__in=['sent', 'partial']).select_related('client')
+    invoices_qs = filter_queryset_by_pos(invoices_qs, request.user, 'point_of_sale')
+    
     unpaid_invoices = [
-
-        inv for inv in Invoice.objects.filter(status__in=['sent', 'partial']).select_related('client') 
-
+        inv for inv in invoices_qs 
         if inv.get_remaining_amount() > 0
-
     ]
 
     
@@ -4684,8 +4686,7 @@ def replenish_pos(request, pk):
 
 
 
-@login_required
-
+@admin_required
 def pos_delete(request, pk):
 
     """Supprimer un point de vente"""
@@ -5504,8 +5505,7 @@ def download_product_template(request):
 
 
 
-@superuser_required
-
+@admin_required
 def reset_data(request):
 
     """
@@ -5768,7 +5768,7 @@ def export_sales_activities_pdf(request):
                 del sys.modules['lxml']
 
 
-@staff_required
+@superuser_required
 def export_invoice_status_excel(request):
     """Exporter l'état des factures en Excel"""
     from ..excel_utils import export_to_excel
@@ -5830,7 +5830,7 @@ def export_invoice_status_excel(request):
 
 
 @staff_required
-@staff_required
+@superuser_required
 def export_invoice_status_pdf(request):
     """Exporter l'état des factures en PDF"""
     import sys
@@ -5940,7 +5940,7 @@ def export_invoice_status_pdf(request):
                 del sys.modules['lxml']
 
 
-@staff_required
+@superuser_required
 def export_stock_distribution_excel(request):
     """Exporter la répartition du stock par magasin en Excel"""
     from ..excel_utils import export_to_excel
@@ -5968,7 +5968,7 @@ def export_stock_distribution_excel(request):
     return export_to_excel(headers, data, "Répartition Stock", "Repartition_Stock")
 
 
-@staff_required
+@superuser_required
 def export_stock_distribution_pdf(request):
     """Exporter la répartition du stock par magasin en PDF"""
     import sys

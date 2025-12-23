@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db import transaction
+from django.db import transaction, models
 from django.utils import timezone
 from decimal import Decimal
 import json
@@ -67,8 +68,9 @@ def quick_sale(request):
                         total=price * qty
                     )
                 
-                # Calculer les totaux et déduire le stock
+                # Calculer les totaux
                 invoice.calculate_totals()
+                
                 # Note: deduct_stock() est déjà appelé par update_status() ou manuellement
                 invoice.deduct_stock()
                 
@@ -76,7 +78,8 @@ def quick_sale(request):
                 'success': True, 
                 'message': 'Vente enregistrée avec succès!',
                 'invoice_id': invoice.id,
-                'invoice_number': invoice.invoice_number
+                'invoice_number': invoice.invoice_number,
+                'redirect_url': reverse('inventory:invoice_detail', args=[invoice.id])
             })
             
         except Exception as e:
@@ -90,13 +93,25 @@ def quick_sale(request):
 
 @staff_required
 def api_search_products(request):
-    """API de recherche rapide de produits pour le POS"""
-    query = request.GET.get('q', '')
-    category_id = request.GET.get('category', '')
+    """API de recherche rapide de produits pour le POS avec cache"""
+    from django.core.cache import cache
     
-    products = Product.objects.all()
+    query = request.GET.get('q', '').strip()
+    category_id = request.GET.get('category', '').strip()
+    
+    # Créer une clé de cache unique
+    cache_key = f'pos_search_{query}_{category_id}'
+    
+    # Vérifier le cache d'abord
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return JsonResponse(cached_result)
+    
+    # Optimiser la requête avec select_related pour éviter les requêtes N+1
+    products = Product.objects.select_related('category')
     
     if query:
+        # Recherche par nom ou SKU (case-insensitive)
         products = products.filter(
             models.Q(name__icontains=query) | 
             models.Q(sku__icontains=query)
@@ -105,9 +120,25 @@ def api_search_products(request):
     if category_id:
         products = products.filter(category_id=category_id)
     
-    # Limiter à 20 résultats pour la performance
+    # Limiter à 15 résultats et ordonner par pertinence
+    # Prioriser les correspondances exactes de SKU
+    products = products.order_by(
+        models.Case(
+            models.When(sku__iexact=query, then=0),
+            models.When(name__istartswith=query, then=1),
+            default=2
+        ),
+        'name'
+    )[:15]
+    
+    # Calculer le stock uniquement pour les produits retournés
     data = []
-    for p in products[:20]:
+    for p in products:
+        # Calculer le stock total pour ce produit
+        total_stock = p.inventory_set.aggregate(
+            total=models.Sum('quantity')
+        )['total'] or 0
+        
         data.append({
             'id': p.id,
             'name': p.name,
@@ -115,11 +146,16 @@ def api_search_products(request):
             'price': float(p.selling_price),
             'wholesale_price': float(p.wholesale_selling_price),
             'units_per_box': p.units_per_box,
-            'stock': p.get_total_stock_quantity(),
+            'stock': total_stock,
             'image_url': p.image.url if p.image else None,
         })
     
-    return JsonResponse({'results': data})
+    result = {'results': data}
+    
+    # Mettre en cache pour 60 secondes
+    cache.set(cache_key, result, 60)
+    
+    return JsonResponse(result)
 
 @staff_required
 def api_create_client(request):

@@ -74,6 +74,10 @@
                         <li><a class="dropdown-item" href="{% url 'inventory:invoice_list' %}">Factures</a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:invoice_create' %}">Nouvelle
                                 Facture</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item fw-bold text-primary" href="{% url 'inventory:quick_sale' %}">
+                            <i class="fas fa-bolt me-2"></i>Vente Rapide (POS)
+                        </a></li>
                     </ul>
                 </li>
 
@@ -163,6 +167,14 @@
                                     </div>
                                 </div>
                             </div>
+                        </li>
+                        <li><hr class="dropdown-divider my-2"></li>
+                        
+                        <li>
+                            <a class="dropdown-item fw-bold text-primary" href="{% url 'inventory:quick_sale' %}">
+                                <span class="icon-wrapper me-2"><i class="fas fa-bolt"></i></span>
+                                <span>Vente Rapide (POS)</span>
+                            </a>
                         </li>
                         <li><hr class="dropdown-divider my-2"></li>
                         

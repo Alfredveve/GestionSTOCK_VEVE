@@ -20,7 +20,7 @@ class InventoryFlowTests(TestCase):
             sku="TEST-001",
             category=self.category,
             supplier=self.supplier,
-            unit_price=Decimal('100.00')
+            selling_price=Decimal('100.00')
         )
         # Create inventory
         self.inventory = Inventory.objects.create(product=self.product, quantity=100)
@@ -80,3 +80,13 @@ class InventoryFlowTests(TestCase):
         self.assertEqual(str(self.category), "Test Category")
         self.assertEqual(str(self.supplier), "Test Supplier")
         self.assertEqual(str(self.product), "Test Product (TEST-001)")
+
+    def test_api_search_products(self):
+        """Test the optimized search API"""
+        response = self.client.get(reverse('inventory:api_pos_search_products'), {'q': 'Test'})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(len(data['results']) > 0)
+        self.assertEqual(data['results'][0]['name'], "Test Product")
+        self.assertEqual(data['results'][0]['stock'], 100) # From setup inventory
+

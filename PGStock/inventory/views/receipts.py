@@ -11,6 +11,8 @@ import sys
 
 from ..models import Receipt, ReceiptItem, Supplier, PointOfSale, Product, StockMovement
 from ..forms import ReceiptForm, ReceiptItemForm
+from ..services.receipt_service import ReceiptService
+from ..services.base import ServiceException
 from ..permissions import staff_required, superuser_required
 
 @staff_required
@@ -38,7 +40,7 @@ def receipt_list(request):
     if end_date:
         receipts = receipts.filter(date_received__lte=end_date)
     
-    paginator = Paginator(receipts, 10)
+    paginator = Paginator(receipts, 5)
     page = request.GET.get('page')
     receipts = paginator.get_page(page)
     
@@ -84,6 +86,10 @@ def receipt_detail(request, pk):
     
     # Handle Add Item Form
     if request.method == 'POST':
+        if receipt.status != 'draft':
+            messages.error(request, 'Impossible d\'ajouter des articles à un bon déjà validé ou reçu.')
+            return redirect('inventory:receipt_detail', pk=pk)
+            
         form = ReceiptItemForm(request.POST)
         if form.is_valid():
             item = form.save(commit=False)
@@ -169,8 +175,11 @@ def receipt_delete(request, pk):
 def receipt_add_item(request, pk):
     """Ajouter un article à un bon de réception"""
     receipt = get_object_or_404(Receipt, pk=pk)
-    
     if request.method == 'POST':
+        if receipt.status != 'draft':
+            messages.error(request, 'Impossible d\'ajouter des articles à un bon déjà validé ou reçu.')
+            return redirect('inventory:receipt_detail', pk=pk)
+            
         form = ReceiptItemForm(request.POST)
         if form.is_valid():
             item = form.save(commit=False)
@@ -195,6 +204,10 @@ def receipt_delete_item(request, pk, item_pk):
     item = get_object_or_404(ReceiptItem, pk=item_pk, receipt=receipt)
     
     if request.method == 'POST':
+        if receipt.status != 'draft':
+            messages.error(request, 'Impossible de supprimer des articles d\'un bon déjà validé ou reçu.')
+            return redirect('inventory:receipt_detail', pk=pk)
+            
         item.delete()
         receipt.calculate_total()
         messages.success(request, 'Article supprimé avec succès!')
@@ -203,39 +216,34 @@ def receipt_delete_item(request, pk, item_pk):
 
 @login_required
 def receipt_change_status(request, pk, status):
-    """Changer le statut d'un bon de réception"""
+    """Changer le statut d'un bon de réception avec impact sur le stock via Service"""
     receipt = get_object_or_404(Receipt, pk=pk)
+    service = ReceiptService()
     
-    if status not in dict(Receipt.STATUS_CHOICES):
-        messages.error(request, "Statut invalide.")
-        return redirect('inventory:receipt_list')
-        
-    receipt.status = status
-    receipt.save()
-    messages.success(request, f"Statut du bon {receipt.receipt_number} mis à jour : {receipt.get_status_display()}")
+    try:
+        service.change_status(receipt, status, request.user)
+        messages.success(request, f"✅ Statut du bon {receipt.receipt_number} mis à jour avec succès.")
+    except ServiceException as e:
+        messages.error(request, f"❌ {str(e)}")
+    except Exception as e:
+        messages.error(request, f"❌ Erreur lors du changement de statut : {str(e)}")
     
     return redirect('inventory:receipt_list')
 
 @login_required
 def receipt_validate(request, pk):
-    """Valider un bon de réception (POST uniquement)"""
+    """Valider un bon de réception via Service"""
     if request.method != 'POST':
         return redirect('inventory:receipt_detail', pk=pk)
         
     receipt = get_object_or_404(Receipt, pk=pk)
-    
-    if receipt.status != 'draft':
-        messages.warning(request, "Ce bon de réception ne peut plus être validé.")
-        return redirect('inventory:receipt_detail', pk=pk)
+    service = ReceiptService()
     
     try:
-        with transaction.atomic():
-            # 1. Changer le statut
-            receipt.status = 'validated'
-            # 2. Ajouter le stock
-            receipt.add_stock()
-        
-        messages.success(request, f"✅ Bon de réception {receipt.receipt_number} validé et stock mis à jour avec succès.")
+        service.validate_and_add_stock(receipt)
+        messages.success(request, f"✅ Bon de réception {receipt.receipt_number} validé et stock mis à jour.")
+    except ServiceException as e:
+        messages.error(request, f"❌ {str(e)}")
     except Exception as e:
         messages.error(request, f"❌ Erreur lors de la validation : {str(e)}")
     
@@ -300,7 +308,7 @@ def export_receipt_list_pdf(request):
     try:
         from django.template.loader import get_template
         from xhtml2pdf import pisa
-        from ..models import CompanySettings
+        from ..models import Settings
         
         # Récupérer les filtres
         query = request.GET.get('q', '')
@@ -332,7 +340,7 @@ def export_receipt_list_pdf(request):
             
         # Calculer le total
         total_amount_sum = receipts.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
-        company_settings = CompanySettings.objects.first()
+        company_settings = Settings.objects.first()
         
         context = {
             'receipts': receipts,

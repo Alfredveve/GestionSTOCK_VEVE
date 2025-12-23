@@ -116,11 +116,21 @@ class ProductDeleteView(AdminRequiredMixin, DeleteView):
     success_url = reverse_lazy('inventory:product_list')
     context_object_name = 'product'
 
+    def post(self, request, *args, **kwargs):
+        try:
+            return self.delete(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, "Impossible de supprimer ce produit car il est utilisé dans des factures ou des réceptions.")
+            return redirect('inventory:product_list')
+
     def delete(self, request, *args, **kwargs):
         try:
-            response = super().delete(request, *args, **kwargs)
+            # First, fetch the object
+            self.object = self.get_object()
+            # Then delete it
+            self.object.delete()
             messages.success(request, "Produit supprimé avec succès!")
-            return response
+            return redirect(self.success_url)
         except ProtectedError:
             messages.error(request, "Impossible de supprimer ce produit car il est utilisé dans des factures ou des réceptions.")
             return redirect('inventory:product_list')

@@ -147,6 +147,11 @@ class Product(models.Model):
         verbose_name = "Produit"
         verbose_name_plural = "Produits"
         ordering = ['name']
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['sku']),
+            models.Index(fields=['category', 'name']),
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.sku})"

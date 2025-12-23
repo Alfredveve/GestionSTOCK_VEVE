@@ -50,11 +50,19 @@ class CategoryDeleteView(AdminRequiredMixin, DeleteView):
     success_url = reverse_lazy('inventory:category_list')
     context_object_name = 'category'
 
+    def post(self, request, *args, **kwargs):
+        try:
+            return self.delete(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, "Impossible de supprimer cette catégorie car elle contient des produits.")
+            return redirect('inventory:category_list')
+
     def delete(self, request, *args, **kwargs):
         try:
-            response = super().delete(request, *args, **kwargs)
+            self.object = self.get_object()
+            self.object.delete()
             messages.success(request, "Catégorie supprimée avec succès!")
-            return response
+            return redirect(self.success_url)
         except ProtectedError:
             messages.error(request, "Impossible de supprimer cette catégorie car elle contient des produits.")
             return redirect('inventory:category_list')

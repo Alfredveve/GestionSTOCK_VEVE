@@ -8,6 +8,8 @@ from django.utils.translation import gettext as _
 
 from .models import Receipt
 from .forms import ReceiptForm, ReceiptItemFormSet
+from inventory.services.receipt_service import ReceiptService
+from inventory.services.base import ServiceException
 
 class ReceiptListView(LoginRequiredMixin, ListView):
     model = Receipt
@@ -45,9 +47,23 @@ class ReceiptCreateView(LoginRequiredMixin, CreateView):
                 # Mise à jour des totaux
                 # Dans le modèle Receipt, nous avons une méthode calculate_total() ? 
                 # Si non, on la calcule ici basiquement
-                total = sum(item.total_cost for item in self.object.items.all())
+                # [FIX] Utiliser receiptitem_set au lieu de items, et total au lieu de total_cost
+                total = sum(item.total for item in self.object.receiptitem_set.all())
                 self.object.total_amount = total
                 self.object.save()
+                
+                # [FIX] Déclencher l'entrée en stock via le Service (gère la validation "non vide")
+                if self.object.status in ['received', 'validated']:
+                    service = ReceiptService()
+                    try:
+                        service.change_status(self.object, self.object.status, self.request.user)
+                    except ServiceException as e:
+                        messages.error(self.request, f"Erreur de validation : {str(e)}")
+                        # On pourrait remettre en brouillon ici si on veut forcer la correction
+                        self.object.status = 'draft'
+                        self.object.save()
+                    except Exception as e:
+                        messages.warning(self.request, f"Bon créé mais erreur lors de l'ajout en stock : {str(e)}")
                 
                 messages.success(self.request, _("Bon de réception créé avec succès !"))
                 return super().form_valid(form)
