@@ -1,109 +1,19 @@
 /* ============================================
    FORMS & INPUTS - PREMIUM DESIGN
-   Theme: Light, Clean, Accessible
    ============================================ */
+/* Variables now mainly sourced from variables.css */
 
-:root {
-    --input-bg: #ffffff;
-    --input-border: #e2e8f0;
-    /* Slate 200 */
-    --input-text: #1e293b;
-    /* Slate 800 */
-    --input-placeholder: #94a3b8;
-    /* Slate 400 */
-
-    --focus-ring-color: rgba(79, 70, 229, 0.15);
-    /* Indigo tint */
-    --focus-border: #6366f1;
-    /* Indigo 500 */
-
-    --form-label: #475569;
-    /* Slate 600 */
-    --form-label-hover: #1e293b;
-}
-
-/* Form Groups */
 .form-group {
     margin-bottom: 1.5rem;
 }
 
-/* Labels */
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--form-label);
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: color 0.2s ease;
-}
-
-.form-label:hover {
-    color: var(--form-label-hover);
-}
-
-/* Metronic Premium Form Styles */
-
-/* Form Control Base */
-/* Form Control Base */
-.form-control,
-.form-select {
-    display: block;
-    width: 100%;
-    padding: 0.775rem 1rem;
-    font-size: 1.1rem;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--input-text);
-    background-color: var(--input-bg);
-    background-clip: padding-box;
-    border: 1px solid var(--input-border);
-    appearance: none;
-    border-radius: 0.475rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-/* Focus State */
-.form-control:focus,
-.form-select:focus {
-    color: var(--input-text);
-    background-color: var(--input-bg);
-    border-color: var(--focus-border);
-    outline: 0;
-    box-shadow: 0 0 0 4px var(--focus-ring-color);
-}
-
-/* Placeholders */
-.form-control::placeholder {
-    color: var(--kt-text-gray-500);
-    opacity: 1;
-}
-
-/* Disabled State */
-.form-control:disabled,
-.form-control[readonly],
-.form-select:disabled {
-    background-color: var(--kt-gray-200);
-    opacity: 1;
-    cursor: not-allowed;
-}
-
-/* File Input */
-.form-control[type="file"] {
-    overflow: hidden;
-    padding: 0.775rem 1rem;
-}
-
-/* Textarea */
-textarea.form-control {
-    min-height: calc(1.5em + 1.55rem + 2px);
-}
-
-/* Form Labels */
-.form-label {
-    margin-bottom: 0.5rem;
-    font-size: 1.05rem;
+    color: var(--text-dark);
     font-weight: 600;
-    color: var(--kt-text-dark);
+    font-size: 1.05rem;
+    transition: color 0.2s ease;
 }
 
 .required:after {
@@ -115,25 +25,52 @@ textarea.form-control {
     font-weight: 600;
 }
 
+.form-control,
+.form-select {
+    display: block;
+    width: 100%;
+    padding: 0.775rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-dark);
+    background-color: #ffffff;
+    background-clip: padding-box;
+    border: 1px solid var(--input-border);
+    appearance: none;
+    border-radius: var(--border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: var(--text-dark);
+    background-color: #ffffff;
+    border-color: var(--kt-primary);
+    outline: 0;
+    box-shadow: 0 0 0 4px rgba(54, 153, 255, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+    background-color: var(--kt-secondary-light);
+    opacity: 1;
+    cursor: not-allowed;
+}
+
 /* Validation States */
 .is-valid .form-control,
 .is-valid .form-select {
     border-color: var(--kt-success);
-    padding-right: calc(1.5em + 1.55rem);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2350cd89' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right calc(0.375em + 0.3875rem) center;
-    background-size: calc(0.75em + 0.775rem) calc(0.75em + 0.775rem);
 }
 
 .is-invalid .form-control,
 .is-invalid .form-select {
     border-color: var(--kt-danger);
-    padding-right: calc(1.5em + 1.55rem);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23f1416c'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23f1416c' stroke='none'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right calc(0.375em + 0.3875rem) center;
-    background-size: calc(0.75em + 0.775rem) calc(0.75em + 0.775rem);
 }
 
 /* Input Group */
@@ -145,62 +82,26 @@ textarea.form-control {
     width: 100%;
 }
 
-.input-group>.form-control,
-.input-group>.form-select {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
-    border-radius: 0.475rem;
-}
-
 .input-group-text {
     display: flex;
     align-items: center;
     padding: 0.775rem 1rem;
     font-size: 1.1rem;
     font-weight: 500;
-    line-height: 1.5;
-    color: var(--kt-text-gray-600);
-    text-align: center;
-    white-space: nowrap;
-    background-color: var(--kt-gray-100);
-    border: 1px solid var(--kt-gray-100);
-    border-radius: 0.475rem;
+    color: var(--text-gray);
+    background-color: var(--kt-secondary-light);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius);
 }
 
-/* Custom Select Arrow (Cleaner) */
-.form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%237E8299' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 16px 12px;
-}
-
-/* Solid Style Variant (Solid Color, No Border initially) */
+/* Solid Style Variant */
 .form-control-solid {
-    background-color: var(--kt-input-bg);
-    border-color: var(--kt-input-bg);
-    color: var(--kt-text-gray-700);
-    transition: color 0.2s ease, background-color 0.2s ease;
+    background-color: var(--input-bg-solid);
+    border-color: var(--input-bg-solid);
+    color: var(--text-dark);
 }
 
-.form-control-solid:active,
-.form-control-solid.active,
-.form-control-solid:focus,
-.form-control-solid.focus {
-    background-color: var(--kt-input-focus-bg);
-    border-color: var(--kt-input-focus-border);
-    color: var(--kt-text-gray-700);
-    transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-/* Flush Style (Transparent, Border Bottom) */
-.form-control-flush {
-    background-color: transparent;
-    border: 0;
-    border-bottom: 1px solid var(--kt-gray-300);
-    border-radius: 0;
-    padding-left: 0;
-    padding-right: 0;
+.form-control-solid:focus {
+    background-color: #ffffff;
+    border-color: var(--kt-primary);
 }

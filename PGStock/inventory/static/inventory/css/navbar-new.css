@@ -1,45 +1,11 @@
 /* ============================================
    NAVBAR METRONIC - PREMIUM DARK THEME
-   Theme: Dark Sidebar/Header, Clean Content
    ============================================ */
+/* Variables now mainly sourced from variables.css */
 
-:root {
-    --nav-height: 70px;
-    --nav-bg-dark: #1e1e2d;
-    /* Metronic Sidebar Dark */
-    --nav-bg-darkER: #151521;
-    /* Darker shade */
-    --nav-border-color: rgba(255, 255, 255, 0.07);
-
-    /* Typography */
-    --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
-    --text-light: #ffffff;
-    --text-muted: #9899ac;
-    /* Metronic Muted Text */
-    --text-hover: #ffffff;
-
-    /* Accents */
-    --brand-primary: #3699ff;
-    /* Metronic Blue */
-    --brand-hover-bg: #2b2b40;
-    --brand-active-bg: #2b2b40;
-
-    /* Dropdowns (Light Theme for readability) */
-    --dropdown-bg: #ffffff;
-    --dropdown-text: #3f4254;
-    --dropdown-hover-bg: #f3f6f9;
-
-    /* Shadows */
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    --shadow-dropdown: 0 0 50px 0 rgba(82, 63, 105, 0.15);
-}
-
-/* ============================================
-   HEADER STRUCTURE
-   ============================================ */
 .metronic-header {
     background-color: var(--nav-bg-dark);
-    border-bottom: 1px solid var(--nav-border-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     height: var(--nav-height);
     display: flex;
     align-items: center;
@@ -48,16 +14,13 @@
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
 }
 
-/* ============================================
-   BRANDING
-   ============================================ */
+/* BRANDING */
 .navbar-brand {
     padding: 0;
     margin-right: 3rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-family: var(--font-primary);
     text-decoration: none;
 }
 
@@ -65,17 +28,16 @@
     width: 35px;
     height: 35px;
     background: rgba(54, 153, 255, 0.2);
-    /* Transparent Blue */
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--brand-primary);
+    color: var(--kt-primary);
     transition: all 0.3s ease;
 }
 
 .navbar-brand:hover .icon-shape-metronic {
-    background: var(--brand-primary);
+    background: var(--kt-primary);
     color: #ffffff;
 }
 
@@ -86,108 +48,52 @@
     letter-spacing: 0.5px;
 }
 
-/* ============================================
-   NAVIGATION LINKS
-   ============================================ */
+/* NAVIGATION LINKS */
 .navbar-nav {
-    gap: 0.25rem; /* Reduced gap slightly for better fit */
-}
-
-@media (min-width: 1400px) {
-    .navbar-nav {
-        gap: 0.5rem;
-    }
+    gap: 0.25rem;
 }
 
 .nav-link {
-    font-family: var(--font-primary);
+    font-family: var(--font-family-base);
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-muted) !important;
-    padding: 0.6rem 0.8rem !important; /* Slightly more compact padding */
+    padding: 0.6rem 0.8rem !important;
     border-radius: 6px;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    white-space: nowrap; /* Prevent breaking */
+    white-space: nowrap;
 }
 
 .nav-link:hover {
-    color: var(--text-hover) !important;
-    background-color: var(--brand-hover-bg);
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-link.active {
-    color: var(--brand-primary) !important;
-    background-color: var(--brand-active-bg);
+    color: var(--kt-primary) !important;
+    background-color: rgba(54, 153, 255, 0.1);
     font-weight: 600;
 }
 
-/* Dropdown Chevron */
-.dropdown-toggle::after {
-    display: inline-block;
-    content: "\F282";
-    /* Bootstrap Chevron */
-    font-family: 'bootstrap-icons';
-    font-size: 0.6em;
-    margin-left: 0.5em;
-    border: none;
-    vertical-align: middle;
-    opacity: 0.7;
-    transition: transform 0.2s ease;
-}
-
-.dropdown-toggle[aria-expanded="true"]::after {
-    transform: rotate(180deg);
-    color: var(--brand-primary);
-}
-
-/* ============================================
-   DROPDOWNS
-   ============================================ */
-
-/* Ensure dropdown parent has proper positioning */
-.nav-item.dropdown {
-    position: relative;
-}
-
-/* Critical fix: Remove gap and add invisible bridge */
+/* DROPDOWNS */
 .dropdown-menu {
     border: 0;
-    border-radius: 8px;
-    box-shadow: var(--shadow-dropdown);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
     padding: 1rem 0;
-    margin-top: 0 !important; /* Remove gap that causes dropdown to disappear */
-    background: var(--dropdown-bg);
-    min-width: 250px;
+    background: #ffffff;
+    min-width: 200px;
     z-index: 1060;
-    /* Add padding-top to create invisible "bridge" area */
-    padding-top: calc(1rem + 8px);
-}
-
-/* Add pseudo-element to create hover bridge between nav item and dropdown */
-.nav-item.dropdown:hover .dropdown-menu::before,
-.nav-item.dropdown .dropdown-menu.show::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: transparent;
-    z-index: 1;
-}
-
-/* Smooth animation for dropdown */
-.dropdown-menu {
     animation: dropdownFadeIn 0.2s ease;
 }
 
 @keyframes dropdownFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-5px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -195,366 +101,77 @@
     }
 }
 
-.dropdown-header {
-    color: #b5b5c3;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 0 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
 .dropdown-item {
-    font-size: 0.95rem;
-    color: var(--dropdown-text);
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    padding: 0.65rem 1.5rem;
     transition: all 0.2s;
-    position: relative;
-    z-index: 2; /* Ensure items are above the bridge */
-}
-
-.dropdown-item i {
-    font-size: 1.1rem;
-    color: #b5b5c3;
-    width: 20px;
-    text-align: center;
-    transition: color 0.2s;
 }
 
 .dropdown-item:hover {
-    background-color: var(--dropdown-hover-bg);
-    color: var(--brand-primary);
+    background-color: var(--bg-body);
+    color: var(--kt-primary);
 }
 
-.dropdown-item:hover i {
-    color: var(--brand-primary);
-}
-
-.dropdown-item:active {
-    background-color: #e8eaed;
-}
-
-.dropdown-divider {
-    border-top: 1px solid #ebedf3;
-    margin: 0.5rem 0;
-}
-
-/* Ensure dropdown stays open when hovering over it */
-@media (min-width: 992px) {
-    .nav-item.dropdown:hover .dropdown-menu,
-    .nav-item.dropdown .dropdown-menu:hover {
-        display: block;
-    }
-}
-
-/* ============================================
-   USER PROFILE - PROFESSIONAL MINIMALIST
-   ============================================ */
-
-/* Adjust user profile container position */
-.navbar-collapse > .ms-auto {
-    margin-right: 0 !important;
-}
-
-@media (min-width: 992px) {
-    .navbar-collapse > .ms-auto {
-        margin-right: 5rem !important; /* Move profile significantly left from right edge */
-    }
-}
-
-
-/* Profile Toggle Button */
+/* USER PROFILE */
 .user-profile-toggle {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 6px 12px 6px 8px;
+    padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
-    border: 1px solid transparent;
-    background: transparent;
 }
 
 .user-profile-toggle:hover {
     background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
 }
 
-.user-profile-toggle:active {
-    background-color: rgba(255, 255, 255, 0.08);
-    transform: translateY(0);
-}
-
-/* User Text */
-.user-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.3;
-}
-
-.user-name {
-    display: block;
-    color: #ffffff;
-    font-weight: 500;
-    font-size: 0.9rem;
-    letter-spacing: -0.01em;
-}
-
-.user-role {
-    display: block;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.75rem;
-    font-weight: 400;
-}
-
-/* Profile Chevron */
-.user-profile-toggle .bi-chevron-down {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.7rem;
-    transition: transform 0.2s ease, color 0.2s ease;
-    margin-left: 4px;
-}
-
-.user-profile-toggle:hover .bi-chevron-down {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.user-profile-toggle[aria-expanded="true"] .bi-chevron-down {
-    transform: rotate(180deg);
-    color: #ffffff;
-}
-
-/* Avatar Wrappers */
 .user-avatar-wrapper {
     position: relative;
-    width: 38px;
-    height: 38px;
-    flex-shrink: 0;
+    width: 35px;
+    height: 35px;
 }
 
-.user-avatar-wrapper-large {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-}
-
-/* Avatar Images */
 .user-avatar-img,
 .user-avatar-placeholder {
     width: 100%;
     height: 100%;
-    border-radius: 50%; /* Circle looks more standard/professional */
+    border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1); /* Subtle border ring */
 }
 
 .user-avatar-placeholder {
-    background-color: #3f4254;
+    background-color: var(--kt-primary);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 1rem;
-    text-transform: uppercase;
 }
 
-/* Status Indicator - Blue Dot */
 .user-status-indicator {
     position: absolute;
     bottom: 0;
     right: 0;
     width: 10px;
     height: 10px;
-    background-color: #3699ff; /* Blue */
+    background-color: var(--kt-success);
     border: 2px solid var(--nav-bg-dark);
     border-radius: 50%;
-    box-shadow: none;
-    z-index: 2;
 }
 
-/* User Dropdown Menu - Minimalist */
-.user-dropdown-menu {
-    min-width: 320px; /* Increased from 280px to show full email */
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Softer shadow */
-    background: #ffffff;
-    margin-top: 8px !important;
-}
-
-/* User Info Header - Clean */
-.user-info-header {
-    background: #f9fafb; /* Light Gray bg */
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border: 1px solid #f3f4f6;
-}
-
-.user-info-header .user-avatar-wrapper-large .user-status-indicator {
-    width: 12px;
-    height: 12px;
-    border-width: 2px;
-    border-color: #f9fafb;
-}
-
-.user-info-header .fw-bold {
-    font-size: 0.95rem;
-    color: #111827; /* Gray 900 */
-    font-weight: 600;
-}
-
-.user-info-header .text-muted {
-    color: #6b7280 !important; /* Gray 500 */
-    font-size: 0.8rem;
-}
-
-/* Center email in dropdown */
-.user-email-centered {
-    text-align: center;
-    width: 100%;
-}
-
-/* Online Badge - Pill */
-.bg-light-success {
-    background-color: transparent !important;
-    border: none;
-    padding: 0;
-    color: #3699ff !important;
+.user-name {
+    color: #ffffff;
     font-weight: 500;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.bg-light-success i {
-    font-size: 0.4rem;
-}
-
-/* Dropdown Items - Standard */
-.user-dropdown-menu .dropdown-item {
-    padding: 8px 12px;
     font-size: 0.9rem;
-    font-weight: 400;
-    color: #374151; /* Gray 700 */
-    border-radius: 6px;
-    transition: all 0.15s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 2px;
 }
 
-/* Remove decorative pseudo-elements */
-.user-dropdown-menu .dropdown-item::before {
-    display: none;
-}
-
-.user-dropdown-menu .dropdown-item i {
-    font-size: 1rem;
-    color: #9ca3af; /* Gray 400 */
-    width: 20px;
-    text-align: center;
-    transition: color 0.15s ease;
-}
-
-.user-dropdown-menu .dropdown-item:hover {
-    background-color: #f3f4f6; /* Gray 100 */
-    color: #111827;
-    padding-left: 12px; /* No movement */
-}
-
-.user-dropdown-menu .dropdown-item:hover i {
-    color: var(--brand-primary);
-    transform: none;
-}
-
-.user-dropdown-menu .dropdown-item.text-danger {
-    color: #ef4444 !important;
-}
-
-.user-dropdown-menu .dropdown-item.text-danger:hover {
-    background-color: #fef2f2;
-    color: #dc2626 !important;
-}
-
-.user-dropdown-menu .dropdown-item.text-danger i {
-    color: #fca5a5;
-}
-
-.user-dropdown-menu .dropdown-item.text-danger:hover i {
-    color: #dc2626;
-}
-
-/* Dropdown Headers & Dividers */
-.user-dropdown-menu .dropdown-header {
-    color: #9ca3af;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 8px 12px 4px;
-    margin: 0;
-}
-
-.user-dropdown-menu .dropdown-divider {
-    border-top: 1px solid #f3f4f6;
-    margin: 6px 0;
-}
-
-/* ============================================
-   MOBILE OFFCANVAS
-   ============================================ */
-.offcanvas {
-    background-color: var(--nav-bg-dark);
-}
-
-.bg-metronic-mobile {
-    background-color: var(--nav-bg-dark);
-}
-
-.navbar-toggler {
-    color: var(--text-light) !important;
-    border: none;
-    padding: 0.5rem;
-}
-
-.navbar-toggler:focus {
-    box-shadow: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 991.98px) {
-    .navbar-brand {
-        margin-right: 0;
-    }
-
+/* RESPONSIVE */
+@media(max-width: 991.98px) {
     .metronic-header {
         height: 60px;
-        padding: 0 1rem;
-    }
-
-    /* Mobile Menu Accordion Customization */
-    .accordion-button::after {
-        filter: invert(1) brightness(0.5); /* Make chevron grayish */
-    }
-
-    .accordion-button:not(.collapsed)::after {
-        filter: invert(1) brightness(1); /* Make chevron white when open */
-    }
-
-    .accordion-button:not(.collapsed) {
-        color: #ffffff !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
     }
 }

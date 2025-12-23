@@ -6,38 +6,40 @@
 
 {% block content %}
 <!-- Header -->
-<div class="d-flex flex-wrap align-items-center justify-content-between mb-5">
-    <div class="d-flex align-items-center">
-        <div class="symbol symbol-50px me-5">
-            <span class="symbol-label bg-light-primary">
-                <i class="bi bi-graph-up-arrow fs-2x text-primary"></i>
-            </span>
+<div class="modern-header mb-6 fade-in">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="symbol symbol-50px me-5">
+                <span class="symbol-label bg-white text-primary">
+                    <i class="bi bi-graph-up-arrow fs-2 text-primary"></i>
+                </span>
+            </div>
+            <div class="d-flex flex-column">
+                <h1 class="text-white fw-bolder fs-2 mb-0">Rapports & Analyses</h1>
+                <div class="text-white opacity-75 fw-bold fs-6">Vue d'ensemble des performances</div>
+            </div>
         </div>
-        <div class="d-flex flex-column">
-            <h1 class="text-white fw-bolder fs-2 mb-0">Rapports & Analyses</h1>
-            <div class="text-muted fw-bold fs-6">Vue d'ensemble des performances</div>
-        </div>
-    </div>
-    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-        <button class="btn btn-sm btn-light-primary fw-bolder" onclick="window.print()">
-            <i class="bi bi-printer me-2"></i>Imprimer
-        </button>
-        <div class="dropdown">
-            <button class="btn btn-sm btn-primary fw-bolder dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-download me-2"></i>Exporter
+        <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+            <button class="btn btn-sm btn-custom text-white fw-bolder" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>Imprimer
             </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item" href="{% url 'inventory:export_reports_excel' %}?{{ request.GET.urlencode }}">
-                        <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="{% url 'inventory:export_reports_pdf' %}?{{ request.GET.urlencode }}">
-                        <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF
-                    </a>
-                </li>
-            </ul>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-custom text-white fw-bolder dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-download me-2"></i>Exporter
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'inventory:export_reports_excel' %}?{{ request.GET.urlencode }}">
+                            <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'inventory:export_reports_pdf' %}?{{ request.GET.urlencode }}">
+                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>PDF
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -73,38 +75,42 @@
 </div>
 
 <!-- KPI Cards -->
-<div class="row g-5 g-xl-8 mb-5 mb-xl-8">
+<div class="row g-6 mb-8 fade-in">
     <!-- Value Stock -->
     <div class="col-md-6 col-xl-3">
-        <div class="card card-stats card-color-blue text-white h-100">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-box-seam text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Valeur Stock</div>
+        <div class="card card-modern h-100">
+            <div class="stat-card stat-card-info">
+                <div class="stat-icon">
+                    <i class="bi bi-box-seam"></i>
                 </div>
-                <div class="fs-4 fw-bolder">{{ total_stock_value|format_currency:company_settings.currency }}</div>
-                <div class="small opacity-50 mt-1">{{ total_products }} références uniques</div>
+                <div class="stat-content">
+                    <div class="stat-label">Valeur Stock</div>
+                    <div class="stat-value fs-3">{{ total_stock_value|format_currency:company_settings.currency }}</div>
+                    <div class="small text-muted mt-1">{{ total_products }} références</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Out of Stock -->
     <div class="col-md-6 col-xl-3">
-        <div class="card card-stats card-color-green text-white h-100">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-exclamation-triangle text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Alertes Stock</div>
+        <div class="card card-modern h-100">
+            <div class="stat-card stat-card-danger">
+                <div class="stat-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div>
-                        <div class="fs-4 fw-bolder">{{ out_of_stock_count }}</div>
-                        <div class="small opacity-50">Ruptures</div>
-                    </div>
-                    <div class="vr bg-white opacity-25"></div>
-                    <div>
-                        <div class="fs-4 fw-bolder">{{ low_stock_count }}</div>
-                        <div class="small opacity-50">Faibles</div>
+                <div class="stat-content">
+                    <div class="stat-label">Alertes Stock</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <div class="stat-value fs-3">{{ out_of_stock_count }}</div>
+                            <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Ruptures</div>
+                        </div>
+                        <div class="vr bg-secondary opacity-50"></div>
+                        <div>
+                            <div class="stat-value fs-3 text-warning">{{ low_stock_count }}</div>
+                            <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Faibles</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,35 +119,35 @@
 
     <!-- Sales -->
     <div class="col-md-6 col-xl-3">
-        <div class="card card-stats card-color-purple text-white h-100">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-wallet2 text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Ventes Confirmées</div>
+        <div class="card card-modern h-100">
+            <div class="stat-card stat-card-success">
+                <div class="stat-icon">
+                    <i class="bi bi-wallet2"></i>
                 </div>
-                <div class="fs-4 fw-bolder">{{ total_sales|format_currency:company_settings.currency }}</div>
-                <div class="small opacity-50 mt-1">Revenu encaissé</div>
+                <div class="stat-content">
+                    <div class="stat-label">Ventes Confirmées</div>
+                    <div class="stat-value fs-3">{{ total_sales|format_currency:company_settings.currency }}</div>
+                    <div class="small text-muted mt-1">Revenu encaissé</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Pending/Recovery -->
     <div class="col-md-6 col-xl-3">
-        <div class="card card-stats card-color-orange text-white h-100">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-hourglass-split text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">En Attente</div>
+        <div class="card card-modern h-100">
+            <div class="stat-card stat-card-warning">
+                <div class="stat-icon">
+                    <i class="bi bi-hourglass-split"></i>
                 </div>
-                <div class="fs-4 fw-bolder">{{ pending_sales_amount|format_currency:company_settings.currency }}</div>
-                <div class="mt-2">
-                    <div class="d-flex justify-content-between small opacity-75 mb-1">
-                        <span>Recouvrement</span>
-                        <span>{% widthratio total_sales total_sales|add:pending_sales_amount 100 %}%</span>
-                    </div>
-                    <div class="progress h-4px bg-white bg-opacity-25 w-100">
-                        <div class="progress-bar bg-white" role="progressbar" 
-                             style="width: {% widthratio total_sales total_sales|add:pending_sales_amount 100 %}%">
+                <div class="stat-content">
+                    <div class="stat-label">En Attente</div>
+                    <div class="stat-value fs-3">{{ pending_sales_amount|format_currency:company_settings.currency }}</div>
+                    <div class="mt-2">
+                        <div class="progress h-4px bg-secondary bg-opacity-10 w-100">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {% widthratio total_sales total_sales|add:pending_sales_amount 100 %}%">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -150,14 +156,13 @@
     </div>
 </div>
 
-<!-- Charts Section -->
-<div class="row g-5 g-xl-8 mb-5 mb-xl-8">
+<div class="row g-6 mb-8 fade-in">
     <div class="col-xl-6">
-        <div class="card card-xl-stretch shadow-sm">
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder text-dark">Évolution des Ventes</span>
-                    <span class="text-muted mt-1 fw-bold fs-7">30 derniers jours</span>
+        <div class="card card-modern shadow-sm">
+            <div class="card-header-modern border-0">
+                <h3 class="card-title-modern">
+                    Evolution des Ventes
+                    <span class="card-subtitle-modern d-block">30 derniers jours</span>
                 </h3>
             </div>
             <div class="card-body pt-0 px-5">
@@ -168,11 +173,11 @@
         </div>
     </div>
     <div class="col-xl-6">
-        <div class="card card-xl-stretch shadow-sm">
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder text-dark">Répartition du Stock</span>
-                    <span class="text-muted mt-1 fw-bold fs-7">Par catégorie de produit</span>
+        <div class="card card-modern shadow-sm">
+            <div class="card-header-modern border-0">
+                <h3 class="card-title-modern">
+                    Répartition du Stock
+                    <span class="card-subtitle-modern d-block">Par catégorie</span>
                 </h3>
             </div>
             <div class="card-body pt-0 px-5">
@@ -185,22 +190,22 @@
 </div>
 
 <!-- Tables Grid -->
-<div class="row g-5 g-xl-8 mb-5 mb-xl-8">
+<div class="row g-6 mb-8 fade-in">
     <!-- Top Products -->
     <div class="col-xl-6">
-        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm">
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder text-dark">Top Produits</span>
-                    <span class="text-muted mt-1 fw-bold fs-7">Meilleures performances</span>
+        <div class="card card-modern mb-5 mb-xl-8 shadow-sm">
+            <div class="card-header-modern border-0">
+                <h3 class="card-title-modern">
+                    Top Produits
+                    <span class="card-subtitle-modern d-block">Meilleures performances</span>
                 </h3>
                 <div class="card-toolbar">
-                    <span class="badge badge-light-success fw-bolder fs-7">Top Ventes</span>
+                    <span class="badge badge-modern badge-success">Top Ventes</span>
                 </div>
             </div>
             <div class="card-body py-3">
                 <div class="table-responsive">
-                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                    <table class="table table-modern align-middle">
                         <thead>
                             <tr class="fw-bolder text-muted">
                                 <th class="min-w-150px">Produit</th>
@@ -211,11 +216,11 @@
                         <tbody>
                             {% if top_products %}
                                 {% for product in top_products %}
-                                <tr>
+                                <tr class="table-row-hover">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="symbol symbol-40px me-3">
-                                                <span class="symbol-label bg-light-primary text-primary fw-bold">
+                                            <div class="symbol symbol-40px bg-light-primary rounded me-3">
+                                                <span class="symbol-label fw-bold text-primary">
                                                     {{ product.product__name|slice:":1"|upper }}
                                                 </span>
                                             </div>
@@ -246,11 +251,11 @@
 
     <!-- Recent Movements -->
     <div class="col-xl-6">
-        <div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm">
-            <div class="card-header border-0 pt-5">
-                <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder text-dark">Mouvements Récents</span>
-                    <span class="text-muted mt-1 fw-bold fs-7">Dernières opérations</span>
+        <div class="card card-modern mb-5 mb-xl-8 shadow-sm">
+            <div class="card-header-modern border-0">
+                <h3 class="card-title-modern">
+                    Mouvements Récents
+                    <span class="card-subtitle-modern d-block">Dernières opérations</span>
                 </h3>
                 <div class="card-toolbar">
                     <a href="{% url 'inventory:movement_list' %}" class="btn btn-sm btn-light btn-active-light-primary">Voir tout</a>
@@ -258,7 +263,7 @@
             </div>
             <div class="card-body py-3">
                 <div class="table-responsive">
-                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                    <table class="table table-modern align-middle">
                         <thead>
                             <tr class="fw-bolder text-muted">
                                 <th class="min-w-140px">Produit / Date</th>
@@ -269,27 +274,27 @@
                         <tbody>
                             {% if recent_movements %}
                                 {% for movement in recent_movements %}
-                                <tr>
+                                <tr class="table-row-hover">
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="d-flex justify-content-start flex-column">
                                                 <a href="#" class="text-dark fw-bolder text-hover-primary fs-6">{{ movement.product.name }}</a>
-                                                <span class="text-muted fw-bold text-muted d-block fs-7">{{ movement.created_at|date:"d/m/Y H:i" }}</span>
+                                                <span class="text-muted fw-bold d-block fs-7">{{ movement.created_at|date:"d/m/Y H:i" }}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         {% if movement.movement_type == 'entry' %}
-                                            <span class="badge badge-light-success">
-                                                <i class="bi bi-arrow-down text-success me-1"></i> Entrée
+                                            <span class="badge badge-modern badge-success">
+                                                <i class="bi bi-arrow-down me-1"></i> Entrée
                                             </span>
                                         {% elif movement.movement_type == 'exit' %}
-                                            <span class="badge badge-light-danger">
-                                                <i class="bi bi-arrow-up text-danger me-1"></i> Sortie
+                                            <span class="badge badge-modern badge-danger">
+                                                <i class="bi bi-arrow-up me-1"></i> Sortie
                                             </span>
                                         {% else %}
-                                            <span class="badge badge-light-info">
-                                                <i class="bi bi-arrow-repeat text-info me-1"></i> Ajust.
+                                            <span class="badge badge-modern badge-info">
+                                                <i class="bi bi-arrow-repeat me-1"></i> Ajust.
                                             </span>
                                         {% endif %}
                                     </td>
@@ -312,19 +317,19 @@
 </div>
 
 <!-- Out of Stock Alert - Full Width -->
-<div class="card card-xl-stretch mb-5 mb-xl-8 shadow-sm border-danger border-start border-3">
-    <div class="card-header border-0 pt-5">
-        <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder text-dark">Alertes de Stock Critique</span>
-            <span class="text-muted mt-1 fw-bold fs-7">Produits en rupture de stock</span>
+<div class="card card-modern mb-8 fade-in card-accent-danger">
+    <div class="card-header-modern border-0">
+        <h3 class="card-title-modern">
+            Alertes de Stock Critique
+            <span class="card-subtitle-modern d-block">Produits en rupture de stock</span>
         </h3>
         <div class="card-toolbar">
-            <span class="badge badge-light-danger fs-7 fw-bolder px-3 py-2">{{ out_of_stock_count }} Produits</span>
+            <span class="badge badge-modern badge-danger">{{ out_of_stock_count }} Produits</span>
         </div>
     </div>
     <div class="card-body py-3">
         <div class="table-responsive">
-            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+            <table class="table table-modern align-middle">
                 <thead>
                     <tr class="fw-bolder text-muted">
                         <th class="min-w-200px">Produit</th>
@@ -335,11 +340,11 @@
                 <tbody>
                     {% if out_of_stock_items %}
                         {% for item in out_of_stock_items %}
-                        <tr>
+                        <tr class="table-row-hover">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="symbol symbol-40px me-3">
-                                        <span class="symbol-label bg-light-danger text-danger fw-bold">!</span>
+                                    <div class="symbol symbol-40px bg-light-danger rounded me-3">
+                                        <span class="symbol-label fw-bold text-danger">!</span>
                                     </div>
                                     <div class="d-flex justify-content-start flex-column">
                                         <a href="#" class="text-dark fw-bolder text-hover-primary fs-6">{{ item.product.name }}</a>
@@ -349,13 +354,13 @@
                             </td>
                             <td>
                                 {% if item.point_of_sale %}
-                                    <span class="badge badge-light-secondary text-muted">{{ item.point_of_sale.name }}</span>
+                                    <span class="badge badge-modern badge-dark">{{ item.point_of_sale.name }}</span>
                                 {% else %}
-                                    <span class="badge badge-light-warning">Non assigné</span>
+                                    <span class="badge badge-modern badge-warning">Non assigné</span>
                                 {% endif %}
                             </td>
                             <td class="text-end">
-                                <a href="{% url 'inventory:receipt_create' %}?items={{ item.product.id }}" class="btn btn-sm btn-light-danger fw-bolder">
+                                <a href="{% url 'inventory:receipt_create' %}?items={{ item.product.id }}" class="btn btn-sm btn-light-danger fw-bolder btn-hover-scale">
                                     Commander
                                 </a>
                             </td>
@@ -364,9 +369,10 @@
                     {% else %}
                         <tr>
                             <td colspan="3" class="text-center py-5">
-                                <div class="d-flex flex-col align-items-center">
-                                    <i class="bi bi-check-circle fs-1 text-success mb-2"></i>
-                                    <span class="text-muted fw-bold">Aucune rupture de stock !</span>
+                                <div class="success-state">
+                                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                                    <h4 class="text-success fw-bold">Tout va bien !</h4>
+                                    <span class="text-muted">Aucune rupture de stock !</span>
                                 </div>
                             </td>
                         </tr>
@@ -381,10 +387,19 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // Configuration Chart.js defaults
+    // Configuration Chart.js defaults - Using CSS variables via computed style
+    const style = getComputedStyle(document.documentElement);
+    const primaryColor = style.getPropertyValue('--kt-primary').trim();
+    const successColor = style.getPropertyValue('--kt-success').trim();
+    const infoColor = style.getPropertyValue('--kt-info').trim();
+    const warningColor = style.getPropertyValue('--kt-warning').trim();
+    const dangerColor = style.getPropertyValue('--kt-danger').trim();
+    const mutedColor = style.getPropertyValue('--text-muted').trim();
+    const borderColor = style.getPropertyValue('--kt-secondary').trim();
+
     Chart.defaults.font.family = 'Inter';
-    Chart.defaults.color = '#6c757d'; // muted text
-    Chart.defaults.borderColor = '#eff2f5'; // light border
+    Chart.defaults.color = mutedColor;
+    Chart.defaults.borderColor = borderColor;
 
     // Sales Chart
     fetch("{% url 'inventory:api_stock_evolution' %}?days=30")
@@ -398,15 +413,15 @@
                     datasets: [{
                         label: 'Entrées',
                         data: data.entries,
-                        borderColor: '#009ef7', // primary blue
-                        backgroundColor: 'rgba(0, 158, 247, 0.1)',
+                        borderColor: primaryColor,
+                        backgroundColor: primaryColor + '10',
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#009ef7',
+                        pointBackgroundColor: primaryColor,
                         pointBorderColor: '#ffffff',
                         pointHoverBackgroundColor: '#ffffff',
-                        pointHoverBorderColor: '#009ef7',
-                        borderWidth: 2
+                        pointHoverBorderColor: primaryColor,
+                        borderWidth: 3
                     }]
                 },
                 options: {
@@ -422,14 +437,15 @@
                             backgroundColor: '#1e1e2d',
                             titleColor: '#ffffff',
                             bodyColor: '#ffffff',
-                            padding: 10,
-                            displayColors: true
+                            padding: 12,
+                            displayColors: true,
+                            cornerRadius: 8
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { borderDash: [5, 5] },
+                            grid: { borderDash: [5, 5], color: borderColor },
                             ticks: { font: { size: 11 } }
                         },
                         x: {
@@ -453,29 +469,29 @@
                     datasets: [{
                         data: data.data,
                         backgroundColor: [
-                            '#009ef7', // blue
-                            '#50cd89', // green
-                            '#ffc700', // yellow
-                            '#f1416c', // red
-                            '#7239ea', // purple
+                            primaryColor,
+                            successColor,
+                            warningColor,
+                            dangerColor,
+                            infoColor,
                             '#04c8c8', // cyan
                             '#a1a5b7'  // gray
                         ],
                         borderWidth: 0,
-                        hoverOffset: 4
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '75%',
                     plugins: {
                         legend: {
                             position: 'right',
                             labels: { 
                                 usePointStyle: true, 
-                                padding: 20,
-                                font: { size: 11, family: 'Inter' }
+                                padding: 25,
+                                font: { size: 12, family: 'Inter', weight: '600' }
                             }
                         }
                     }

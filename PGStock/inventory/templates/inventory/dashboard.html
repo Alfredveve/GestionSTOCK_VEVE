@@ -13,33 +13,109 @@
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
     }
-    .pagination .page-link {
-        border-radius: 8px;
-        margin: 0 3px;
+    
+    /* Hero Section matching mockup */
+    .hero-section {
+        background: #0d9488 !important; /* Teal base */
+        background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        color: #ffffff;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(13, 148, 136, 0.2);
+    }
+    .hero-nav .nav-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500;
+        padding: 0.5rem 0;
+        margin-right: 2rem;
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+    }
+    .hero-nav .nav-link:hover {
+        color: #fff !important;
+        opacity: 1;
+    }
+    .hero-nav .nav-link.active {
+        color: #fff !important;
+        border-bottom-color: #fff;
+        font-weight: 700;
+    }
+
+    /* Stats Grid - 5 columns on desktop */
+    .col-stats {
+        flex: 0 0 auto;
+        width: 20%;
+    }
+    @media (max-width: 1200px) {
+        .col-stats { width: 33.333%; }
+    }
+    @media (max-width: 768px) {
+        .col-stats { width: 50%; }
+    }
+    @media (max-width: 576px) {
+        .col-stats { width: 100%; }
+    }
+
+    /* Stat Cards Refinement */
+    .card-stats {
+        border-radius: 12px;
         border: none;
-        color: #7e8299;
+        transition: transform 0.2s ease;
+    }
+    .card-stats:hover {
+        transform: translateY(-3px);
+    }
+    .card-stats .stat-title {
+        font-size: 0.9rem;
         font-weight: 600;
-        transition: all 0.2s;
+        opacity: 0.9;
     }
-    .pagination .page-item.active .page-link {
-        background-color: #009ef7;
-        color: #fff;
-        box-shadow: 0 4px 10px rgba(0, 158, 247, 0.3);
+    .card-stats .stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
     }
-    .pagination .page-link:hover {
-        background-color: #f1faff;
-        color: #009ef7;
+    
+    /* Specific Colors from Mockup */
+    .card-color-blue { background-color: #3b82f6 !important; }
+    .card-color-purple { background-color: #8b5cf6 !important; }
+    .card-color-green { background-color: #10b981 !important; }
+    .card-color-cyan { background-color: #0d9488 !important; }
+    .card-color-orange { background-color: #f97316 !important; }
+
+    /* Action Buttons */
+    .btn-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem;
+        border-radius: 12px !important;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: white !important;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
     }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        filter: brightness(110%);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    .btn-action i {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+    }
+    .bg-green { background-color: #10b981 !important; }
+    .bg-orange { background-color: #ea580c !important; }
+    .bg-blue { background-color: #2563eb !important; }
+
     .table thead th {
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.05rem;
     }
-    .card-label {
-        letter-spacing: -0.02rem;
-    }
     
-    /* New side-accent card styles */
     .status-card {
         border-left: 5px solid transparent;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -101,8 +177,8 @@
 <div class="hero-section">
     <div class="d-flex align-items-center mb-4">
         <div class="symbol symbol-50px me-3">
-            <div class="symbol-label" style="background: rgba(255,255,255,0.2);">
-                <i class="bi bi-box-seam text-white fs-1"></i>
+            <div class="symbol-label" style="background: rgba(255,255,255,0.2); font-size: 2rem;">
+                📦
             </div>
         </div>
         <h1 class="text-white fw-bolder my-0 fs-1">E-Stock</h1>
@@ -110,101 +186,101 @@
 
     <!-- Navigation Tabs within Hero -->
     <div class="hero-nav d-flex overflow-auto">
+        <a href="{% url 'inventory:quick_sale' %}" class="nav-link">Vente rapide(POS)</a>
         <a href="{% url 'inventory:invoice_list' %}" class="nav-link">Vente</a>
-        <a href="{% url 'inventory:quick_sale' %}" class="nav-link text-warning fw-bold"><i class="fas fa-bolt me-1"></i>Vente Rapide</a>
         <a href="{% url 'inventory:invoice_create' %}" class="nav-link">Facturation</a>
         <a href="{% url 'inventory:payment_list' %}" class="nav-link">Suivi de paiements</a>
         <a href="{% url 'inventory:reports' %}" class="nav-link">Rapports</a>
     </div>
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats Cards Grid -->
 <div class="row g-3 mb-5 mb-xl-8" style="margin-top: -30px;">
     <!-- Valeur Stock (Blue) -->
-    <div class="col-12 col-md-6 col-xl-4">
+    <div class="col-stats">
         <div class="card card-stats card-color-blue text-white h-100">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-graph-up text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Valeur Stock</div>
+                    <div class="stat-title">Valeur Stock</div>
                 </div>
-                <div class="fs-4 fw-bolder">{{ total_stock_value|format_currency }}</div>
+                <div class="stat-value">{{ total_stock_value|format_currency }}</div>
             </div>
         </div>
     </div>
 
     <!-- Bénéfice Estimé (Purple) -->
-    <div class="col-12 col-md-6 col-xl-4">
+    <div class="col-stats">
         <div class="card card-stats card-color-purple text-white h-100">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-cash-coin text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Bénéfice Estimé</div>
+                    <div class="stat-title">Bénéfice Estimé</div>
                 </div>
-                <div class="fs-4 fw-bolder">{{ total_estimated_profit|format_currency }}</div>
-                <div class="small opacity-50 mt-1" style="font-size: 0.75rem;">Potentiel sur stock actuel</div>
+                <div class="stat-value">{{ total_estimated_profit|format_currency }}</div>
+                <div class="small opacity-75 mt-1" style="font-size: 0.75rem;">Potentiel sur stock actuel</div>
             </div>
         </div>
     </div>
 
     <!-- Ventes totales (Green) -->
-    <div class="col-12 col-md-6 col-xl-4">
+    <div class="col-stats">
         <div class="card card-stats card-color-green text-white h-100">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-wallet2 text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Ventes totales</div>
+                    <div class="stat-title">Ventes totales</div>
                 </div>
-                <div class="fs-4 fw-bolder">{{ total_sales|format_currency }}</div>
+                <div class="stat-value">{{ total_sales|format_currency }}</div>
             </div>
         </div>
     </div>
 
     <!-- Commandes en attente (Cyan) -->
-    <div class="col-12 col-md-6 col-xl-6">
+    <div class="col-stats">
         <div class="card card-stats card-color-cyan text-white h-100">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-box-seam text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Commandes en attente</div>
+                    <div class="stat-title">Commandes en attente</div>
                 </div>
-                <div class="fs-2x fw-bolder">{{ pending_orders }}</div>
+                <div class="stat-value">{{ pending_orders }}</div>
             </div>
         </div>
     </div>
 
     <!-- Total Produits (Orange) -->
-    <div class="col-12 col-md-6 col-xl-6">
+    <div class="col-stats">
         <div class="card card-stats card-color-orange text-white h-100">
-            <div class="card-body p-4">
+            <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-tags text-white fs-3 me-2"></i>
-                    <div class="fw-bold fs-7 opacity-75">Total Produits</div>
+                    <div class="stat-title">Total Produits</div>
                 </div>
-                <div class="fs-2x fw-bolder">{{ total_products }}</div>
+                <div class="stat-value">{{ total_products }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Action Buttons -->
-<div class="row g-3 mb-xl-8 mb-5 mt-5">
+<!-- Quick Actions -->
+<div class="row g-4 mb-5">
     <div class="col-12 col-md-4">
-        <a href="{% url 'inventory:product_create' %}" class="btn btn-action card-color-green w-100 py-3 shadow-sm">
-            <i class="bi bi-plus-lg fs-3 me-2"></i>
-            <span class="fs-6 fw-bold">Ajouter un produit</span>
+        <a href="{% url 'inventory:product_create' %}" class="btn-action bg-green w-100 shadow-sm">
+            <i class="bi bi-plus-lg"></i>
+            <span>Ajouter un produit</span>
         </a>
     </div>
     <div class="col-12 col-md-4">
-        <a href="{% url 'inventory:invoice_create' %}" class="btn btn-action card-color-orange w-100 py-3 shadow-sm">
-            <i class="bi bi-file-text fs-3 me-2"></i>
-            <span class="fs-6 fw-bold">Créer une facture</span>
+        <a href="{% url 'inventory:invoice_create' %}" class="btn-action bg-orange w-100 shadow-sm">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Créer une facture</span>
         </a>
     </div>
     <div class="col-12 col-md-4">
-        <a href="{% url 'inventory:quick_sale' %}" class="btn btn-action card-color-blue w-100 py-3 shadow-sm">
-            <i class="fas fa-bolt fs-3 me-2"></i>
-            <span class="fs-6 fw-bold">Vente Rapide (POS)</span>
+        <a href="{% url 'inventory:quick_sale' %}" class="btn-action bg-blue w-100 shadow-sm">
+            <i class="bi bi-journal-plus"></i>
+            <span>Enregistrer une vente</span>
         </a>
     </div>
 </div>

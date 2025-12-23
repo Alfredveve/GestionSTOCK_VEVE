@@ -160,11 +160,11 @@
                             </td>
                             <td class="text-center">
                                 {% if inventory.get_status == 'in_stock' %}
-                                <span class="badge badge-light-success">En stock</span>
+                                <span class="badge badge-light-success text-dark">En stock</span>
                                 {% elif inventory.get_status == 'low_stock' %}
-                                <span class="badge badge-light-warning">Stock faible</span>
+                                <span class="badge badge-light-warning text-dark">Stock faible</span>
                                 {% else %}
-                                <span class="badge badge-light-danger">Rupture</span>
+                                <span class="badge badge-light-danger text-dark">Rupture</span>
                                 {% endif %}
                             </td>
                             <td class="text-end">

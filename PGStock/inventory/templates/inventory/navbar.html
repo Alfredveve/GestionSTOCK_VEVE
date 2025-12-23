@@ -15,7 +15,7 @@
         <!-- Mobile Toggle -->
         <button class="navbar-toggler p-2 border-0" type="button" data-bs-toggle="offcanvas"
             data-bs-target="#mobileMenu">
-            <span class="bi bi-list fs-1 text-white"></span>
+            <span class="bi bi-list fs-1"></span>
         </button>
 
         <!-- Desktop Menu (Flex Centered Safe) -->
@@ -98,7 +98,7 @@
                 <li class="nav-item dropdown group">
                     <a class="nav-link dropdown-toggle {% if 'pos' in request.resolver_match.url_name %}active{% endif %}"
                         href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-                        POS
+                        Points de Vente
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'inventory:pos_list' %}">Liste des POS</a>
@@ -213,18 +213,18 @@
 </nav>
 
 <!-- Clean Dark Mobile Offcanvas -->
-<div class="offcanvas offcanvas-start bg-metronic-mobile text-white" tabindex="-1" id="mobileMenu"
+<div class="offcanvas offcanvas-start bg-metronic-mobile" tabindex="-1" id="mobileMenu"
     aria-labelledby="mobileMenuLabel">
-    <div class="offcanvas-header border-bottom border-secondary">
+    <div class="offcanvas-header border-bottom border-light">
         <h5 class="offcanvas-title d-flex align-items-center gap-2" id="mobileMenuLabel">
             <span class="fw-bold tracking-tight">GestionSTOCK</span>
         </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body p-0">
         <div class="list-group list-group-flush rounded-0 theme-dark-list">
             <a href="{% url 'inventory:dashboard' %}"
-                class="list-group-item list-group-item-action bg-transparent text-white-50 py-3 border-secondary">
+                class="list-group-item list-group-item-action bg-transparent py-3 border-light">
                 <i class="bi bi-speedometer2 me-3"></i> Tableau de bord
             </a>
 
@@ -232,9 +232,9 @@
             <div class="accordion accordion-flush bg-transparent" id="mobileMenuAccordion">
                 
                 <!-- Produits -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingProduits">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseProduits" aria-expanded="false"
                             aria-controls="flush-collapseProduits">
                             <i class="bi bi-tags me-3"></i> Produits
@@ -242,20 +242,20 @@
                     </h2>
                     <div id="flush-collapseProduits" class="accordion-collapse collapse" aria-labelledby="flush-headingProduits"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:product_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Liste des produits</a>
-                                <a href="{% url 'inventory:product_create' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Nouveau produit</a>
-                                <a href="{% url 'inventory:category_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Catégories</a>
+                                <a href="{% url 'inventory:product_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Liste des produits</a>
+                                <a href="{% url 'inventory:product_create' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Nouveau produit</a>
+                                <a href="{% url 'inventory:category_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Catégories</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Stock -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingStock">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseStock" aria-expanded="false"
                             aria-controls="flush-collapseStock">
                             <i class="bi bi-boxes me-3"></i> Stock
@@ -263,21 +263,21 @@
                     </h2>
                     <div id="flush-collapseStock" class="accordion-collapse collapse" aria-labelledby="flush-headingStock"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:inventory_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>État du Stock</a>
-                                <a href="{% url 'inventory:movement_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Historique</a>
-                                <a href="{% url 'inventory:movement_create' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Entrée/Sortie</a>
-                                <a href="{% url 'inventory:receipt_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Bons de Réception</a>
+                                <a href="{% url 'inventory:inventory_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>État du Stock</a>
+                                <a href="{% url 'inventory:movement_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Historique</a>
+                                <a href="{% url 'inventory:movement_create' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Entrée/Sortie</a>
+                                <a href="{% url 'inventory:receipt_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Bons de Réception</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Ventes -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingVentes">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseVentes" aria-expanded="false"
                             aria-controls="flush-collapseVentes">
                             <i class="bi bi-cart3 me-3"></i> Ventes
@@ -285,20 +285,20 @@
                     </h2>
                     <div id="flush-collapseVentes" class="accordion-collapse collapse" aria-labelledby="flush-headingVentes"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:quote_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Devis & Commandes</a>
-                                <a href="{% url 'inventory:invoice_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Factures</a>
-                                <a href="{% url 'inventory:invoice_create' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Nouvelle Facture</a>
+                                <a href="{% url 'inventory:quote_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Devis & Commandes</a>
+                                <a href="{% url 'inventory:invoice_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Factures</a>
+                                <a href="{% url 'inventory:invoice_create' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Nouvelle Facture</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Contacts -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingContacts">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseContacts" aria-expanded="false"
                             aria-controls="flush-collapseContacts">
                             <i class="bi bi-people me-3"></i> Contacts
@@ -306,19 +306,19 @@
                     </h2>
                     <div id="flush-collapseContacts" class="accordion-collapse collapse" aria-labelledby="flush-headingContacts"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:client_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Clients</a>
-                                <a href="{% url 'inventory:supplier_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Fournisseurs</a>
+                                <a href="{% url 'inventory:client_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Clients</a>
+                                <a href="{% url 'inventory:supplier_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Fournisseurs</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- POS -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingPOS">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapsePOS" aria-expanded="false"
                             aria-controls="flush-collapsePOS">
                             <i class="bi bi-shop me-3"></i> POS
@@ -326,19 +326,19 @@
                     </h2>
                     <div id="flush-collapsePOS" class="accordion-collapse collapse" aria-labelledby="flush-headingPOS"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:pos_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Liste des POS</a>
-                                <a href="{% url 'inventory:bulk_stock_configuration' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Config. Stock</a>
+                                <a href="{% url 'inventory:pos_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Liste des POS</a>
+                                <a href="{% url 'inventory:bulk_stock_configuration' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Config. Stock</a>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Rapports -->
-                <div class="accordion-item bg-transparent border-secondary">
+                <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingRapports">
-                        <button class="accordion-button collapsed bg-transparent text-white-50 shadow-none py-3" type="button"
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseRapports" aria-expanded="false"
                             aria-controls="flush-collapseRapports">
                             <i class="bi bi-bar-chart me-3"></i> Rapports
@@ -346,11 +346,11 @@
                     </h2>
                     <div id="flush-collapseRapports" class="accordion-collapse collapse" aria-labelledby="flush-headingRapports"
                         data-bs-parent="#mobileMenuAccordion">
-                        <div class="accordion-body py-0 bg-black bg-opacity-10">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
-                                <a href="{% url 'inventory:reports' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Tableau de bord</a>
-                                <a href="{% url 'inventory:payment_list' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Finance & Paiements</a>
-                                <a href="{% url 'inventory:advanced_reports' %}" class="list-group-item bg-transparent text-white-50 border-0 ps-5"><i class="bi bi-dot me-2"></i>Analyses Avancées</a>
+                                <a href="{% url 'inventory:reports' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Tableau de bord</a>
+                                <a href="{% url 'inventory:payment_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Finance & Paiements</a>
+                                <a href="{% url 'inventory:advanced_reports' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Analyses Avancées</a>
                             </div>
                         </div>
                     </div>
