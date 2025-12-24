@@ -1848,7 +1848,7 @@ def export_inventory_excel(request):
     if pos_id:
         inventories = inventories.filter(point_of_sale_id=pos_id)
         
-    headers = ['Produit', 'SKU', 'Catégorie', 'Quantité', 'Seuil', 'Emplacement', 'Point de Vente', 'Statut']
+    headers = ['Produit', 'SKU', 'Catégorie', 'Qté Totale', 'Colis', 'Unités', 'Analyse', 'Seuil', 'Emplacement', 'Point de Vente', 'Statut']
     data = []
     
     for item in inventories:
@@ -1858,11 +1858,16 @@ def export_inventory_excel(request):
         elif item.quantity <= item.reorder_level:
             status_label = 'Stock faible'
             
+        analysis_data = item.get_analysis_data()
+            
         data.append([
             item.product.name,
             item.product.sku or '-',
             item.product.category.name if item.product.category else '-',
             item.quantity,
+            analysis_data['colis'],
+            analysis_data['unites'],
+            analysis_data['analysis'],
             item.reorder_level,
             item.location or '-',
             item.point_of_sale.name,
@@ -6316,18 +6321,22 @@ def export_products_excel(request):
         total_stock=Sum('inventory__quantity')
     ).select_related('category').order_by('name')
     
-    headers = ['Nom', 'SKU', 'Catégorie', 'Stock Total', 'Prix Achat', 'Prix Vente', 'Marge', 'Description']
+    headers = ['Nom', 'SKU', 'Catégorie', 'Stock Total', 'Colis', 'Unités', 'Analyse', 'Prix Achat', 'Prix Vente', 'Marge', 'Description']
     data = []
     
     for product in products:
         total_stock = product.total_stock or 0
         margin = float(product.selling_price - product.purchase_price) if product.selling_price and product.purchase_price else 0
+        analysis_data = product.get_analysis_data()
         
         data.append([
             product.name,
             product.sku or '-',
             product.category.name if product.category else '-',
             total_stock,
+            analysis_data['colis'],
+            analysis_data['unites'],
+            analysis_data['analysis'],
             float(product.purchase_price) if product.purchase_price else 0,
             float(product.selling_price) if product.selling_price else 0,
             margin,

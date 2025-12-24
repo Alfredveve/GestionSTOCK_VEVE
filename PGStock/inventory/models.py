@@ -117,8 +117,8 @@ class Product(models.Model):
     # --- Champs pour la vente en gros ---
     units_per_box = models.PositiveIntegerField(
         default=1, 
-        verbose_name="Unités par carton",
-        help_text="Nombre d'articles dans un carton/gros lot"
+        verbose_name="Unités par colis/casier/carton",
+        help_text="Nombre d'articles dans un colis, casier ou carton"
     )
     wholesale_purchase_price = models.DecimalField(
         max_digits=12, 
@@ -254,6 +254,23 @@ class Product(models.Model):
         else:
             return 'in_stock'
 
+    def get_analysis_data(self):
+        """Retourne les données d'analyse (Colis, Unités, Analyse) pour le stock global"""
+        total_quantity = self.get_total_stock_quantity()
+        if self.units_per_box > 1:
+            colis = total_quantity // self.units_per_box
+            unites = total_quantity % self.units_per_box
+            analysis = f"{colis} Colis, {unites} Unité(s)"
+        else:
+            colis = 0
+            unites = total_quantity
+            analysis = f"{total_quantity} Unité(s)"
+        return {
+            'colis': colis,
+            'unites': unites,
+            'analysis': analysis
+        }
+
 
 class PointOfSale(models.Model):
     """Point de vente / Magasin"""
@@ -339,6 +356,14 @@ class Inventory(models.Model):
         total = cls.objects.filter(product=product).aggregate(total=Sum('quantity'))['total']
         return total or 0
 
+    def get_quantity_display(self):
+        """Retourne la quantité formatée en Colis/Unités"""
+        if self.product.units_per_box > 1:
+            colis = self.quantity // self.product.units_per_box
+            unites = self.quantity % self.product.units_per_box
+            return f"{colis} Colis, {unites} Unité(s)"
+        return f"{self.quantity} Unité(s)"
+
     def get_status(self):
         """Retourne le statut du stock (in_stock, low_stock, out_of_stock)"""
         if self.quantity == 0:
@@ -365,6 +390,22 @@ class Inventory(models.Model):
     def is_out_of_stock(self):
         """Vérifie si le stock est épuisé"""
         return self.quantity == 0
+
+    def get_analysis_data(self):
+        """Retourne les données d'analyse (Colis, Unités, Analyse) pour cet inventaire"""
+        if self.product.units_per_box > 1:
+            colis = self.quantity // self.product.units_per_box
+            unites = self.quantity % self.product.units_per_box
+            analysis = f"{colis} Colis, {unites} Unité(s)"
+        else:
+            colis = 0
+            unites = self.quantity
+            analysis = f"{self.quantity} Unité(s)"
+        return {
+            'colis': colis,
+            'unites': unites,
+            'analysis': analysis
+        }
 
 
 
@@ -458,12 +499,20 @@ class StockMovement(models.Model):
                 is_correction = self.notes and ("Correction" in self.notes or "Annulation" in self.notes)
                 
                 if stock_after_movement < min_quantity and not is_correction:
+                    # Formatter les stocks pour l'affichage
+                    def format_qty(qty, product):
+                        if product.units_per_box > 1:
+                            colis = qty // product.units_per_box
+                            unites = qty % product.units_per_box
+                            return f"{colis} Colis, {unites} Unité(s) ({qty} total)"
+                        return f"{qty} Unité(s)"
+
                     raise ValidationError(
                         f"❌ Opération refusée au {self.from_point_of_sale.code}: "
-                        f"Cette sortie ramènerait le stock à {stock_after_movement} unité(s), "
-                        f"en dessous du stock minimum requis de {min_quantity} unité(s). "
-                        f"Stock actuel : {current_quantity} unité(s). "
-                        f"Quantité maximum autorisée : {max(0, current_quantity - min_quantity)} unité(s)."
+                        f"Cette sortie ramènerait le stock à {format_qty(stock_after_movement, self.product)}, "
+                        f"en dessous du stock minimum requis de {format_qty(min_quantity, self.product)}. "
+                        f"Stock actuel : {format_qty(current_quantity, self.product)}. "
+                        f"Quantité maximum autorisée à sortir : {format_qty(max(0, current_quantity - min_quantity), self.product)}."
                     )
             except Inventory.DoesNotExist:
                 raise ValidationError(

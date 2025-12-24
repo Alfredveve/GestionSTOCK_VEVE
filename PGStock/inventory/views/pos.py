@@ -30,6 +30,8 @@ def quick_sale(request):
         try:
             data = json.loads(request.body)
             client_id = data.get('client_id')
+            invoice_type = data.get('invoice_type', 'retail')
+            apply_tax = data.get('apply_tax', True)
             items = data.get('items', [])
             
             if not items:
@@ -41,8 +43,9 @@ def quick_sale(request):
                 # Créer la facture
                 invoice = Invoice.objects.create(
                     client=client,
-                    invoice_type='retail',
+                    invoice_type=invoice_type,
                     point_of_sale=pos,
+                    apply_tax=apply_tax,
                     date_issued=timezone.now().date(),
                     date_due=timezone.now().date(),
                     status='paid', # Vente rapide est généralement payée immédiatement

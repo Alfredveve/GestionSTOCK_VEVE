@@ -53,3 +53,21 @@ def get_item(dictionary, key):
     if dictionary is None:
         return None
     return dictionary.get(str(key))
+
+
+@register.filter
+def stock_package_display(quantity, units_per_box):
+    """
+    Format quantity in Colis and Units.
+    Usage: {{ quantity|stock_package_display:units_per_box }}
+    """
+    try:
+        qty = int(quantity)
+        upb = int(units_per_box)
+        if upb > 1:
+            colis = qty // upb
+            unites = qty % upb
+            return f"{colis} Colis, {unites} Unité(s)"
+        return f"{qty} Unité(s)"
+    except (ValueError, TypeError):
+        return f"{quantity} Unité(s)"

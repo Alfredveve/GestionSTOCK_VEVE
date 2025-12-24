@@ -15,6 +15,12 @@
                             <i class="fas fa-search me-2 text-primary"></i>Recherche Produits
                         </h5>
                         <div class="d-flex gap-2">
+                            <!-- Sale Type Selector -->
+                            <select id="sale-type" class="form-select form-select-sm border-0 bg-light fw-bold text-primary" style="width: 150px;">
+                                <option value="retail">Détail</option>
+                                <option value="wholesale">Gros</option>
+                            </select>
+                            
                             <select id="category-filter" class="form-select form-select-sm border-0 bg-light" style="width: 150px;">
                                 <option value="">Toutes catégories</option>
                                 {% for cat in categories %}
@@ -121,7 +127,16 @@
                         <span class="text-muted">Sous-total</span>
                         <span id="summary-subtotal" class="fw-bold">0.00 GNF</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
+                    
+                    <div class="d-flex justify-content-between mb-2 align-items-center">
+                        <div class="form-check form-switch cursor-pointer">
+                            <input class="form-check-input" type="checkbox" id="apply-tax" checked onchange="cart.render()">
+                            <label class="form-check-label small text-muted user-select-none" for="apply-tax">Appliquer TVA (18%)</label>
+                        </div>
+                        <span id="summary-tax" class="fw-bold text-muted small">0.00 GNF</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3 border-top pt-2">
                         <h4 class="mb-0 fw-bold">Total</h4>
                         <h4 id="summary-total" class="mb-0 fw-bold text-primary">0.00 GNF</h4>
                     </div>
@@ -311,13 +326,22 @@
             }
             
             document.getElementById('summary-subtotal').innerText = `${this.total.toLocaleString()} GNF`;
-            document.getElementById('summary-total').innerText = `${this.total.toLocaleString()} GNF`;
+            
+            // Calculate Tax
+            const applyTax = document.getElementById('apply-tax').checked;
+            const taxRate = 0.18; // 18% default, could be dynamic
+            const taxAmount = applyTax ? (this.total * taxRate) : 0;
+            const finalTotal = this.total + taxAmount;
+            
+            document.getElementById('summary-tax').innerText = `${taxAmount.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})} GNF`;
+            document.getElementById('summary-total').innerText = `${finalTotal.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})} GNF`;
         }
     };
 
     // Product Search Logic
     const productSearch = document.getElementById('product-search');
     const categoryFilter = document.getElementById('category-filter');
+    const saleTypeSelect = document.getElementById('sale-type');
     const searchSpinner = document.getElementById('search-spinner');
     let searchTimeout;
     let selectedResultIndex = -1;
@@ -388,8 +412,24 @@
         searchProducts();
     });
 
+    saleTypeSelect.addEventListener('change', () => {
+        // Re-render current results with new pricing
+        const query = productSearch.value.trim();
+        const category = categoryFilter.value;
+        const cacheKey = `${query}-${category}`;
+        
+        if (searchCache.has(cacheKey)) {
+            renderProducts(searchCache.get(cacheKey));
+        } else {
+            searchProducts();
+        }
+    });
+
     function renderProducts(data) {
         const container = document.getElementById('product-list');
+        const saleType = document.getElementById('sale-type').value;
+        const isWholesaleMode = saleType === 'wholesale';
+        
         container.innerHTML = '';
         
         if (data.results.length === 0) {
@@ -399,6 +439,18 @@
 
         data.results.forEach((p, index) => {
             const stockStatus = p.stock <= 0 ? 'bg-danger' : (p.stock <= 10 ? 'bg-warning' : 'bg-success');
+            
+            // Determine primary price and action based on mode
+            let primaryPrice = p.price;
+            let isWholesaleAction = false;
+            let priceLabel = 'GNF';
+            
+            if (isWholesaleMode) {
+                primaryPrice = p.wholesale_price;
+                isWholesaleAction = true;
+                priceLabel = `GNF / ${p.units_per_box} unités`;
+            }
+
             const card = document.createElement('div');
             card.className = 'col animate__animated animate__fadeIn';
             card.innerHTML = `
@@ -407,17 +459,25 @@
                         <div class="d-flex justify-content-between mb-2">
                             <span class="badge bg-light text-dark border-0 shadow-xs">${p.sku}</span>
                             <span class="badge ${stockStatus} bg-opacity-10 ${stockStatus.replace('bg-', 'text-')} border-0">
-                                Stock: ${p.stock}
+                                Stock: ${p.units_per_box > 1 ? Math.floor(p.stock / p.units_per_box) + ' Colis, ' + (p.stock % p.units_per_box) + ' Unité(s)' : p.stock + ' Unité(s)'}
                             </span>
                         </div>
                         <h6 class="fw-bold mb-3 text-dark text-truncate" title="${p.name}">${p.name}</h6>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-sm btn-primary bg-gradient border-0 rounded-pill" onclick='cart.add(${JSON.stringify(p)}, false); focusSearch();'>
-                                <i class="fas fa-cart-plus me-1"></i> ${p.price.toLocaleString()} GNF
+                            <button class="btn btn-sm ${isWholesaleMode ? 'btn-success' : 'btn-primary'} bg-gradient border-0 rounded-pill" 
+                                    onclick='cart.add(${JSON.stringify(p)}, ${isWholesaleAction}); focusSearch();'>
+                                <i class="fas fa-cart-plus me-1"></i> ${primaryPrice.toLocaleString()} ${priceLabel}
                             </button>
-                            ${p.units_per_box > 1 ? `
+                            
+                            <!-- Alternative Option (Show the OTHER mode's button as secondary) -->
+                            ${!isWholesaleMode && p.units_per_box > 1 ? `
                             <button class="btn btn-sm btn-outline-success border-1 rounded-pill" onclick='cart.add(${JSON.stringify(p)}, true); focusSearch();'>
                                 <i class="fas fa-box me-1"></i> Gros (${p.units_per_box}): ${p.wholesale_price.toLocaleString()}
+                            </button>` : ''}
+                            
+                            ${isWholesaleMode ? `
+                            <button class="btn btn-sm btn-outline-primary border-1 rounded-pill" onclick='cart.add(${JSON.stringify(p)}, false); focusSearch();'>
+                                <i class="fas fa-tag me-1"></i> Détail: ${p.price.toLocaleString()}
                             </button>` : ''}
                         </div>
                     </div>
@@ -479,6 +539,8 @@
     // Checkout Logic
     async function checkout() {
         const isPassage = document.getElementById('is-passage-client').checked;
+        const saleType = document.getElementById('sale-type').value;
+        const applyTax = document.getElementById('apply-tax').checked;
         let clientId = document.getElementById('client-select').value;
         
         const btn = document.getElementById('checkout-btn');
@@ -542,10 +604,12 @@
                 },
                 body: JSON.stringify({
                     client_id: clientId,
+                    invoice_type: saleType,
+                    apply_tax: applyTax,
                     items: cart.items.map(i => ({
                         product_id: i.id,
                         quantity: i.quantity,
-                        is_wholesale: i.is_wholesale
+                        is_wholesale: i.isWholesale
                     }))
                 })
             });

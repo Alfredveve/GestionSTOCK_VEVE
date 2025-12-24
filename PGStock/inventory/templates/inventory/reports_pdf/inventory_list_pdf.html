@@ -4,31 +4,37 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 30%;">Produit</th>
-                <th style="width: 15%;">SKU</th>
-                <th style="width: 15%;">Catégorie</th>
-                <th style="width: 10%;" class="text-center">Qté</th>
-                <th style="width: 10%;" class="text-center">Seuil</th>
-                <th style="width: 20%;">Point de Vente</th>
+                <th style="width: 20%;">Produit</th>
+                <th style="width: 10%;">SKU</th>
+                <th style="width: 10%;">Catégorie</th>
+                <th style="width: 8%;" class="text-center">Total</th>
+                <th style="width: 8%;" class="text-center">Colis</th>
+                <th style="width: 8%;" class="text-center">Unités</th>
+                <th style="width: 18%;" class="text-center">Analyse</th>
+                <th style="width: 8%;" class="text-center">Seuil</th>
+                <th style="width: 10%;">Magasin</th>
             </tr>
         </thead>
         <tbody>
             {% for item in inventories %}
             <tr class="{% cycle '' 'row-even' %}">
-                <td class="font-bold">{{ item.product_name }}</td>
-                <td>{{ item.sku|default:"-" }}</td>
-                <td>{{ item.category|default:"-" }}</td>
+                <td class="font-bold">{{ item.product.name }}</td>
+                <td>{{ item.product.sku|default:"-" }}</td>
+                <td>{{ item.product.category|default:"-" }}</td>
                 <td class="text-center">
                     <span class="badge {% if item.quantity <= item.reorder_level %}badge-light-danger{% else %}badge-light-primary{% endif %}">
                         {{ item.quantity }}
                     </span>
                 </td>
+                <td class="text-center">{{ item.get_analysis_data.colis }}</td>
+                <td class="text-center">{{ item.get_analysis_data.unites }}</td>
+                <td class="text-center">{{ item.get_analysis_data.analysis }}</td>
                 <td class="text-center text-muted">{{ item.reorder_level }}</td>
-                <td>{{ item.pos }}</td>
+                <td>{{ item.point_of_sale.name }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center text-muted" style="padding: 40px;">Aucun stock trouvé.</td>
+                <td colspan="10" class="text-center text-muted" style="padding: 40px;">Aucun stock trouvé.</td>
             </tr>
             {% endfor %}
         </tbody>

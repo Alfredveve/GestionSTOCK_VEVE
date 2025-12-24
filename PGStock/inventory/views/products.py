@@ -25,14 +25,14 @@ class ProductListView(StaffRequiredMixin, ListView):
             total_stock_annotated=Coalesce(Sum('inventory__quantity'), 0)
         ).order_by('name')
 
-        query = self.request.GET.get('q')
+        search_query = self.request.GET.get('search')
         category_id = self.request.GET.get('category')
 
-        if query:
+        if search_query:
             queryset = queryset.filter(
-                Q(name__icontains=query) | 
-                Q(sku__icontains=query) | 
-                Q(description__icontains=query)
+                Q(name__icontains=search_query) | 
+                Q(sku__icontains=search_query) | 
+                Q(description__icontains=search_query)
             )
         
         if category_id:
@@ -43,8 +43,8 @@ class ProductListView(StaffRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
-        context['query'] = self.request.GET.get('q', '')
-        context['selected_category'] = self.request.GET.get('category', '')
+        context['search_query'] = self.request.GET.get('search', '')
+        context['category_filter'] = self.request.GET.get('category', '')
         return context
 
 class ProductCreateView(SuperuserRequiredMixin, CreateView):

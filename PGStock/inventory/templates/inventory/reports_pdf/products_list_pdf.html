@@ -5,13 +5,16 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 30%;">Produit</th>
-                <th style="width: 15%;">SKU</th>
-                <th style="width: 15%;">Catégorie</th>
-                <th class="text-center" style="width: 10%;">Stock</th>
-                <th class="text-right" style="width: 10%;">Achat</th>
-                <th class="text-right" style="width: 10%;">Vente</th>
-                <th class="text-right" style="width: 10%;">Marge</th>
+                <th style="width: 20%;">Produit</th>
+                <th style="width: 10%;">SKU</th>
+                <th style="width: 10%;">Catégorie</th>
+                <th class="text-center" style="width: 8%;">Total</th>
+                <th class="text-center" style="width: 8%;">Colis</th>
+                <th class="text-center" style="width: 8%;">Unités</th>
+                <th class="text-center" style="width: 12%;">Analyse</th>
+                <th class="text-right" style="width: 8%;">Achat</th>
+                <th class="text-right" style="width: 8%;">Vente</th>
+                <th class="text-right" style="width: 8%;">Marge</th>
             </tr>
         </thead>
         <tbody>
@@ -25,13 +28,16 @@
                         {{ product.total_stock }}
                     </span>
                 </td>
+                <td class="text-center">{{ product.get_analysis_data.colis }}</td>
+                <td class="text-center">{{ product.get_analysis_data.unites }}</td>
+                <td class="text-center">{{ product.get_analysis_data.analysis }}</td>
                 <td class="text-right text-muted">{{ product.purchase_price|format_currency:company_settings.currency }}</td>
                 <td class="text-right text-primary font-bold">{{ product.selling_price|format_currency:company_settings.currency }}</td>
                 <td class="text-right text-success font-bold">{{ product.margin|format_currency:company_settings.currency }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center text-muted" style="padding: 40px;">
+                <td colspan="11" class="text-center text-muted" style="padding: 40px;">
                     Aucun produit trouvé dans la base.
                 </td>
             </tr>

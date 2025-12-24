@@ -82,7 +82,13 @@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                              <small class="text-body-secondary">Quantité Totale Globale</small>
-                             <span class="badge bg-secondary-subtle text-dark fs-6">{{ product.get_total_stock_quantity }} unités</span>
+                             <span class="badge bg-secondary-subtle text-dark fs-6">
+                                 {% if product.units_per_box > 1 %}
+                                     {{ product.get_total_stock_quantity|stock_package_display:product.units_per_box }} ({{ product.get_total_stock_quantity }} total)
+                                 {% else %}
+                                     {{ product.get_total_stock_quantity }} unité(s)
+                                 {% endif %}
+                             </span>
                         </div>
                     </div>
 
@@ -102,7 +108,13 @@
                                 <tr>
                                     <td class="ps-3 fw-bold text-dark">{{ item.point_of_sale.name }}</td>
                                     <td class="text-center">
-                                        <span class="fw-bold fs-5">{{ item.quantity }}</span>
+                                        <span class="fw-bold fs-5">
+                                            {% if product.units_per_box > 1 %}
+                                                {{ item.quantity|stock_package_display:product.units_per_box }}
+                                            {% else %}
+                                                {{ item.quantity }}
+                                            {% endif %}
+                                        </span>
                                     </td>
                                     <td class="text-gray-600 font-monospace small">
                                         {{ item.location|default:"-" }}
@@ -198,7 +210,13 @@
                                         <span class="badge bg-secondary-subtle text-secondary px-3">{{ movement.get_movement_type_display }}</span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-4 fw-bold">{{ movement.quantity }}</td>
+                                    <td class="px-4 fw-bold">
+                                        {% if product.units_per_box > 1 %}
+                                            {{ movement.quantity|stock_package_display:product.units_per_box }}
+                                        {% else %}
+                                            {{ movement.quantity }}
+                                        {% endif %}
+                                    </td>
                                     <td class="px-4 text-muted small">{{ movement.reference|default:"-" }}</td>
                                     <td class="px-4">
                                         <div class="d-flex align-items-center gap-2">

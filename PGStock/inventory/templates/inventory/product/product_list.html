@@ -145,7 +145,18 @@
                                 </td>
 
                                 <td class="text-center text-dark fw-bold">
-                                    {{ product.total_stock_annotated }}
+                                    {% if product.units_per_box > 1 %}
+                                        <div class="d-flex flex-column align-items-center">
+                                            <span class="fs-7 fw-bold badge badge-light-primary mb-1">
+                                                {{ product.total_stock_annotated|floatformat:0 }} Total
+                                            </span>
+                                            <span class="text-gray-600 fs-7">
+                                                {{ product.total_stock_annotated|stock_package_display:product.units_per_box }}
+                                            </span>
+                                        </div>
+                                    {% else %}
+                                        {{ product.total_stock_annotated }}
+                                    {% endif %}
                                 </td>
 
                                 {% if user|can_view_finances %}
@@ -265,7 +276,13 @@
                                     <!-- Stock -->
                                     <div class="info-item">
                                         <div class="info-label">Stock</div>
-                                        <div class="info-value">{{ product.total_stock_annotated }}</div>
+                                        <div class="info-value">
+                                            {% if product.units_per_box > 1 %}
+                                                {{ product.total_stock_annotated|stock_package_display:product.units_per_box }}
+                                            {% else %}
+                                                {{ product.total_stock_annotated }}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                     
                                     {% if user|can_view_finances %}
