@@ -427,6 +427,7 @@ class StockMovement(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Produit")
     movement_type = models.CharField(max_length=20, choices=MOVEMENT_TYPES, verbose_name="Type de mouvement")
     quantity = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Quantité")
+    is_wholesale = models.BooleanField(default=False, verbose_name="En gros lot")
     
     # Point de vente source et destination
     from_point_of_sale = models.ForeignKey(
@@ -537,6 +538,10 @@ class StockMovement(models.Model):
                 from django.core.exceptions import ValidationError
                 raise ValidationError("Les mouvements de stock ne peuvent pas être modifiés une fois créés. Créez un mouvement de correction à la place.")
         
+        # Force is_wholesale=True for entries as per user request
+        if is_new and self.movement_type == 'entry':
+            self.is_wholesale = True
+
         super().save(*args, **kwargs)
         
         if is_new:
@@ -547,16 +552,21 @@ class StockMovement(models.Model):
                 defaults={'quantity': 0}
             )
             
+            # Calculer la quantité réelle en unités
+            actual_move_qty = self.quantity
+            if self.is_wholesale:
+                actual_move_qty = self.quantity * self.product.units_per_box
+                
             # Logique selon le type de mouvement
             if self.movement_type == 'entry':
-                inventory_from.quantity += self.quantity
+                inventory_from.quantity += actual_move_qty
                 
             elif self.movement_type in ['exit', 'defective']:
-                inventory_from.quantity = max(0, inventory_from.quantity - self.quantity)
+                inventory_from.quantity = max(0, inventory_from.quantity - actual_move_qty)
                 
             elif self.movement_type == 'transfer':
                 # Diminuer le stock du point de vente source
-                inventory_from.quantity = max(0, inventory_from.quantity - self.quantity)
+                inventory_from.quantity = max(0, inventory_from.quantity - actual_move_qty)
                 
                 # Augmenter le stock du point de vente destination
                 if self.to_point_of_sale:
@@ -565,20 +575,21 @@ class StockMovement(models.Model):
                         point_of_sale=self.to_point_of_sale,
                         defaults={'quantity': 0}
                     )
-                    inventory_to.quantity += self.quantity
+                    inventory_to.quantity += actual_move_qty
                     inventory_to.save()
                 
             elif self.movement_type == 'return':
-                inventory_from.quantity += self.quantity
+                inventory_from.quantity += actual_move_qty
                 
             elif self.movement_type == 'adjustment':
-                inventory_from.quantity = self.quantity
+                inventory_from.quantity = actual_move_qty
             
             inventory_from.save()
             
             logger.info(
                 f"STOCK UPDATE: Product {self.product.name} ({self.product.sku}) "
                 f"Action {self.movement_type} Quantity {self.quantity} "
+                f"({'Gros' if self.is_wholesale else 'Détail'}) "
                 f"at {self.from_point_of_sale.name}. "
                 f"New Stock Level: {inventory_from.quantity}"
             )
@@ -622,6 +633,7 @@ class Invoice(models.Model):
     subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Sous-total")
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=16, verbose_name="Taux TVA (%)")
     tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Montant TVA")
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Remise (Montant)")
     total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total TTC")
     notes = models.TextField(blank=True, verbose_name="Notes")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
@@ -654,7 +666,12 @@ class Invoice(models.Model):
             self.tax_amount = Decimal('0.00')
             
         # Calculer le total et quantifier à 2 décimales
-        self.total_amount = (self.subtotal + self.tax_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        self.total_amount = (self.subtotal + self.tax_amount - self.discount_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        # S'assurer que le total n'est pas négatif
+        if self.total_amount < Decimal('0.00'):
+            self.total_amount = Decimal('0.00')
+            
         self.save()
 
     def generate_invoice_number(self):
@@ -746,15 +763,11 @@ class Invoice(models.Model):
         # Créer un mouvement de stock pour chaque item de la facture
         items = self.invoiceitem_set.all()
         for item in items:
-            # Calculer la quantité réelle en unités
-            actual_quantity = item.quantity
-            if item.is_wholesale:
-                actual_quantity = item.quantity * item.product.units_per_box
-                
             StockMovement.objects.create(
                 product=item.product,
                 movement_type='exit',
-                quantity=actual_quantity,
+                quantity=item.quantity,
+                is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Facture {self.invoice_number}",
                 notes=f"Sortie automatique ({'Gros' if item.is_wholesale else 'Détail'}) pour facture {self.invoice_number}",
@@ -778,14 +791,11 @@ class Invoice(models.Model):
         # Créer un mouvement de retour pour chaque item de la facture
         items = self.invoiceitem_set.all()
         for item in items:
-            actual_quantity = item.quantity
-            if item.is_wholesale:
-                actual_quantity = item.quantity * item.product.units_per_box
-
             StockMovement.objects.create(
                 product=item.product,
                 movement_type='return',
-                quantity=actual_quantity,
+                quantity=item.quantity,
+                is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Annulation Facture {self.invoice_number}",
                 notes=f"Retour automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite à annulation facture {self.invoice_number}",
@@ -953,14 +963,11 @@ class Receipt(models.Model):
         # Créer un mouvement de stock pour chaque item du bon
         items = self.receiptitem_set.all()
         for item in items:
-            actual_quantity = item.quantity
-            if item.is_wholesale:
-                actual_quantity = item.quantity * item.product.units_per_box
-
             StockMovement.objects.create(
                 product=item.product,
                 movement_type='entry',
-                quantity=actual_quantity,
+                quantity=item.quantity,
+                is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Bon {self.receipt_number}",
                 notes=f"Entrée automatique ({'Gros' if item.is_wholesale else 'Détail'}) pour bon de réception {self.receipt_number}",
@@ -985,14 +992,11 @@ class Receipt(models.Model):
         # On utilise 'adjustment' ou 'exit' pour retirer le stock ajouté par erreur
         items = self.receiptitem_set.all()
         for item in items:
-            actual_quantity = item.quantity
-            if item.is_wholesale:
-                actual_quantity = item.quantity * item.product.units_per_box
-
             StockMovement.objects.create(
                 product=item.product,
                 movement_type='exit',
-                quantity=actual_quantity,
+                quantity=item.quantity,
+                is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Annulation Bon {self.receipt_number}",
                 notes=f"Correction automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite à annulation bon {self.receipt_number}",
@@ -1010,7 +1014,7 @@ class ReceiptItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Produit")
     quantity = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Quantité")
     unit_cost = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Coût unitaire")
-    is_wholesale = models.BooleanField(default=False, verbose_name="Reçu en gros lot")
+    is_wholesale = models.BooleanField(default=True, verbose_name="Reçu en gros lot")
     total = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Total")
 
     class Meta:

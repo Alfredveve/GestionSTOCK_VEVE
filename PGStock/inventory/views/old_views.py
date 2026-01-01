@@ -20,7 +20,7 @@ from django.core.paginator import Paginator
 
 from django.core.exceptions import ValidationError
 
-from django.db.models import F, Q, Sum, Count
+from django.db.models import F, Q, Sum, Count, Prefetch
 
 from django.db.models.functions import Coalesce, TruncMonth
 
@@ -1743,15 +1743,16 @@ def product_delete(request, pk):
 
 @staff_required
 def inventory_list(request):
-    """Liste de l'inventaire avec filtrage avancé"""
+    """Liste de l'inventaire groupée par produit avec filtrage avancé"""
     query = request.GET.get('q', '')
     status_filter = request.GET.get('status', '')
     category_id = request.GET.get('category', '')
     pos_id = request.GET.get('pos', '')
     
+    # On commence par filtrer les objets Inventory
     inventories = Inventory.objects.select_related('product', 'product__category', 'point_of_sale').all()
     
-    # Filtrage par point de vente pour STAFF (restriction de base)
+    # Filtrage par point de vente pour STAFF
     inventories = filter_queryset_by_pos(inventories, request.user, 'point_of_sale')
     
     # Recherche textuelle
@@ -1764,45 +1765,59 @@ def inventory_list(request):
             Q(product__category__name__icontains=query)
         )
     
-    # Filtre par statut
-    if status_filter:
-        if status_filter == 'low_stock':
-            inventories = inventories.filter(quantity__lte=F('reorder_level'), quantity__gt=0)
-        elif status_filter == 'out_of_stock':
-            inventories = inventories.filter(quantity=0)
-        elif status_filter == 'in_stock':
-            inventories = inventories.filter(quantity__gt=F('reorder_level'))
-
     # Filtre par catégorie
     if category_id:
         inventories = inventories.filter(product__category_id=category_id)
 
-    # Filtre par Point de Vente (si l'utilisateur a accès à plusieurs)
+    # Filtre par Point de Vente
     if pos_id:
         inventories = inventories.filter(point_of_sale_id=pos_id)
+
+    # Groupement par produit
+    from django.db.models import Sum, Count
     
+    # On récupère les IDs des produits qui correspondent aux filtres
+    product_ids = inventories.values_list('product_id', flat=True).distinct()
+    
+    # On prépare le queryset de base des produits
+    products_qs = Product.objects.filter(id__in=product_ids).select_related('category').prefetch_related(
+        Prefetch('inventory_set', queryset=inventories, to_attr='filtered_inventories')
+    ).annotate(
+        total_quantity=Sum('inventory__quantity'),
+        pos_count=Count('inventory__point_of_sale', distinct=True)
+    )
+
+    # Filtre par statut (appliqué sur la quantité totale ou le statut spécifique)
+    # Note: On garde la logique originale mais adaptée au groupement
+    if status_filter:
+        # Pour les filtres de statut, on doit parfois regarder au niveau global du produit
+        if status_filter == 'low_stock':
+            # Un produit est en stock faible s'il a au moins un inventaire en stock faible
+            products_qs = products_qs.filter(inventory__quantity__lte=F('inventory__reorder_level'), inventory__quantity__gt=0).distinct()
+        elif status_filter == 'out_of_stock':
+            # Un produit est en rupture s'il n'a pas de stock du tout (ou 0 sur les filtres actuels)
+            products_qs = products_qs.filter(total_quantity=0)
+        elif status_filter == 'in_stock':
+            products_qs = products_qs.filter(inventory__quantity__gt=F('inventory__reorder_level')).distinct()
+
     # Récupération des options pour les filtres
     categories = Category.objects.all().order_by('name')
     
-    # Pour les points de vente, on montre ceux accessibles à l'utilisateur
+    # Pour les points de vente
     if request.user.is_superuser or is_admin(request.user):
         points_of_sale = PointOfSale.objects.filter(is_active=True)
     else:
-        # Si l'utilisateur est lié à un POS, on ne montre que celui-là (ou rien si on veut cacher le filtre)
         user_pos = get_user_pos(request.user)
-        if user_pos:
-            points_of_sale = PointOfSale.objects.filter(id=user_pos.id)
-        else:
-            points_of_sale = PointOfSale.objects.none()
+        points_of_sale = PointOfSale.objects.filter(id=user_pos.id) if user_pos else PointOfSale.objects.none()
 
-    # Pagination
-    paginator = Paginator(inventories, 5)  # 5 items per page
+    # Pagination sur les produits groupés
+    paginator = Paginator(products_qs, 10)  # On peut augmenter un peu car c'est plus condensé
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'inventory/inventory/inventory_list.html', {
-        'inventories': page_obj,
-        'search_query': query, # Uniformisé avec 'search_query' utilisé dans le template
+        'page_obj': page_obj,
+        'search_query': query,
         'status_filter': status_filter,
         'category_filter': int(category_id) if category_id and category_id.isdigit() else None,
         'pos_filter': int(pos_id) if pos_id and pos_id.isdigit() else None,

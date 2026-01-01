@@ -309,7 +309,7 @@ class StockMovementForm(forms.ModelForm):
     """Formulaire de mouvement de stock"""
     class Meta:
         model = StockMovement
-        fields = ['product', 'movement_type', 'quantity', 'from_point_of_sale', 'to_point_of_sale', 'reference', 'notes']
+        fields = ['product', 'movement_type', 'is_wholesale', 'quantity', 'from_point_of_sale', 'to_point_of_sale', 'reference', 'notes']
         widgets = {
             'product': forms.Select(attrs={'class': INPUT_CLASSES}),
             'movement_type': forms.Select(attrs={'class': INPUT_CLASSES}),
@@ -470,7 +470,7 @@ InvoiceItemFormSet = inlineformset_factory(
     Invoice,
     InvoiceItem,
     form=InvoiceItemForm,
-    fields=['product', 'quantity', 'unit_price', 'discount'],
+    fields=['product', 'is_wholesale', 'quantity', 'unit_price', 'discount'],
     extra=1,
     can_delete=True
 )

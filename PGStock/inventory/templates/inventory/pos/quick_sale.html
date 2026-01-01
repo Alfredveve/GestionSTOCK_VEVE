@@ -136,9 +136,16 @@
                         <span id="summary-tax" class="fw-bold text-muted small">0.00 GNF</span>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                    <div class="d-flex justify-content-between mb-2">
                         <h4 class="mb-0 fw-bold">Total</h4>
                         <h4 id="summary-total" class="mb-0 fw-bold text-primary">0.00 GNF</h4>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-0">Remise (GNF)</span>
+                            <input type="number" id="cart-discount" class="form-control border-0 bg-light text-end fw-bold" placeholder="0" oninput="cart.setDiscount(this.value)">
+                        </div>
                     </div>
                     <button id="checkout-btn" class="btn btn-success btn-lg w-full rounded-pill py-3 fw-bold" disabled onclick="checkout()">
                         <i class="fas fa-check-circle me-2"></i>VALIDER LA VENTE
@@ -227,33 +234,79 @@
 <style>
     .product-card {
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        background: #fff;
+        border-radius: 20px !important;
+        overflow: hidden;
     }
     .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    .qty-input::-webkit-outer-spin-button,
-    .qty-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    .select2-container .select2-selection--single {
-        border: none !important;
-        background-color: #f8f9fa !important;
-        height: 38px !important;
-        display: flex !important;
-        align-items: center !important;
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
     }
     .product-card.active {
-        border-color: var(--bs-primary) !important;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    }
+    .product-card .card-body {
+        padding: 1.25rem !important;
+    }
+    .product-card .sku-tag {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+    }
+    .product-card h6 {
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #1e293b;
+        margin-top: 0.5rem;
+        line-height: 1.4;
+    }
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        border: none;
+    }
+    .btn-gradient-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+    }
+    .product-card .btn {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1rem !important;
+        transition: all 0.2s;
+    }
+    .product-card .btn:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+    .product-card .card-footer {
+        background: #f8fafc !important;
+        border-top: 1px solid rgba(0,0,0,0.03) !important;
+        padding: 0.75rem 1.25rem !important;
+    }
+    .stock-badge {
+        font-size: 0.75rem !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 </style>
 
 <script>
     const cart = {
         items: [],
+        discount: 0,
         add(product, isWholesale = false) {
             const existing = this.items.find(i => i.id === product.id && i.isWholesale === isWholesale);
             if (existing) {
@@ -281,6 +334,12 @@
         },
         clear() {
             this.items = [];
+            this.discount = 0;
+            document.getElementById('cart-discount').value = '';
+            this.render();
+        },
+        setDiscount(value) {
+            this.discount = parseFloat(value) || 0;
             this.render();
         },
         get total() {
@@ -331,9 +390,12 @@
             const applyTax = document.getElementById('apply-tax').checked;
             const taxRate = 0.18; // 18% default, could be dynamic
             const taxAmount = applyTax ? (this.total * taxRate) : 0;
-            const finalTotal = this.total + taxAmount;
             
             document.getElementById('summary-tax').innerText = `${taxAmount.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})} GNF`;
+            
+            const totalWithTax = this.total + taxAmount;
+            const finalTotal = Math.max(0, totalWithTax - this.discount);
+            
             document.getElementById('summary-total').innerText = `${finalTotal.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})} GNF`;
         }
     };
@@ -360,15 +422,9 @@
         
         if (query.length < 2 && query.length > 0) return;
         
-        // Cache check
-        const cacheKey = `${query}-${categoryFilter.value}`;
-        if (searchCache.has(cacheKey)) {
-            renderProducts(searchCache.get(cacheKey));
-            return;
-        }
-
-        // Increased debounce to 500ms for better performance
-        searchTimeout = setTimeout(searchProducts, 500);
+        searchTimeout = setTimeout(() => {
+            searchProducts();
+        }, 300);
     });
 
     productSearch.addEventListener('keydown', (e) => {
@@ -408,21 +464,11 @@
     }
 
     categoryFilter.addEventListener('change', () => {
-        searchCache.clear();
         searchProducts();
     });
 
     saleTypeSelect.addEventListener('change', () => {
-        // Re-render current results with new pricing
-        const query = productSearch.value.trim();
-        const category = categoryFilter.value;
-        const cacheKey = `${query}-${category}`;
-        
-        if (searchCache.has(cacheKey)) {
-            renderProducts(searchCache.get(cacheKey));
-        } else {
-            searchProducts();
-        }
+        searchProducts();
     });
 
     function renderProducts(data) {
@@ -437,48 +483,39 @@
             return;
         }
 
+        console.log("Rendering products:", data.results.length);
         data.results.forEach((p, index) => {
             const stockStatus = p.stock <= 0 ? 'bg-danger' : (p.stock <= 10 ? 'bg-warning' : 'bg-success');
+            const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
             
-            // Determine primary price and action based on mode
-            let primaryPrice = p.price;
-            let isWholesaleAction = false;
-            let priceLabel = 'GNF';
-            
-            if (isWholesaleMode) {
-                primaryPrice = p.wholesale_price;
-                isWholesaleAction = true;
-                priceLabel = `GNF / ${p.units_per_box} unités`;
-            }
-
             const card = document.createElement('div');
             card.className = 'col animate__animated animate__fadeIn';
             card.innerHTML = `
-                <div class="card h-100 product-card border-0 shadow-sm" data-index="${index}" style="border-radius: 15px;">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="badge bg-light text-dark border-0 shadow-xs">${p.sku}</span>
-                            <span class="badge ${stockStatus} bg-opacity-10 ${stockStatus.replace('bg-', 'text-')} border-0">
-                                Stock: ${p.units_per_box > 1 ? Math.floor(p.stock / p.units_per_box) + ' Colis, ' + (p.stock % p.units_per_box) + ' Unité(s)' : p.stock + ' Unité(s)'}
-                            </span>
+                <div class="card h-100 product-card border-0 shadow-sm" data-index="${index}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="sku-tag">${p.sku}</span>
                         </div>
-                        <h6 class="fw-bold mb-3 text-dark text-truncate" title="${p.name}">${p.name}</h6>
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-sm ${isWholesaleMode ? 'btn-success' : 'btn-primary'} bg-gradient border-0 rounded-pill" 
-                                    onclick='cart.add(${JSON.stringify(p)}, ${isWholesaleAction}); focusSearch();'>
-                                <i class="fas fa-cart-plus me-1"></i> ${primaryPrice.toLocaleString()} ${priceLabel}
+                        <h6 class="text-truncate" title="${p.name}">${p.name}</h6>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-gradient-primary shadow-sm" 
+                                    onclick="cart.add(${pJson}, false); focusSearch();"
+                                    ${p.stock <= 0 ? 'disabled' : ''}>
+                                <i class="fas fa-cart-plus me-1"></i> ${p.price.toLocaleString()} GNF (Détail)
                             </button>
                             
-                            <!-- Alternative Option (Show the OTHER mode's button as secondary) -->
-                            ${!isWholesaleMode && p.units_per_box > 1 ? `
-                            <button class="btn btn-sm btn-outline-success border-1 rounded-pill" onclick='cart.add(${JSON.stringify(p)}, true); focusSearch();'>
-                                <i class="fas fa-box me-1"></i> Gros (${p.units_per_box}): ${p.wholesale_price.toLocaleString()}
+                            ${p.units_per_box > 1 ? `
+                            <button class="btn btn-outline-success border-2 shadow-xs" 
+                                    onclick="cart.add(${pJson}, true); focusSearch();"
+                                    ${p.stock < p.units_per_box ? 'disabled' : ''}>
+                                <i class="fas fa-box me-1"></i> ${p.wholesale_price.toLocaleString()} GNF (Gros)
                             </button>` : ''}
-                            
-                            ${isWholesaleMode ? `
-                            <button class="btn btn-sm btn-outline-primary border-1 rounded-pill" onclick='cart.add(${JSON.stringify(p)}, false); focusSearch();'>
-                                <i class="fas fa-tag me-1"></i> Détail: ${p.price.toLocaleString()}
-                            </button>` : ''}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="stock-badge ${stockStatus.replace('bg-', 'text-')}">
+                            <i class="fas fa-boxes"></i>
+                            <span>Stock: ${p.units_per_box > 1 ? Math.floor(p.stock / p.units_per_box) + ' Colis / ' + (p.stock % p.units_per_box) + ' U.' : p.stock + ' U.'}</span>
                         </div>
                     </div>
                 </div>
@@ -504,11 +541,6 @@
             const url = `{% url 'inventory:api_pos_search_products' %}?q=${encodeURIComponent(query)}&category=${category}`;
             const response = await fetch(url, { signal: abortController.signal });
             const data = await response.json();
-            
-            // Cache current result
-            if (query.length >= 2) {
-                searchCache.set(`${query}-${category}`, data);
-            }
             
             renderProducts(data);
 
@@ -610,7 +642,8 @@
                         product_id: i.id,
                         quantity: i.quantity,
                         is_wholesale: i.isWholesale
-                    }))
+                    })),
+                    discount: cart.discount
                 })
             });
 
@@ -619,6 +652,9 @@
                 showToast(result.message, 'success');
                 cart.clear();
                 
+                // Refresh products to update stock display immediately
+                searchProducts();
+
                 // Configurer le modal de succès
                 document.getElementById('success-invoice-number').innerText = result.invoice_number;
                 

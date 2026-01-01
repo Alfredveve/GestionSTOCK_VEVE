@@ -109,6 +109,7 @@ class ReceiptService(BaseService):
         product = item_data.get('product')
         quantity = item_data.get('quantity')
         unit_cost = item_data.get('unit_cost')
+        is_wholesale = item_data.get('is_wholesale', False)
         
         # Validate
         self.validate_required(product, "Produit")
@@ -124,17 +125,23 @@ class ReceiptService(BaseService):
             product=product,
             quantity=quantity,
             unit_cost=unit_cost,
+            is_wholesale=is_wholesale,
             total=total
         )
         
+        # Calculate actual quantity in units
+        actual_quantity = quantity
+        if is_wholesale:
+            actual_quantity = quantity * product.units_per_box
+
         # Create stock entry
         self.stock_service.process_entry(
             product=product,
-            quantity=quantity,
+            quantity=actual_quantity,
             point_of_sale=receipt.point_of_sale,
             user=user,
             reference=f"Bon de réception {receipt.receipt_number}",
-            notes=f"Réception fournisseur {receipt.supplier.name}"
+            notes=f"Réception fournisseur {receipt.supplier.name} ({'Gros' if is_wholesale else 'Détail'})"
         )
         
         return item
@@ -207,14 +214,19 @@ class ReceiptService(BaseService):
             item: Item to remove
             user: User performing the operation
         """
+        # Calculate actual quantity in units to reverse
+        actual_quantity = item.quantity
+        if item.is_wholesale:
+            actual_quantity = item.quantity * item.product.units_per_box
+
         # Create a stock exit to reverse the entry
         self.stock_service.process_exit(
             product=item.product,
-            quantity=item.quantity,
+            quantity=actual_quantity,
             point_of_sale=receipt.point_of_sale,
             user=user,
             reference=f"Correction {receipt.receipt_number}",
-            notes=f"Suppression article du bon de réception {receipt.receipt_number}"
+            notes=f"Suppression article du bon de réception {receipt.receipt_number} ({'Gros' if item.is_wholesale else 'Détail'})"
         )
         
         # Delete the item

@@ -5,11 +5,12 @@ from inventory.models import Product, PointOfSale
 class StockMovementForm(forms.ModelForm):
     class Meta:
         model = StockMovement
-        fields = ['product', 'movement_type', 'quantity', 'from_point_of_sale', 'to_point_of_sale', 'reference', 'notes']
+        fields = ['product', 'movement_type', 'is_wholesale', 'quantity', 'from_point_of_sale', 'to_point_of_sale', 'reference', 'notes']
         widgets = {
             'comments': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
             'product': forms.Select(attrs={'class': 'form-select select2'}), # select2 if available
-            'movement_type': forms.Select(attrs={'class': 'form-select'}),
+            'movement_type': forms.Select(attrs={'class': 'form-select', 'onchange': 'toggleWholesale()'}),
+            'is_wholesale': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_is_wholesale'}),
             'from_point_of_sale': forms.Select(attrs={'class': 'form-select'}),
             'to_point_of_sale': forms.Select(attrs={'class': 'form-select'}),
             'reference': forms.TextInput(attrs={'class': 'form-control'}),
