@@ -1291,3 +1291,78 @@ class QuoteItem(models.Model):
         self.total = self.get_total()
         super().save(*args, **kwargs)
 
+
+class ExpenseCategory(models.Model):
+    """Catégorie de dépense (Salaires, Loyer, Électricité/eau, Marketing, Transport, etc.)"""
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nom de la catégorie")
+    description = models.TextField(blank=True, verbose_name="Description")
+
+    class Meta:
+        verbose_name = "Catégorie de dépense"
+        verbose_name_plural = "Catégories de dépenses"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Expense(models.Model):
+    """Dépense ou charge supportée par un point de vente"""
+    reference = models.CharField(max_length=50, unique=True, verbose_name="Référence")
+    category = models.ForeignKey(ExpenseCategory, on_delete=models.PROTECT, verbose_name="Catégorie")
+    point_of_sale = models.ForeignKey(PointOfSale, on_delete=models.CASCADE, verbose_name="Point de vente")
+    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Montant")
+    date = models.DateField(verbose_name="Date de la dépense")
+    description = models.TextField(verbose_name="Description/Notes")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Dépense"
+        verbose_name_plural = "Dépenses"
+        ordering = ['-date', '-created_at']
+
+    def __str__(self):
+        return f"{self.reference} - {self.category.name} ({self.amount})"
+
+
+class MonthlyProfitReport(models.Model):
+    """Rapport de profit mensuel par point de vente (Intérêt net)"""
+    month = models.IntegerField(verbose_name="Mois (1-12)")
+    year = models.IntegerField(verbose_name="Année")
+    point_of_sale = models.ForeignKey(PointOfSale, on_delete=models.CASCADE, verbose_name="Point de vente")
+    
+    # Revenus
+    total_sales_brut = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Ventes Brutes (Avant Remises)")
+    total_discounts = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total Remises Accordées")
+    
+    # Coûts
+    total_cost_of_goods = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Coût d'Achat Total (COGS)")
+    total_expenses = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total Charges (Loyer, Salaires, etc.)")
+    
+    # Intérêts
+    gross_profit = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Bénéfice Brut")
+    net_interest = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Intérêt Net")
+    
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Rapport de profit mensuel"
+        verbose_name_plural = "Rapports de profit mensuels"
+        unique_together = [['month', 'year', 'point_of_sale']]
+        ordering = ['-year', '-month', 'point_of_sale']
+
+    def __str__(self):
+        return f"Profit {self.month}/{self.year} - {self.point_of_sale.name}"
+
+    def calculate_totals(self):
+        """Met à jour les calculs du rapport"""
+        # Gross Profit = Total Sales (After Item Discounts) - COGS
+        # Net Interest = Gross Profit - Global Discounts - Expenses
+        # Note: In our model, InvoiceItem.total already subtracts item-level discounts.
+        # But Invoice.discount_amount is global.
+        self.gross_profit = self.total_sales_brut - self.total_discounts - self.total_cost_of_goods
+        self.net_interest = self.gross_profit - self.total_expenses
+        # We don't save here to avoid recursion if called from save
+
+

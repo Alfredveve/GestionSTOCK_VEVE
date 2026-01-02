@@ -3,3 +3,4 @@ from .categories import *
 from .products import *
 from .receipts import *
 from .pos import *
+from .finance import *

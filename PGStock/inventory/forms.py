@@ -9,8 +9,10 @@ import socket
 from .models import (
     Category, Supplier, Client, Product, Inventory, PointOfSale,
     StockMovement, Invoice, InvoiceItem, Receipt, ReceiptItem,
-    Quote, QuoteItem, Settings, UserProfile, PasswordResetCode
+    Quote, QuoteItem, Settings, UserProfile, PasswordResetCode,
+    ExpenseCategory, Expense, MonthlyProfitReport
 )
+
 
 # Bootstrap classes
 INPUT_CLASSES = 'form-control'
@@ -721,3 +723,32 @@ class ProductImportForm(forms.Form):
                 raise ValidationError("Le fichier est trop volumineux. Taille maximale: 5MB")
         
         return file
+
+
+# ==================== FINANCE FORMS ====================
+
+class ExpenseCategoryForm(forms.ModelForm):
+    """Formulaire de catégorie de dépense"""
+    class Meta:
+        model = ExpenseCategory
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': INPUT_CLASSES}),
+            'description': forms.Textarea(attrs={'class': INPUT_CLASSES, 'rows': 3}),
+        }
+
+
+class ExpenseForm(forms.ModelForm):
+    """Formulaire de dépense"""
+    class Meta:
+        model = Expense
+        fields = ['reference', 'category', 'point_of_sale', 'amount', 'date', 'description']
+        widgets = {
+            'reference': forms.TextInput(attrs={'class': INPUT_CLASSES}),
+            'category': forms.Select(attrs={'class': INPUT_CLASSES}),
+            'point_of_sale': forms.Select(attrs={'class': INPUT_CLASSES}),
+            'amount': forms.NumberInput(attrs={'class': INPUT_CLASSES, 'step': '0.01'}),
+            'date': forms.DateInput(attrs={'class': INPUT_CLASSES, 'type': 'date'}),
+            'description': forms.Textarea(attrs={'class': INPUT_CLASSES, 'rows': 3}),
+        }
+

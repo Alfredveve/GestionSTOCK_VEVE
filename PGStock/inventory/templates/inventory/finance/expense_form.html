@@ -1,0 +1,77 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-4">
+                <h3 class="card-title fw-bold mb-0 text-dark">
+                    <i class="fas fa-plus-circle me-2 text-primary"></i>Nouvelle Dépense
+                </h3>
+            </div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="card-body p-5">
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger mb-4">
+                        <h5 class="alert-heading h6 fw-bold"><i class="fas fa-exclamation-circle me-2"></i>Erreurs dans le formulaire</h5>
+                        <ul class="mb-0 small">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-gray-700 required">Référence</label>
+                            {{ form.reference }}
+                            <div class="form-text text-muted">Référence unique de la dépense (ex: Loyer-01-2026)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-gray-700 required">Date</label>
+                            {{ form.date }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-gray-700 required">Catégorie</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-gray-700 required">Point de Vente</label>
+                            {{ form.point_of_sale }}
+                            <div class="form-text text-muted">Point de vente supportant cette charge</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-gray-700 required">Montant (GNF)</label>
+                        {{ form.amount }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-gray-700">Description / Notes</label>
+                        {{ form.description }}
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3 px-5 d-flex justify-content-end align-items-center">
+                    <a href="{% url 'inventory:expense_list' %}" class="btn btn-light me-3">Annuler</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

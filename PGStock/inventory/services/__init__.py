@@ -13,10 +13,13 @@ from .stock_service import StockService
 from .invoice_service import InvoiceService
 from .receipt_service import ReceiptService
 from .payment_service import PaymentService
+from .finance_service import FinanceService
 
 __all__ = [
     'StockService',
     'InvoiceService',
     'ReceiptService',
     'PaymentService',
+    'FinanceService',
 ]
+

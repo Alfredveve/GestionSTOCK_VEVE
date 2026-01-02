@@ -1,0 +1,69 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-4 d-flex justify-content-between align-items-center">
+                <h3 class="card-title fw-bold mb-0 text-dark">
+                    <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Liste des Dépenses
+                </h3>
+                <a href="{% url 'inventory:expense_add' %}" class="btn btn-primary d-flex align-items-center">
+                    <i class="fas fa-plus me-2"></i>Nouvelle Dépense
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="expensesTable">
+                        <thead class="bg-light text-uppercase text-muted fs-7 fw-bold">
+                            <tr>
+                                <th>Date</th>
+                                <th>Référence</th>
+                                <th>Point de Vente</th>
+                                <th>Catégorie</th>
+                                <th>Description</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            <tr>
+                                <td>{{ expense.date|date:"d/m/Y" }}</td>
+                                <td class="fw-bold text-primary">{{ expense.reference }}</td>
+                                <td>
+                                    <span class="badge bg-light-info text-info">{{ expense.point_of_sale.name }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light-warning text-warning">{{ expense.category.name }}</span>
+                                </td>
+                                <td class="text-muted">{{ expense.description|truncatechars:50 }}</td>
+                                <td class="text-end fw-bold">{{ expense.amount }} GNF</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fas fa-file-invoice-dollar fa-3x mb-3 opacity-25"></i>
+                                    <p class="mb-0">Aucune dépense enregistrée pour le moment.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#expensesTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
+            },
+            order: [[0, 'desc']]
+        });
+    });
+</script>
+{% endblock %}

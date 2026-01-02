@@ -108,7 +108,20 @@
                     </ul>
                 </li>
 
+                <!-- Finance -->
+                <li class="nav-item dropdown group">
+                    <a class="nav-link dropdown-toggle {% if 'finance' in request.resolver_match.url_name %}active{% endif %}"
+                        href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                        Finance
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'inventory:expense_list' %}">Dépenses</a></li>
+                        <li><a class="dropdown-item" href="{% url 'inventory:profit_report' %}">Rapport de Profit</a></li>
+                    </ul>
+                </li>
+
                 <!-- Rapports -->
+
                 <li class="nav-item dropdown group">
                     <a class="nav-link dropdown-toggle {% if 'report' in request.resolver_match.url_name or 'payment' in request.resolver_match.url_name %}active{% endif %}"
                         href="#" role="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
@@ -335,7 +348,28 @@
                     </div>
                 </div>
 
+                <!-- Finance -->
+                <div class="accordion-item bg-transparent border-light">
+                    <h2 class="accordion-header" id="flush-headingFinance">
+                        <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#flush-collapseFinance" aria-expanded="false"
+                            aria-controls="flush-collapseFinance">
+                            <i class="bi bi-cash-coin me-3"></i> Finance
+                        </button>
+                    </h2>
+                    <div id="flush-collapseFinance" class="accordion-collapse collapse" aria-labelledby="flush-headingFinance"
+                        data-bs-parent="#mobileMenuAccordion">
+                        <div class="accordion-body py-0 bg-light bg-opacity-10">
+                            <div class="list-group list-group-flush">
+                                <a href="{% url 'inventory:expense_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Dépenses</a>
+                                <a href="{% url 'inventory:profit_report' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Rapport de Profit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Rapports -->
+
                 <div class="accordion-item bg-transparent border-light">
                     <h2 class="accordion-header" id="flush-headingRapports">
                         <button class="accordion-button collapsed bg-transparent shadow-none py-3" type="button"

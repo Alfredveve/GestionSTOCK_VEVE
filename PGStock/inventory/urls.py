@@ -147,5 +147,11 @@ urlpatterns = [
     # Returned Products Exports
     path('reports/returned-products/excel/', views.export_returned_products_excel, name='export_returned_products_excel'),
     path('reports/returned-products/pdf/', views.export_returned_products_pdf, name='export_returned_products_pdf'),
+    
+    # Gestion Financière (Dépenses & Profit)
+    path('finance/expenses/', views.expense_list, name='expense_list'),
+    path('finance/expenses/add/', views.expense_add, name='expense_add'),
+    path('finance/profit-report/', views.profit_report, name='profit_report'),
 ]
+
 
