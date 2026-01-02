@@ -1,0 +1,70 @@
+{% load static %}
+<!-- Footer Section -->
+<footer class="footer mt-auto py-5" style="background-color: #1e1e2d; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+    <div class="container-fluid px-3 px-lg-5">
+        <div class="row gy-4">
+            <!-- Company Info & Logo -->
+            <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="symbol symbol-40px me-3">
+                         <div class="symbol-label fs-2 fw-bold bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            C
+                        </div>
+                    </div>
+                    <span class="fs-4 fw-bolder text-white">CODESHESTERGN</span>
+                </div>
+                <p class="text-muted small">
+                    Votre partenaire de confiance pour la prestation de services informatiques, création de sites web et d'applications mobiles.
+                </p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="https://facebook.com/codeshestergn" target="_blank" class="social-link text-muted"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/codeshestergn" target="_blank" class="social-link text-muted"><i class="fab fa-twitter"></i></a>
+                    <a href="https://linkedin.com/in/codeshestergn" target="_blank" class="social-link text-muted"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://instagram.com/codeshestergn" target="_blank" class="social-link text-muted"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-white fw-bold mb-3 fs-6 text-uppercase ls-1">Navigation</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'inventory:dashboard' %}" class="text-muted text-hover-primary text-decoration-none transition-all">Tableau de bord</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/services/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Services</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/portfolio/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Portfolio</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/blog/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Blog</a></li>
+                </ul>
+            </div>
+
+            <!-- Resources/Legal -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-white fw-bold mb-3 fs-6 text-uppercase ls-1">Informations</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/a-propos/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">À propos</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/contact/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Contact</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/confidentialite/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Confidentialité</a></li>
+                    <li class="mb-2"><a href="https://vevebea.pythonanywhere.com/conditions-utilisation/" target="_blank" class="text-muted text-hover-primary text-decoration-none transition-all">Conditions</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact/Newsletter -->
+            <div class="col-lg-4 col-md-6">
+                <h5 class="text-white fw-bold mb-3 fs-6 text-uppercase ls-1">Contactez-nous</h5>
+                <ul class="list-unstyled text-muted">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Kagbélen, Conakry, Guinée</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> +224 620 83 35 02</li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> codeshester@gmail.com</li>
+                     <li class="mb-2"><i class="fas fa-clock me-2 text-primary"></i> Ouvert 24h/24</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-top border-secondary mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="text-muted small order-2 order-md-1">
+                &copy; {% now "Y" %} <strong>CODESHESTERGN</strong>. Tous droits réservés.
+            </div>
+            <div class="text-muted small order-1 order-md-2 mb-3 mb-md-0">
+                Conçu avec <i class="fas fa-heart text-danger mx-1"></i> par <a href="https://vevebea.pythonanywhere.com/" target="_blank" class="text-muted text-hover-primary text-decoration-none">Codesheter</a>
+            </div>
+        </div>
+    </div>
+</footer>

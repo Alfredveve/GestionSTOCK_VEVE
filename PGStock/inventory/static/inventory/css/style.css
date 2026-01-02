@@ -795,10 +795,53 @@ a:hover {
 }
 
 .stat-content {
-    flex: 1;
     position: relative;
     z-index: 1;
 }
+
+/* ============================================
+   MODERN FOOTER STYLES
+   ============================================ */
+.footer {
+    background-color: #1e1e2d;
+    color: #a1a5b7;
+}
+
+.footer .symbol-label {
+    background: linear-gradient(135deg, var(--kt-primary) 0%, var(--kt-primary-active) 100%);
+    color: white;
+}
+
+.social-link {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: var(--kt-primary);
+    color: white !important;
+    transform: translateY(-3px);
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.text-hover-primary:hover {
+    color: var(--kt-primary) !important;
+    padding-left: 5px;
+}
+
+.ls-1 {
+    letter-spacing: 1px;
+}
+
 .stat-label {
     font-size: 0.875rem;
     color: var(--text-gray);
