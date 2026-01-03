@@ -1,0 +1,87 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="fw-bold mb-0">Catégories de Dépenses</h3>
+            <p class="text-muted small mb-0">Gérez les types de charges de votre entreprise</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'inventory:expense_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Retour aux Dépenses
+            </a>
+            <a href="{% url 'inventory:expense_category_add' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Nouvelle Catégorie
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-uppercase text-muted fs-7 fw-bold">
+                    <tr>
+                        <th class="ps-4">Nom</th>
+                        <th>Description</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-dark">{{ category.name }}</td>
+                        <td>{{ category.description|default:"-" }}</td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'inventory:expense_category_edit' category.pk %}" class="btn btn-icon btn-light-primary btn-sm me-1" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-icon btn-light-danger btn-sm" title="Supprimer" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ category.pk }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ category.pk }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content text-start">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmer la suppression</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Êtes-vous sûr de vouloir supprimer la catégorie <strong>{{ category.name }}</strong> ?
+                                            <p class="text-danger small mt-2">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> 
+                                                Cette action ne sera possible que si aucune dépense n'utilise cette catégorie.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Annuler</button>
+                                            <form action="{% url 'inventory:expense_category_delete' category.pk %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-5 text-muted">
+                            <i class="fas fa-tags fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">Aucune catégorie trouvée.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

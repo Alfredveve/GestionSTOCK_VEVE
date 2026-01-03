@@ -154,6 +154,13 @@ urlpatterns = [
     path('finance/expenses/<int:pk>/', views.expense_detail, name='expense_detail'),
     path('finance/expenses/<int:pk>/edit/', views.expense_edit, name='expense_edit'),
     path('finance/expenses/<int:pk>/delete/', views.expense_delete, name='expense_delete'),
+    
+    # Catégories de Dépenses
+    path('finance/expense-categories/', views.expense_category_list, name='expense_category_list'),
+    path('finance/expense-categories/add/', views.expense_category_add, name='expense_category_add'),
+    path('finance/expense-categories/<int:pk>/edit/', views.expense_category_edit, name='expense_category_edit'),
+    path('finance/expense-categories/<int:pk>/delete/', views.expense_category_delete, name='expense_category_delete'),
+    
     path('finance/profit-report/', views.profit_report, name='profit_report'),
 ]
 

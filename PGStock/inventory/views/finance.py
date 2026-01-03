@@ -42,6 +42,15 @@ def expense_add(request):
         messages.error(request, "⛔ Accès refusé. Cette page est réservée aux administrateurs.")
         return redirect('inventory:dashboard')
     
+    # Créer des catégories par défaut si aucune n'existe
+    if not ExpenseCategory.objects.exists():
+        default_categories = [
+            'Salaires', 'Loyer', 'Électricité', 'Eau', 
+            'Transport', 'Marketing', 'Fournitures', 'Divers'
+        ]
+        for cat_name in default_categories:
+            ExpenseCategory.objects.get_or_create(name=cat_name)
+
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
         if form.is_valid():
@@ -57,6 +66,76 @@ def expense_add(request):
         'form': form,
         'title': 'Nouvelle Dépense'
     })
+
+@login_required
+def expense_category_list(request):
+    """Affiche la liste des catégories de dépenses"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    categories = ExpenseCategory.objects.all()
+    return render(request, 'inventory/finance/expense_category_list.html', {
+        'categories': categories
+    })
+
+@login_required
+def expense_category_add(request):
+    """Ajouter une catégorie de dépense"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    if request.method == 'POST':
+        form = ExpenseCategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Catégorie ajoutée avec succès.")
+            return redirect('inventory:expense_category_list')
+    else:
+        form = ExpenseCategoryForm()
+    
+    return render(request, 'inventory/finance/expense_category_form.html', {
+        'form': form,
+        'title': 'Nouvelle Catégorie'
+    })
+
+@login_required
+def expense_category_edit(request, pk):
+    """Modifier une catégorie de dépense"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    category = get_object_or_404(ExpenseCategory, pk=pk)
+    if request.method == 'POST':
+        form = ExpenseCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Catégorie mise à jour.")
+            return redirect('inventory:expense_category_list')
+    else:
+        form = ExpenseCategoryForm(instance=category)
+    
+    return render(request, 'inventory/finance/expense_category_form.html', {
+        'form': form,
+        'title': 'Modifier la Catégorie',
+        'is_edit': True
+    })
+
+@login_required
+def expense_category_delete(request, pk):
+    """Supprimer une catégorie de dépense"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    category = get_object_or_404(ExpenseCategory, pk=pk)
+    if request.method == 'POST':
+        category.delete()
+        messages.success(request, "Catégorie supprimée.")
+        return redirect('inventory:expense_category_list')
+    return redirect('inventory:expense_category_list')
 
 @login_required
 def expense_edit(request, pk):

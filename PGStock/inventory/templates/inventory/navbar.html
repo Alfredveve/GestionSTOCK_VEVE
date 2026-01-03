@@ -116,6 +116,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'inventory:expense_list' %}">Dépenses</a></li>
+                        <li><a class="dropdown-item" href="{% url 'inventory:expense_category_list' %}">Catégories (Dépenses)</a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:profit_report' %}">Rapport de Profit</a></li>
                     </ul>
                 </li>
@@ -362,6 +363,7 @@
                         <div class="accordion-body py-0 bg-light bg-opacity-10">
                             <div class="list-group list-group-flush">
                                 <a href="{% url 'inventory:expense_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Dépenses</a>
+                                <a href="{% url 'inventory:expense_category_list' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Catégories (Dépenses)</a>
                                 <a href="{% url 'inventory:profit_report' %}" class="list-group-item bg-transparent border-0 ps-5"><i class="bi bi-dot me-2"></i>Rapport de Profit</a>
                             </div>
                         </div>
