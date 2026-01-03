@@ -5,13 +5,13 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 12%;">N° Facture</th>
-                <th style="width: 18%;">Client</th>
+                <th style="width: 10%;">N° Facture</th>
+                <th style="width: 15%;">Client</th>
                 <th style="width: 10%;">Date</th>
                 <th style="width: 10%;">Échéance</th>
-                <th style="width: 12%;">Statut</th>
-                <th class="text-right" style="width: 14%;">Montant</th>
-                <th class="text-right" style="width: 14%;">Solde</th>
+                <th style="width: 8%;">Statut</th>
+                <th class="text-right" style="width: 25%;">Montant</th>
+                <th class="text-right" style="width: 22%;">Solde</th>
             </tr>
         </thead>
         <tbody>
@@ -26,8 +26,8 @@
                             {{ invoice.status_display }}
                         </span>
                     </td>
-                    <td class="text-right text-muted">{{ invoice.total_amount|format_currency:company_settings.currency }}</td>
-                    <td class="text-right text-primary font-bold">{{ invoice.remaining_amount|format_currency:company_settings.currency }}</td>
+                    <td class="text-right text-muted" style="white-space: nowrap;">{{ invoice.total_amount|format_currency:company_settings.currency }}</td>
+                    <td class="text-right text-primary font-bold" style="white-space: nowrap;">{{ invoice.remaining_amount|format_currency:company_settings.currency }}</td>
                 </tr>
             {% empty %}
                 <tr>
@@ -38,8 +38,8 @@
         <tfoot>
             <tr style="background-color: #F4F6FA; font-weight: bold;">
                 <td colspan="5" class="text-right" style="padding: 10px;">TOTAL GÉNÉRAL</td>
-                <td class="text-right text-muted" style="padding: 10px;">{{ total_amount_sum|format_currency:company_settings.currency }}</td>
-                <td class="text-right text-primary" style="padding: 10px; font-size: 10pt;">{{ total_remaining_sum|format_currency:company_settings.currency }}</td>
+                <td class="text-right text-muted" style="padding: 10px; white-space: nowrap;">{{ total_amount_sum|format_currency:company_settings.currency }}</td>
+                <td class="text-right text-primary" style="padding: 10px; font-size: 10pt; white-space: nowrap;">{{ total_remaining_sum|format_currency:company_settings.currency }}</td>
             </tr>
         </tfoot>
     </table>

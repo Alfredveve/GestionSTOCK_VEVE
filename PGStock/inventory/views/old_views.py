@@ -4150,7 +4150,7 @@ def export_reports_excel(request):
             
         wb = openpyxl.Workbook()
         
-        def apply_modern_style(ws):
+        def apply_modern_style(ws, monetary_cols=None):
             # Header style
             header_fill = PatternFill(start_color=PRIMARY_BLUE, end_color=PRIMARY_BLUE, fill_type="solid")
             header_font = Font(bold=True, color=WHITE)
@@ -4174,6 +4174,10 @@ def export_reports_excel(request):
                     if fill: cell.fill = fill
                     cell.border = border
                     cell.alignment = Alignment(vertical='center')
+                    
+                    # Apply currency format to specified columns
+                    if monetary_cols and cell.column in monetary_cols:
+                        cell.number_format = '#,##0.00'
 
             for column in ws.columns:
                 max_length = 0
@@ -4191,7 +4195,7 @@ def export_reports_excel(request):
             ws_sales.append([inv.date_issued.strftime('%d/%m/%Y'), inv.invoice_number, inv.client.name, 
                              inv.get_status_display(), float(inv.total_amount), 
                              float(inv.get_amount_paid()), float(inv.get_remaining_amount())])
-        apply_modern_style(ws_sales)
+        apply_modern_style(ws_sales, monetary_cols=[5, 6, 7])
 
         # Etat du Stock
         ws_stock = wb.create_sheet("Etat du Stock")
@@ -4200,7 +4204,7 @@ def export_reports_excel(request):
             ws_stock.append([inv.product.name, inv.product.sku or '-', inv.product.category.name if inv.product.category else '-',
                              inv.quantity, float(inv.product.purchase_price or 0), float(inv.product.selling_price or 0),
                              float(inv.quantity * (inv.product.selling_price or 0))])
-        apply_modern_style(ws_stock)
+        apply_modern_style(ws_stock, monetary_cols=[5, 6, 7])
 
         # Mouvements
         ws_movements = wb.create_sheet("Mouvements de Stock")

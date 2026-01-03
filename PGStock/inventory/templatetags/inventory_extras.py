@@ -24,7 +24,8 @@ def format_currency(amount, user=None):
     from inventory.permissions import can_view_finances
     
     # Check if user can view finances
-    if user and not can_view_finances(user):
+    # Handle case where user is not a User object (e.g. passed as string 'GNF')
+    if hasattr(user, 'is_authenticated') and user and not can_view_finances(user):
         return "### ###,## GNF"
     
     try:

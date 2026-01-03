@@ -181,11 +181,11 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="text-gray-800 fw-bold">{{ invoice.total_amount|format_currency:company_settings.currency }}</span>
+                                <span class="text-gray-800 fw-bold">{{ invoice.total_amount|format_currency:request.user }}</span>
                             </td>
                             <td>
                                 {% if invoice.get_remaining_amount > 0 %}
-                                <span class="text-danger fw-bold">{{ invoice.get_remaining_amount|format_currency:company_settings.currency }}</span>
+                                <span class="text-danger fw-bold">{{ invoice.get_remaining_amount|format_currency:request.user }}</span>
                                 {% else %}
                                 <span class="badge badge-light-success fw-bold"><i class="fas fa-check-circle text-success me-1"></i>Réglé</span>
                                 {% endif %}

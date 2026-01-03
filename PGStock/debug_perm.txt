@@ -1,0 +1,6 @@
+DEBUG invoice_list START: user type: <class 'django.utils.functional.SimpleLazyObject'> value: veve
+DEBUG get_user_role: user type: <class 'django.utils.functional.SimpleLazyObject'> value: veve
+DEBUG get_user_role: user type: <class 'str'> value: GNF
+DEBUG invoice_list START: user type: <class 'django.utils.functional.SimpleLazyObject'> value: veve
+DEBUG get_user_role: user type: <class 'django.utils.functional.SimpleLazyObject'> value: veve
+DEBUG get_user_role: user type: <class 'str'> value: GNF

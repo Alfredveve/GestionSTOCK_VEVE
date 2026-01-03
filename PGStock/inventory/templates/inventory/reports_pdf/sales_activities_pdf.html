@@ -6,12 +6,12 @@
         <thead>
             <tr>
                 <th style="width: 10%;">Date</th>
-                <th style="width: 15%;">N° Facture</th>
-                <th style="width: 18%;">Client</th>
-                <th style="width: 25%;">Produit</th>
-                <th class="text-center" style="width: 7%;">Qté</th>
-                <th class="text-right" style="width: 12%;">Prix Unit.</th>
-                <th class="text-right" style="width: 13%;">Total</th>
+                <th style="width: 12%;">N° Facture</th>
+                <th style="width: 15%;">Client</th>
+                <th style="width: 20%;">Produit</th>
+                <th class="text-center" style="width: 5%;">Qté</th>
+                <th class="text-right" style="width: 20%;">Prix Unit.</th>
+                <th class="text-right" style="width: 18%;">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -23,8 +23,8 @@
                 <td>{{ item.invoice.client.name }}</td>
                 <td class="font-bold">{{ item.product.name }}</td>
                 <td class="text-center">{{ item.quantity }}</td>
-                <td class="text-right text-muted">{{ item.unit_price|format_currency:currency }}</td>
-                <td class="text-right text-success font-bold">{{ item.total|format_currency:currency }}</td>
+                <td class="text-right text-muted" style="white-space: nowrap;">{{ item.unit_price|format_currency:currency }}</td>
+                <td class="text-right text-success font-bold" style="white-space: nowrap;">{{ item.total|format_currency:currency }}</td>
             </tr>
             {% empty %}
             <tr>

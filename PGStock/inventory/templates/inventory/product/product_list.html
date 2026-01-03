@@ -161,11 +161,11 @@
 
                                 {% if user|can_view_finances %}
                                 <td class="text-end text-gray-600">
-                                    {{ product.purchase_price|format_currency:company_settings.currency }}
+                                    {{ product.purchase_price|format_currency:request.user }}
                                 </td>
                                 <td class="text-end">
                                     {% if product.margin > 0 %}
-                                    <span class="text-success fw-bold">{{ product.margin|format_currency:company_settings.currency }}</span>
+                                    <span class="text-success fw-bold">{{ product.margin|format_currency:request.user }}</span>
                                     {% else %}
                                     <span class="text-muted">-</span>
                                     {% endif %}
@@ -173,7 +173,7 @@
                                 {% endif %}
 
                                 <td class="text-end text-dark fw-bold">
-                                    {{ product.selling_price|format_currency:company_settings.currency }}
+                                    {{ product.selling_price|format_currency:request.user }}
                                 </td>
 
                                 <td class="text-center">
@@ -289,21 +289,21 @@
                                     <!-- Purchase Price -->
                                     <div class="info-item">
                                         <div class="info-label">Achat</div>
-                                        <div class="info-value text-muted">{{ product.purchase_price|format_currency:company_settings.currency }}</div>
+                                        <div class="info-value text-muted">{{ product.purchase_price|format_currency:request.user }}</div>
                                     </div>
                                     {% endif %}
                                     
                                     <!-- Selling Price -->
                                     <div class="info-item">
                                         <div class="info-label">Vente</div>
-                                        <div class="info-value text-primary">{{ product.selling_price|format_currency:company_settings.currency }}</div>
+                                        <div class="info-value text-primary">{{ product.selling_price|format_currency:request.user }}</div>
                                     </div>
                                     
                                     {% if user|can_view_finances and product.margin > 0 %}
                                     <!-- Margin -->
                                     <div class="info-item">
                                         <div class="info-label">Marge</div>
-                                        <div class="info-value text-success">{{ product.margin|format_currency:company_settings.currency }}</div>
+                                        <div class="info-value text-success">{{ product.margin|format_currency:request.user }}</div>
                                     </div>
                                     {% endif %}
                                 </div>

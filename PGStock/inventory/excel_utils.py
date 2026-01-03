@@ -44,12 +44,25 @@ def export_to_excel(headers, data, title, filename_prefix="Export"):
             cell.alignment = center_alignment
             cell.border = thin_border
 
+        # Detection of currency columns
+        currency_keywords = ['prix', 'total', 'montant', 'solde', 'valeur', 'bénéfice', 'intérêt', 'coût', 'remise', 'dépense', 'marge']
+        currency_cols = []
+        for col_num, header in enumerate(headers, 1):
+            if any(keyword in header.lower() for keyword in currency_keywords):
+                currency_cols.append(col_num)
+
         # Write Data
         for row_num, row_data in enumerate(data, 2):
             for col_num, cell_value in enumerate(row_data, 1):
                 cell = ws.cell(row=row_num, column=col_num, value=cell_value)
                 cell.border = thin_border
-                cell.alignment = left_alignment
+                
+                if col_num in currency_cols:
+                    cell.alignment = Alignment(horizontal="right", vertical="center")
+                    # GNF format with thousands separator
+                    cell.number_format = '#,##0 "GNF"'
+                else:
+                    cell.alignment = left_alignment
                 
                 # Alternate row coloring
                 if row_num % 2 == 0:

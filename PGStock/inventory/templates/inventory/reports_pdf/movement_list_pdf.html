@@ -4,14 +4,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 12%;">Date/Heure</th>
-                <th style="width: 25%;">Produit</th>
-                <th style="width: 10%;">Type</th>
-                <th style="width: 8%;" class="text-center">Qté</th>
-                <th style="width: 12%;">De (Magasin)</th>
-                <th style="width: 12%;">Vers (Magasin)</th>
-                <th style="width: 10%;">Réf.</th>
-                <th style="width: 11%;">Utilisateur</th>
+                <th style="width: 10%;">Date/Heure</th>
+                <th style="width: 18%;">Produit</th>
+                <th style="width: 8%;">Type</th>
+                <th style="width: 5%;" class="text-center">Qté</th>
+                <th style="width: 15%;">De (Magasin)</th>
+                <th style="width: 10%;">Vers (Magasin)</th>
+                <th style="width: 19%;">Réf.</th>
+                <th style="width: 15%;">Utilisateur</th>
             </tr>
         </thead>
         <tbody>
@@ -38,8 +38,8 @@
                 <td class="text-center font-bold">{{ movement.quantity }}</td>
                 <td>{{ movement.from_point_of_sale.name|default:"-" }}</td>
                 <td>{{ movement.to_point_of_sale.name|default:"-" }}</td>
-                <td class="text-muted">{{ movement.reference|default:"-" }}</td>
-                <td>{{ movement.user.username|default:"Système" }}</td>
+                <td class="text-muted" style="font-size: 8.5pt;">{{ movement.reference|default:"-" }}</td>
+                <td style="font-size: 8.5pt;">{{ movement.user.username|default:"Système" }}</td>
             </tr>
             {% empty %}
             <tr>

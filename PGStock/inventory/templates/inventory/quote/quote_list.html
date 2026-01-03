@@ -99,7 +99,7 @@
                                 class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Brouillon</span>
                             {% endif %}
                         </td>
-                        <td class="fw-bold">{{ quote.total_amount|format_currency:company_settings.currency }}</td>
+                        <td class="fw-bold">{{ quote.total_amount|format_currency:request.user }}</td>
                         <td class="text-end">
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{% url 'inventory:quote_detail' quote.pk %}" class="btn btn-icon btn-light-primary btn-sm"

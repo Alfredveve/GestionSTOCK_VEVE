@@ -161,7 +161,7 @@
                                 {% endif %}
                             </td>
                             <td class="text-end fw-bold text-dark fs-6">
-                                {{ invoice.total_amount|format_currency:company_settings.currency }}
+                                {{ invoice.total_amount|format_currency:request.user }}
                             </td>
                             <td class="text-center">
                                 <a href="{% url 'inventory:invoice_detail' invoice.pk %}" class="btn btn-icon btn-sm btn-active-light-primary" title="Voir la facture">

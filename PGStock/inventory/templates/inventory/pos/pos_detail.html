@@ -63,7 +63,7 @@
                         <span class="symbol-label bg-light-success text-success"><i class="fas fa-coins fs-4"></i></span>
                     </div>
                     <div class="d-flex flex-column">
-                        <span class="text-gray-800 fw-boldest fs-3">{{ total_stock_value|format_currency:company_settings.currency }}</span>
+                        <span class="text-gray-800 fw-boldest fs-3">{{ total_stock_value|format_currency:request.user }}</span>
                         <span class="text-muted fw-bold fs-8 text-uppercase">Valeur Inventaire</span>
                     </div>
                 </div>
