@@ -206,11 +206,31 @@ def mask_currency(value, user):
     Usage: {{ amount|mask_currency:user }}
     """
     if check_finances_perm(user):
-        # Si c'est un nombre, le formater avec la devise
         try:
-            from django.contrib.humanize.templatetags.humanize import intcomma
-            return f"{intcomma(value)} GNF"
-        except:
+            # Conversion en float pour gérer les calculs ou chaînes numériques
+            amount = float(value)
+            
+            # Formatage : 0 décimale si entier, 2 sinon
+            if amount.is_integer():
+                 formatted = f"{int(amount)}"
+                 decimal_part = ""
+            else:
+                # Formatage avec 2 décimales et arrondi
+                formatted = f"{amount:.2f}"
+                parts = formatted.split('.')
+                formatted = parts[0]
+                decimal_part = f",{parts[1]}"
+                
+            # Ajout des espaces comme séparateurs de milliers
+            integer_with_spaces = ''
+            for i, digit in enumerate(reversed(formatted)):
+                if i > 0 and i % 3 == 0:
+                    integer_with_spaces = ' ' + integer_with_spaces
+                integer_with_spaces = digit + integer_with_spaces
+            
+            return f"{integer_with_spaces}{decimal_part} GNF"
+        except (ValueError, TypeError):
+            # En cas d'erreur, retourner la valeur brute avec GNF
             return f"{value} GNF"
     return "### ###,## GNF"
 
