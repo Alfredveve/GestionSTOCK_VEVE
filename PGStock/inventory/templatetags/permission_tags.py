@@ -182,3 +182,35 @@ def can_access_module(user, module_name):
     
     allowed_roles = module_access.get(module_name, [])
     return role in allowed_roles
+
+
+@register.filter
+def mask_amount(value, user):
+    """
+    Masque un montant pour les utilisateurs STAFF.
+    Les ADMIN et SUPERUSER voient le montant réel.
+    
+    Usage: {{ amount|mask_amount:user }}
+    """
+    if check_finances_perm(user):
+        return value
+    return "### ###,##"
+
+
+@register.filter
+def mask_currency(value, user):
+    """
+    Masque un montant avec la devise pour les utilisateurs STAFF.
+    Les ADMIN et SUPERUSER voient le montant réel.
+    
+    Usage: {{ amount|mask_currency:user }}
+    """
+    if check_finances_perm(user):
+        # Si c'est un nombre, le formater avec la devise
+        try:
+            from django.contrib.humanize.templatetags.humanize import intcomma
+            return f"{intcomma(value)} GNF"
+        except:
+            return f"{value} GNF"
+    return "### ###,## GNF"
+

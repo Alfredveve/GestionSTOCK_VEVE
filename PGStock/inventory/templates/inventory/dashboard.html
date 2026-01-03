@@ -208,7 +208,7 @@
                     <i class="bi bi-graph-up text-white fs-3 me-2"></i>
                     <div class="stat-title">Valeur Stock</div>
                 </div>
-                <div class="stat-value">{{ total_stock_value|format_currency }}</div>
+                <div class="stat-value">{{ total_stock_value|format_currency:user }}</div>
             </div>
         </div>
     </div>
@@ -221,7 +221,7 @@
                     <i class="bi bi-cash-coin text-white fs-3 me-2"></i>
                     <div class="stat-title">Bénéfice Estimé</div>
                 </div>
-                <div class="stat-value">{{ total_estimated_profit|format_currency }}</div>
+                <div class="stat-value">{{ total_estimated_profit|format_currency:user }}</div>
                 <div class="small opacity-75 mt-1" style="font-size: 0.75rem;">Potentiel sur stock actuel</div>
             </div>
         </div>
@@ -235,7 +235,7 @@
                     <i class="bi bi-wallet2 text-white fs-3 me-2"></i>
                     <div class="stat-title">Ventes totales</div>
                 </div>
-                <div class="stat-value">{{ total_sales|format_currency }}</div>
+                <div class="stat-value">{{ total_sales|format_currency:user }}</div>
             </div>
         </div>
     </div>
@@ -329,7 +329,7 @@
                                     <span class="text-muted fw-bold d-block fs-7">{{ invoice.date_issued|date:"d M Y" }}</span>
                                 </td>
                                 <td class="text-end">
-                                    <span class="text-dark fw-bolder d-block fs-6">{{ invoice.total_amount|format_currency }}</span>
+                                    <span class="text-dark fw-bolder d-block fs-6">{{ invoice.total_amount|format_currency:user }}</span>
                                 </td>
                                 <td class="text-end pe-4">
                                     {% if invoice.status == 'paid' %}
@@ -386,7 +386,7 @@
                     <div class="flex-grow-1 me-2">
                         <a href="{% url 'inventory:invoice_list' %}?status={{ stat.status }}" class="fw-bolder text-gray-800 text-hover-primary fs-6">{{ stat.label }}</a>
                         <div class="d-flex align-items-center mt-1">
-                            <span class="text-muted fw-bold fs-7 me-2">{{ stat.total|format_currency }}</span>
+                            <span class="text-muted fw-bold fs-7 me-2">{{ stat.total|format_currency:user }}</span>
                         </div>
                     </div>
                     <div class="text-end">
@@ -492,7 +492,7 @@
                                     <span class="badge badge-light text-dark fw-bolder">{{ pos.total_items }}</span>
                                 </td>
                                 <td class="text-end">
-                                    <span class="text-dark fw-bolder">{{ pos.total_value|format_currency }}</span>
+                                    <span class="text-dark fw-bolder">{{ pos.total_value|format_currency:user }}</span>
                                 </td>
                             </tr>
                             {% empty %}
@@ -538,7 +538,7 @@
                         <div class="d-flex align-items-center justify-content-between flex-wrap mb-1">
                             <a href="{% url 'inventory:product_detail' item.product__id %}" class="text-gray-900 text-hover-primary fs-6 fw-bolder me-2">{{ item.product__name }}</a>
                             <div class="text-end">
-                                <span class="text-dark fw-bolder d-block">{{ item.total_revenue|format_currency }}</span>
+                                <span class="text-dark fw-bolder d-block">{{ item.total_revenue|format_currency:user }}</span>
                                 <span class="badge badge-light-success fw-bold fs-8">{{ item.total_sold }} vendus</span>
                             </div>
                         </div>

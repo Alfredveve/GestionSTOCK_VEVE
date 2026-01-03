@@ -1,5 +1,5 @@
 {% extends 'inventory/base.html' %}
-{% load static humanize %}
+{% load static humanize permission_tags %}
 
 {% block content %}
 <div class="row mb-4">
@@ -51,8 +51,8 @@
             <div class="card-body">
                 <h6 class="text-white-50 text-uppercase fw-bold mb-2 small">Ventes Brutes</h6>
                 <div class="d-flex align-items-baseline">
-                    <h2 class="mb-0 fw-bold">{{ global_sales|intcomma }}</h2>
-                    <small class="ms-2 opacity-75">GNF</small>
+                    <h2 class="mb-0 fw-bold">{{ global_sales|mask_currency:user }}</h2>
+                    <small class="ms-2 opacity-75"></small>
                 </div>
                 <div class="mt-2 text-white-50 small">
                     Avant remises
@@ -69,8 +69,8 @@
             <div class="card-body">
                 <h6 class="text-white-50 text-uppercase fw-bold mb-2 small">Ventes Nettes</h6>
                 <div class="d-flex align-items-baseline">
-                    <h2 class="mb-0 fw-bold">{{ global_net_sales|intcomma }}</h2>
-                    <small class="ms-2 opacity-75">GNF</small>
+                    <h2 class="mb-0 fw-bold">{{ global_net_sales|mask_currency:user }}</h2>
+                    <small class="ms-2 opacity-75"></small>
                 </div>
                 <div class="mt-2 text-white-50 small">
                     Après remises
@@ -87,8 +87,8 @@
             <div class="card-body">
                 <h6 class="text-white-50 text-uppercase fw-bold mb-2 small">Intérêt Net Global</h6>
                 <div class="d-flex align-items-baseline">
-                    <h2 class="mb-0 fw-bold">{{ global_profit|intcomma }}</h2>
-                    <small class="ms-2 opacity-75">GNF</small>
+                    <h2 class="mb-0 fw-bold">{{ global_profit|mask_currency:user }}</h2>
+                    <small class="ms-2 opacity-75"></small>
                 </div>
                 <div class="mt-2 text-white-50 small">
                     Bénéfice Réel (Marge - Dépenses)
@@ -234,15 +234,15 @@
                     {% for report in reports %}
                     <tr>
                         <td class="ps-4 fw-bold text-dark">{{ report.point_of_sale.name }}</td>
-                        <td class="text-end font-monospace">{{ report.total_sales_brut|intcomma }}</td>
-                        <td class="text-end font-monospace text-danger">-{{ report.total_discounts|intcomma }}</td>
-                        <td class="text-end font-monospace text-secondary">-{{ report.total_cost_of_goods|intcomma }}</td>
+                        <td class="text-end font-monospace">{{ report.total_sales_brut|mask_currency:user }}</td>
+                        <td class="text-end font-monospace text-danger">-{{ report.total_discounts|mask_currency:user }}</td>
+                        <td class="text-end font-monospace text-secondary">-{{ report.total_cost_of_goods|mask_currency:user }}</td>
                         <td class="text-end font-monospace bg-light-primary fw-bold text-primary border-start border-end">
-                            {{ report.gross_profit|intcomma }}
+                            {{ report.gross_profit|mask_currency:user }}
                         </td>
-                        <td class="text-end font-monospace text-warning">-{{ report.total_expenses|intcomma }}</td>
+                        <td class="text-end font-monospace text-warning">-{{ report.total_expenses|mask_currency:user }}</td>
                         <td class="text-end pe-4 font-monospace bg-light-success fw-bolder text-success">
-                            {{ report.net_interest|intcomma }}
+                            {{ report.net_interest|mask_currency:user }}
                         </td>
                     </tr>
                     {% empty %}

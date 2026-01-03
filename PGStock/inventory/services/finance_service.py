@@ -82,3 +82,25 @@ class FinanceService:
         for pos in PointOfSale.objects.all():
             reports.append(FinanceService.generate_monthly_report(month, year, pos))
         return reports
+
+    @staticmethod
+    def recalculate_report_for_expense(expense):
+        """Recalcule le rapport pour le mois et le POS d'une dépense spécifique"""
+        if expense and expense.date and expense.point_of_sale:
+            return FinanceService.generate_monthly_report(
+                expense.date.month, 
+                expense.date.year, 
+                expense.point_of_sale
+            )
+        return None
+
+    @staticmethod
+    def recalculate_report_for_date(date, point_of_sale):
+        """Recalcule le rapport pour une date et un POS spécifiques"""
+        if date and point_of_sale:
+            return FinanceService.generate_monthly_report(
+                date.month,
+                date.year,
+                point_of_sale
+            )
+        return None

@@ -7,7 +7,11 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-4">
                 <h3 class="card-title fw-bold mb-0 text-dark">
+                    {% if is_edit %}
+                    <i class="fas fa-edit me-2 text-warning"></i>Modifier la Dépense : {{ expense.reference }}
+                    {% else %}
                     <i class="fas fa-plus-circle me-2 text-primary"></i>Nouvelle Dépense
+                    {% endif %}
                 </h3>
             </div>
             <form method="post" action="">

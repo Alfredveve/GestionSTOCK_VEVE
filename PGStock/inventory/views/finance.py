@@ -12,15 +12,36 @@ from ..services import FinanceService
 @login_required
 def expense_list(request):
     """Affiche la liste des dépenses"""
+    # Vérifier les permissions
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé. Cette page est réservée aux administrateurs.")
+        return redirect('inventory:dashboard')
+    
     expenses = Expense.objects.all().order_by('-date')
     return render(request, 'inventory/finance/expense_list.html', {
         'expenses': expenses
     })
 
 @login_required
-@permission_required('inventory.add_expense', raise_exception=True)
+def expense_detail(request, pk):
+    """Affiche les détails d'une dépense"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    expense = get_object_or_404(Expense, pk=pk)
+    return render(request, 'inventory/finance/expense_detail.html', {
+        'expense': expense
+    })
+
+@login_required
 def expense_add(request):
     """Ajouter une nouvelle dépense"""
+    # Vérifier les permissions
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé. Cette page est réservée aux administrateurs.")
+        return redirect('inventory:dashboard')
+    
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
         if form.is_valid():
@@ -38,8 +59,51 @@ def expense_add(request):
     })
 
 @login_required
+def expense_edit(request, pk):
+    """Modifier une dépense existante"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    expense = get_object_or_404(Expense, pk=pk)
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Dépense mise à jour avec succès.")
+            return redirect('inventory:expense_list')
+    else:
+        form = ExpenseForm(instance=expense)
+    
+    return render(request, 'inventory/finance/expense_form.html', {
+        'form': form,
+        'title': 'Modifier la Dépense',
+        'is_edit': True,
+        'expense': expense
+    })
+
+@login_required
+def expense_delete(request, pk):
+    """Supprimer une dépense"""
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé.")
+        return redirect('inventory:dashboard')
+    
+    expense = get_object_or_404(Expense, pk=pk)
+    if request.method == 'POST':
+        expense.delete()
+        messages.success(request, "Dépense supprimée avec succès.")
+        return redirect('inventory:expense_list')
+    return redirect('inventory:expense_list')
+
+@login_required
 def profit_report(request):
     """Affiche le rapport de profit mensuel"""
+    # Vérifier les permissions
+    if not request.user.is_superuser and not request.user.groups.filter(name__in=['SUPERUSER', 'Admin']).exists():
+        messages.error(request, "⛔ Accès refusé. Cette page est réservée aux administrateurs.")
+        return redirect('inventory:dashboard')
+    
     today = timezone.now().date()
     month = int(request.GET.get('month', today.month))
     year = int(request.GET.get('year', today.year))

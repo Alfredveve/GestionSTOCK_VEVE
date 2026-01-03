@@ -18,8 +18,15 @@ def currency_symbol(currency_code):
 
 
 @register.filter
-def format_currency(amount, currency_code='GNF'):
-    """Format amount with currency symbol - Always displays in GNF format"""
+def format_currency(amount, user=None):
+    """Format amount with currency symbol - Masks for STAFF users"""
+    # Import here to avoid circular imports
+    from inventory.permissions import can_view_finances
+    
+    # Check if user can view finances
+    if user and not can_view_finances(user):
+        return "### ###,## GNF"
+    
     try:
         amount = float(amount)
         # Format with 0 decimals if integer, else 2

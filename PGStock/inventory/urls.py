@@ -151,6 +151,9 @@ urlpatterns = [
     # Gestion Financière (Dépenses & Profit)
     path('finance/expenses/', views.expense_list, name='expense_list'),
     path('finance/expenses/add/', views.expense_add, name='expense_add'),
+    path('finance/expenses/<int:pk>/', views.expense_detail, name='expense_detail'),
+    path('finance/expenses/<int:pk>/edit/', views.expense_edit, name='expense_edit'),
+    path('finance/expenses/<int:pk>/delete/', views.expense_delete, name='expense_delete'),
     path('finance/profit-report/', views.profit_report, name='profit_report'),
 ]
 
