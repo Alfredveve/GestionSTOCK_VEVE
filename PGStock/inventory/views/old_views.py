@@ -49,8 +49,7 @@ from ..models import (
 
 
 
-    Quote, QuoteItem, PasswordResetCode
-
+    Quote, QuoteItem, PasswordResetCode, MonthlyProfitReport, Expense
 )
 
 from ..forms import (
@@ -5557,6 +5556,10 @@ def reset_data(request):
                 QuoteItem.objects.all().delete()
 
                 Quote.objects.all().delete()
+
+                # 1b. Finance
+                MonthlyProfitReport.objects.all().delete()
+                Expense.objects.all().delete()
 
                 
 

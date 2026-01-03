@@ -334,7 +334,13 @@ class InvoiceService(BaseService):
             invoice.tax_amount = Decimal('0.00')
         
         # Calculate total
-        invoice.total_amount = (invoice.subtotal + invoice.tax_amount).quantize(
+        invoice.total_amount = (invoice.subtotal + invoice.tax_amount - invoice.discount_amount).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
+        
+        # Calculate total profit
+        invoice.total_profit = sum(item.margin for item in items) - invoice.discount_amount
+        invoice.total_profit = Decimal(str(invoice.total_profit)).quantize(
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
         

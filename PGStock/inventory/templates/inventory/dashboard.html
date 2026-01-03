@@ -47,14 +47,18 @@
         flex: 0 0 auto;
         width: 20%;
     }
+    @media (max-width: 1400px) {
+        .col-stats { width: 25%; } /* 4 per row */
+    }
     @media (max-width: 1200px) {
-        .col-stats { width: 33.333%; }
+        .col-stats { width: 33.333%; } /* 3 per row */
     }
     @media (max-width: 768px) {
-        .col-stats { width: 50%; }
+        .col-stats { width: 50%; } /* 2 per row */
     }
     @media (max-width: 576px) {
-        .col-stats { width: 100%; }
+        .col-stats { width: 100%; } /* 1 per row - stacked */
+        .card-stats { margin-bottom: 1rem; }
     }
 
     /* Stat Cards Refinement */

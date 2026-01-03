@@ -635,6 +635,7 @@ class Invoice(models.Model):
     tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Montant TVA")
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Remise (Montant)")
     total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total TTC")
+    total_profit = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Bénéfice Total")
     notes = models.TextField(blank=True, verbose_name="Notes")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
@@ -667,6 +668,10 @@ class Invoice(models.Model):
             
         # Calculer le total et quantifier à 2 décimales
         self.total_amount = (self.subtotal + self.tax_amount - self.discount_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        # Calculer le bénéfice total (Somme des marges des lignes - remise globale)
+        self.total_profit = sum(item.margin for item in items) - self.discount_amount
+        self.total_profit = Decimal(str(self.total_profit)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         # S'assurer que le total n'est pas négatif
         if self.total_amount < Decimal('0.00'):
@@ -816,6 +821,8 @@ class InvoiceItem(models.Model):
     is_wholesale = models.BooleanField(default=False, verbose_name="Vendu en gros lot")
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0, null=True, blank=True, verbose_name="Remise (%)")
     total = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Total")
+    purchase_price = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Prix d'achat unitaire")
+    margin = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Marge")
 
     class Meta:
         verbose_name = "Ligne de facture"
@@ -840,6 +847,20 @@ class InvoiceItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.total = self.get_total()
+        
+        # Fixer le prix d'achat au moment de la vente pour l'historique
+        if not hasattr(self, 'purchase_price') or not self.purchase_price :
+            if self.is_wholesale:
+                self.purchase_price = self.product.wholesale_purchase_price
+            else:
+                self.purchase_price = self.product.purchase_price
+        
+        # Calculer la marge de cette ligne
+        # Marge = Total ligne - (Quantité * Prix d'achat)
+        from decimal import Decimal
+        cost = Decimal(str(self.quantity)) * Decimal(str(self.purchase_price))
+        self.margin = self.total - cost
+        
         super().save(*args, **kwargs)
 
 

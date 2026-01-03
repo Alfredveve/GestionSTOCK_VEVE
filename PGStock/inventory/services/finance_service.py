@@ -16,29 +16,38 @@ class FinanceService:
             date_issued__month=month,
             date_issued__year=year,
             point_of_sale=point_of_sale,
-            status='paid'
+            status__in=['paid', 'sent'] # Include 'sent' invoices
         )
         
         total_sales_brut = Decimal('0.00')
         total_discounts = Decimal('0.00')
         total_cogs = Decimal('0.00')
+        total_net_profit = Decimal('0.00')
         
         for inv in invoices:
-            # Remise globale sur la facture
+            # total_sales_brut += inv.subtotal # Subtotal is brut before global discount
+            # We will calculate total_sales_brut from items to be truly "Gross" (before item discounts)
             total_discounts += inv.discount_amount
             
             items = inv.invoiceitem_set.all()
             for item in items:
-                # Vente brute (avant remise ligne)
+                # Add item-level discount to total_discounts if we want to show it separately
+                # But in our model, 'subtotal' already accounts for item-level discounts if we use item.get_total()
+                # Actually, Invoice.subtotal = sum(item.get_total())
+                # And item.get_total() = (qty * price) - item_discount
+                
+                # To get TRUE brut sales:
                 brut_line = item.quantity * item.unit_price
                 total_sales_brut += brut_line
                 
-                # Remise sur la ligne
+                # COGS using the purchase_price stored on the item (fixed for wholesale)
+                total_cogs += item.quantity * item.purchase_price
+                
+                # If we want to track item-level discounts for display:
                 if item.discount:
                     total_discounts += (brut_line * (item.discount / Decimal('100')))
-                
-                # Coût d'achat (COGS)
-                total_cogs += item.quantity * item.product.purchase_price
+            
+            total_net_profit += inv.total_profit
 
         # 2. Calculer le total des dépenses pour ce mois et ce POS
         expenses_total = Expense.objects.filter(
@@ -59,7 +68,9 @@ class FinanceService:
         report.total_cost_of_goods = total_cogs
         report.total_expenses = expenses_total
         
-        report.calculate_totals()
+        # Use our new calculated profit
+        report.gross_profit = total_net_profit
+        report.net_interest = report.gross_profit - report.total_expenses
         report.save()
         
         return report

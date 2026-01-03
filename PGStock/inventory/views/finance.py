@@ -50,7 +50,10 @@ def profit_report(request):
     reports = MonthlyProfitReport.objects.filter(month=month, year=year)
     
     # Totaux globaux
-    global_sales = reports.aggregate(t=Sum('total_sales_brut'))['t'] or 0
+    global_sales_brut = reports.aggregate(t=Sum('total_sales_brut'))['t'] or 0
+    global_discounts = reports.aggregate(t=Sum('total_discounts'))['t'] or 0
+    global_net_sales = global_sales_brut - global_discounts
+    
     global_profit = reports.aggregate(t=Sum('net_interest'))['t'] or 0
     
     # Données pour le graphique (Jan-Déc)
@@ -81,7 +84,8 @@ def profit_report(request):
         'reports': reports,
         'month': month,
         'year': year,
-        'global_sales': global_sales,
+        'global_sales': global_sales_brut,
+        'global_net_sales': global_net_sales,
         'global_profit': global_profit,
         'months': months_choices,
         'years': range(today.year - 2, today.year + 1),
