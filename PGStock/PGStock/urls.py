@@ -27,6 +27,7 @@ urlpatterns = [
     path('test-400/', lambda request: render(request, '400.html')),
     path('admin/', admin.site.urls),
     path('', lambda request: redirect('inventory:dashboard'), name='home'),
+    path('api/v1/', include('PGStock.api_urls')),
     path('inventory/', include('inventory.urls')),
     path('sales/', include('sales.urls')),
     path('purchasing/', include('purchasing.urls')),

@@ -44,3 +44,28 @@ def check_and_send_low_stock_alert(product):
                 print(f"Failed to send email alert: {e}")
     except Exception as e:
         print(f"Error checking stock: {e}")
+
+from rest_framework.views import exception_handler
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework.response import Response
+from rest_framework import status
+
+def custom_exception_handler(exc, context):
+    """
+    Custom exception handler to handle SimpleJWT exceptions gracefully
+    and avoid SystemError deep recursion issues in DRF.
+    """
+    # Check for SimpleJWT errors FIRST to avoid default handler side-effects
+    if isinstance(exc, (InvalidToken, TokenError)) or exc.__class__.__name__ in ['InvalidToken', 'TokenError']:
+        return Response(
+            {
+                "detail": "Token is invalid or expired",
+                "code": "token_not_valid",
+                "messages": getattr(exc, 'detail', {}).get('messages', [])
+            },
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    # Call REST framework's default exception handler for other exceptions
+    response = exception_handler(exc, context)
+    return response

@@ -37,16 +37,16 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'inventory:product_list' %}">
-                                <i class="bi bi-list-ul"></i> Liste des produits
+                                <i class="bi bi-list-ul me-2"></i> Liste des produits
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:product_create' %}">
-                                <i class="bi bi-plus-circle"></i> Nouveau produit
+                                <i class="bi bi-plus-circle me-2"></i> Nouveau produit
                             </a></li>
                         <li>
                             <div class="dropdown-divider"></div>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:category_list' %}">
-                                <i class="bi bi-folder"></i> Catégories
+                                <i class="bi bi-folder me-2"></i> Catégories
                             </a></li>
                     </ul>
                 </li>
@@ -62,13 +62,13 @@
                             <h6 class="dropdown-header">Gestion</h6>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:inventory_list' %}">
-                                <i class="bi bi-clipboard-data"></i> État du Stock
+                                <i class="bi bi-clipboard-data me-2"></i> État du Stock
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:movement_list' %}">
-                                <i class="bi bi-clock-history"></i> Historique
+                                <i class="bi bi-clock-history me-2"></i> Historique
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:movement_create' %}">
-                                <i class="bi bi-arrow-left-right"></i> Entrée/Sortie
+                                <i class="bi bi-arrow-left-right me-2"></i> Entrée/Sortie
                             </a></li>
                         <li>
                             <div class="dropdown-divider"></div>
@@ -77,7 +77,7 @@
                             <h6 class="dropdown-header">Réceptions</h6>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:receipt_list' %}">
-                                <i class="bi bi-truck"></i> Bons de Réception
+                                <i class="bi bi-truck me-2"></i> Bons de Réception
                             </a></li>
                     </ul>
                 </li>
@@ -90,16 +90,22 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'inventory:quote_list' %}">
-                                <i class="bi bi-file-earmark-text"></i> Devis & Commandes
+                                <i class="bi bi-file-earmark-text me-2"></i> Devis & Commandes
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:invoice_list' %}">
-                                <i class="bi bi-receipt"></i> Factures
+                                <i class="bi bi-receipt me-2"></i> Factures
                             </a></li>
                         <li>
                             <div class="dropdown-divider"></div>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:invoice_create' %}">
-                                <i class="bi bi-plus-lg"></i> Nouvelle Facture
+                                <i class="bi bi-plus-lg me-2"></i> Nouvelle Facture
+                            </a></li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li><a class="dropdown-item fw-bold text-primary" href="{% url 'inventory:quick_sale' %}">
+                                <i class="bi bi-lightning-charge me-2"></i> Vente Rapide (POS)
                             </a></li>
                     </ul>
                 </li>
@@ -115,10 +121,10 @@
                             <h6 class="dropdown-header">Partenaires</h6>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:client_list' %}">
-                                <i class="bi bi-people"></i> Clients
+                                <i class="bi bi-people me-2"></i> Clients
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:supplier_list' %}">
-                                <i class="bi bi-building"></i> Fournisseurs
+                                <i class="bi bi-building me-2"></i> Fournisseurs
                             </a></li>
                         <li>
                             <div class="dropdown-divider"></div>
@@ -127,10 +133,10 @@
                             <h6 class="dropdown-header">Configuration</h6>
                         </li>
                         <li><a class="dropdown-item" href="{% url 'inventory:pos_list' %}">
-                                <i class="bi bi-shop"></i> Points de Vente
+                                <i class="bi bi-shop me-2"></i> Points de Vente
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:bulk_stock_configuration' %}">
-                                <i class="bi bi-gear-wide-connected"></i> Config. Stock
+                                <i class="bi bi-gear-wide-connected me-2"></i> Config. Stock
                             </a></li>
                     </ul>
                 </li>
@@ -143,13 +149,13 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'inventory:reports' %}">
-                                <i class="bi bi-pie-chart"></i> Tableau de bord
+                                <i class="bi bi-pie-chart me-2"></i> Tableau de bord
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:payment_list' %}">
-                                <i class="bi bi-cash-stack"></i> Finance
+                                <i class="bi bi-cash-stack me-2"></i> Finance
                             </a></li>
                         <li><a class="dropdown-item" href="{% url 'inventory:advanced_reports' %}">
-                                <i class="bi bi-bar-chart-steps"></i> Analyses Avancées
+                                <i class="bi bi-bar-chart-steps me-2"></i> Analyses Avancées
                             </a></li>
                     </ul>
                 </li>
