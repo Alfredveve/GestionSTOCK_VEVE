@@ -1,6 +1,0 @@
---- QUOTES ---
-ID: 2, Num: QUO-2025-00002, Status: sent
-ID: 1, Num: QUO-2025-00001, Status: converted
-ID: 3, Num: QUO-2025-00003, Status: sent
-
---- INVOICES ---

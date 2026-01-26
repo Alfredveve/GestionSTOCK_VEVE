@@ -1,0 +1,36 @@
+/* Modern Form Inputs */
+.form-control,
+.form-select {
+    border: 1px solid #e4e6ef;
+    background-color: #ffffff;
+    border-radius: 0.475rem;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: #5e6278;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #b5b5c3;
+    box-shadow: none;
+    background-color: #ffffff;
+    color: #5e6278;
+}
+
+.form-label {
+    color: #3f4254;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #009ef7;
+    border-color: #009ef7;
+}
+
+.btn-primary:hover {
+    background-color: #0095e8;
+    border-color: #0095e8;
+}

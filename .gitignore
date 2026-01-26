@@ -4,101 +4,55 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.pyc
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # Django
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-PGStock/media/
-PGStock/staticfiles/
-PGStock/static/
-sent_emails/
+media/
+staticfiles/
 
-# Virtual Environments
-venv/
-vert/
-env/
-ENV/
-*.bak/
-*.old/
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-*.env
-frontend/.env
-frontend/.env.local
+# Logs & Temp
+*.log
+*.txt
+PGStock/*.txt
+!PGStock/requirements.txt
+PGStock/inventory/tests/
+PGStock/sales/tests_*.py
+PGStock/test_*.py
+PGStock/*.py[cod]
 
 # Node / Frontend
 node_modules/
-frontend/node_modules/
 dist/
-frontend/dist/
 dist-ssr/
-frontend/dist-ssr/
 *.local
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# IDE / Editors
 .vscode/
-!.vscode/extensions.json
 .idea/
-*.swp
-*.swo
-*~
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.sw?
 
-# System Files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Temporary / Backup files
-*.tmp
-*.bak
-*.old
-*.new_backup
-junk_files.txt
-vert/
-
-# Database (backup & extractions)
-*.db
-*.sqlite3
-PGStock/*.backup_*
-PGStock/db.sqlite3.backup*
-PGStock/*_log.txt
-PGStock/*_output.txt
-PGStock/db_extraction*.txt
-PGStock/error_log*.txt
-PGStock/result_log*.txt
-PGStock/traceback_output*.txt
-PGStock/simulation*.txt
-
-# Testing / Coverage
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-frontend/coverage/
-
-# OS X
+# Cursor/IDE
+.cursorrules
+.gemini/
+.agent/
 .DS_Store
-.AppleDouble
-.LSOverride

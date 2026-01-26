@@ -1,0 +1,255 @@
+: root {
+    -- bs - body - bg : #f5f8fa;
+    --bs - body - color : #181c32;
+    --kt - primary : #009ef7;
+    --kt - primary - active : #0095e8;
+    --kt - secondary : #e4e6ef;
+    --kt - success : #50cd89;
+    --kt - info : #7239ea;
+    --kt - warning : #ffc700;
+    --kt - danger : #f1416c;
+    --kt - dark : #181c32;
+    --kt - text - muted : #a1a5b7;
+    --kt - gray - 100 : #f5f8fa;
+    --kt - gray - 200 : #eff2f5;
+    --kt - gray - 300 : #e4e6ef;
+    --kt - gray - 400 : #b5b5c3;
+    --kt - gray - 500 : #a1a5b7;
+    --kt - gray - 600 : #7e8299;
+    --kt - gray - 700 : #5e6278;
+    --kt - gray - 800 : #3f4254;
+    --kt - gray - 900 : #181c32;
+
+    /* Metronic Dashboard Colors */
+    --card - blue : #3699ff;
+    --card - purple : #8950fc;
+    --card - green : #1bc5bd;
+    --card - teal : #1abc9c;
+    --card - orange : #ffa800;
+    --card - cyan : #00b5ad;
+
+    --hero - bg : #00947a; /* Dark Jungle Green for Hero */
+
+    --font - family - base : 'Inter',
+    Helvetica,
+    "sans-serif";
+}
+
+body {
+    font - family : var(-- font - family - base);
+    background - color : #1e1e2d; /* Dark Sidebar/Body Background */
+}
+
+/* Navbar */.metronic - header {
+    background - color : #1e1e2d;
+    border - bottom : 1 px solid rgba(255, 255, 255, 0.05);
+    padding : 1 rem 0;
+}.metronic - brand {
+    font - size : 1.5 rem;
+    font - weight : 700;
+    color : #ffffff;
+    margin - left : 10 px;
+}.icon - shape - metronic {
+    width : 40 px;
+    height : 40 px;
+    background : linear - gradient(135 deg, #ffa800 0 %, #f1416c 100 %);
+    border - radius : 8 px;
+    display : flex;
+    align - items : center;
+    justify - content : center;
+    color : white;
+}.navbar - nav.nav - link {
+    color : #92929f;
+    font - weight : 500;
+    font - size : 0.95 rem;
+    padding : 0.75 rem 1 rem;
+    transition : color 0.2 s ease;
+}.navbar - nav.nav - link : hover,.navbar - nav.nav - link.active {
+    color : #ffffff;
+}
+
+/* Hero Section */.hero - section {
+    background - color : var(-- hero - bg);
+    padding : 2 rem 2 rem 4 rem 2 rem; /* Extra padding bottom for overlap or aesthetic */
+    border - radius : 0 0 0 0;
+    margin - bottom : 2 rem;
+}.hero - nav.nav - link {
+    color : #ffffff !important;
+    font - weight : 700;
+    padding : 0.5 rem 0;
+    margin - right : 2 rem;
+    border - bottom : 2 px solid transparent;
+    transition : all 0.2 s ease;
+    opacity : 1 !important;
+    font - size : 1 rem;
+}.hero - nav.nav - link : hover,.hero - nav.nav - link.active {
+    color : #ffffff;
+    border - bottom - color : #ffffff;
+    opacity : 1;
+}
+
+/* Stats Cards */.card - stats {
+    border : none;
+    border - radius : 0;
+    box - shadow : 0 4 px 20 px rgba(0, 0, 0, 0.05);
+    transition : transform 0.2 s ease,
+    box - shadow 0.2 s ease;
+    overflow : hidden;
+}.card - stats.fs - 7 {
+    font - size: 0.85 rem !important;
+}.card - stats.fs - 4 {
+    font - size: 1.15 rem !important;
+}.card - stats.fs - 2 x {
+    font - size : 1.5 rem !important;
+}.card - stats : hover {
+    transform : translateY(-5 px);
+    box - shadow : 0 10 px 30 px rgba(0, 0, 0, 0.1);
+}.card - color - blue {
+    background - color : var(-- card - blue);
+}.card - color - purple {
+    background - color : var(-- card - purple);
+}.card - color - green {
+    background - color : var(-- card - green);
+}.card - color - cyan {
+    background - color : var(-- card - cyan);
+}.card - color - orange {
+    background - color : var(-- card - orange);
+}
+
+/* Action Buttons */.btn - action {
+    color : white;
+    font - weight : 600;
+    padding : 0.75 rem 1.5 rem;
+    border - radius : 8 px;
+    border : none;
+    display : inline - flex;
+    align - items : center;
+    gap : 8 px;
+    transition : filter 0.2 s ease;
+}.btn - action : hover {
+    filter : brightness(1.1);
+    color : white;
+}
+
+/* General Layout */.content - wrapper {
+    background - color : #1e1e2d; /* Match body main bg */
+    min - height : 100 vh;
+}
+
+/* Tables & Cards (Content) */.card - xl - stretch {
+    background - color : #ffffff;
+    border - radius : 0.65 rem;
+    box - shadow : 0 px 0 px 20 px 0 px rgba(76, 87, 125, 0.02);
+    border : 0;
+}.table - row - dashed tr {
+    border - bottom - width: 1 px;
+    border - bottom - style: dashed;
+    border - bottom - color: #eff2f5;
+}.symbol - label {
+    display : flex;
+    align - items : center;
+    justify - content : center;
+    border - radius : 0.475 rem;
+    width : 50 px;
+    height : 50 px;
+    background - size : cover;
+    background - position : center;
+}
+
+/* Utilities */.bg - white - o - 20 {
+    background - color: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Metronic Form Styles */.form - control - solid,.form - select - solid {
+    background - color : var(-- kt - gray - 100);
+    border - color : var(-- kt - gray - 300); /* Make border visible */
+    color : var(-- kt - gray - 700);
+    transition : color 0.2 s ease,
+    background - color 0.2 s ease;
+    border : 1 px solid var(-- kt - gray - 300); /* Ensure border is drawn */
+}.form - control - solid : active,.form - control - solid.active,.form - control - solid : focus,.form - control - solid.focus,.form - select - solid : active,.form - select - solid.active,.form - select - solid : focus,.form - select - solid.focus {
+    background - color : var(-- kt - gray - 200);
+    border - color : var(-- kt - gray - 200);
+    color : var(-- kt - gray - 700);
+}.form - label {
+    color : var(-- kt - gray - 800);
+    font - weight : 500;
+    font - size : 1.05 rem;
+    margin - bottom : 0.5 rem;
+}
+
+/* Metronic Card Styles */.card - flush {
+    border : 0;
+    box - shadow : none;
+    background - color : transparent;
+}.card - flush >.card - header {
+    background - color : transparent;
+    border - bottom : 0;
+}.card - flush >.card - footer {
+    background - color : transparent;
+    border - top : 0;
+}
+
+/* Metronic Button Light Variants */.btn - light {
+    color : #7e8299;
+    background - color : #f5f8fa;
+    border - color : #f5f8fa;
+}.btn - light : hover {
+    color : #7e8299;
+    background - color : #eff2f5;
+    border - color : #eff2f5;
+}.btn - light - primary {
+    color : #009ef7;
+    background - color : #f1faff;
+    border - color : #f1faff;
+}.btn - light - primary : hover {
+    color : #ffffff;
+    background - color : #009ef7;
+    border - color : #009ef7;
+}.btn - light - success {
+    color : #50cd89;
+    background - color : #e8fff3;
+    border - color : #e8fff3;
+}.btn - light - danger {
+    color : #f1416c;
+    background - color : #fff5f8;
+    border - color : #fff5f8;
+}.btn - light - warning {
+    color : #ffc700;
+    background - color : #fff8dd;
+    border - color : #fff8dd;
+}.btn - light - info {
+    color : #7239ea;
+    background - color : #f8f5ff;
+    border - color : #f8f5ff;
+}
+
+/* Breadcrumb & Title */.page - heading {
+    font - weight : 600;
+    font - size : 1.25 rem;
+    color : var(-- kt - dark);
+}.breadcrumb - separatorless.breadcrumb - item +.breadcrumb - item::before {
+    display : none;
+}.bullet {
+    display : inline - block;
+    border - radius : 50 %;
+}.w - 5 px {
+    width : 5 px;
+}.h - 2 px {
+    height : 2 px;
+}.bg - gray - 400 {
+    background - color: var(-- kt - gray - 400);
+}
+
+/* Utilities */.mw - 600 px {
+    max - width : 600 px;
+}.flex - stack {
+    justify - content : space - between;
+    align - items : center;
+}.fs - 7 {
+    font - size: 0.95 rem !important;
+}.fs - 2 hx {
+    font - size : 2.5 rem !important;
+}
+
