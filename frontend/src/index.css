@@ -1,4 +1,8 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
+
+@utility animate-delay-2s {
+    animation-delay: 2s;
+}
 
 @theme {
     --color-background: hsl(var(--background));
@@ -74,5 +78,82 @@
 }
 body {
     @apply bg-background text-foreground;
+}
+}
+
+/* Print Styles */
+@media print {
+body * {
+    visibility: hidden;
+}
+/* Generic Print Section Support */
+body.printing-invoice #print-invoice,
+body.printing-invoice #print-invoice *,
+body.printing-quote #print-quote,
+body.printing-quote #print-quote *,
+body.printing-order #print-order,
+body.printing-order #print-order * {
+    visibility: visible;
+}
+
+body.printing-invoice #print-invoice,
+body.printing-quote #print-quote,
+body.printing-order #print-order {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.printing-invoice .no-print,
+body.printing-invoice .no-print *,
+body.printing-quote .no-print,
+body.printing-quote .no-print *,
+body.printing-order .no-print,
+body.printing-order .no-print * {
+    visibility: hidden !important;
+    display: none !important;
+}
+
+body.printing-ticket #print-ticket,
+body.printing-ticket #print-ticket * {
+    visibility: visible;
+}
+body.printing-ticket #print-ticket {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 2mm;
+    background: white;
+}
+@page {
+    size: A4;
+    margin: 20mm 25mm !important;
+}
+body.printing-ticket {
+    width: 80mm;
+}
+@page {
+    size: 80mm auto;
+    margin: 0;
+}
+body.printing-invoice,
+body.printing-quote,
+body.printing-order {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+body.printing-invoice .bg-blue-50,
+body.printing-invoice .bg-gray-50,
+body.printing-invoice .bg-gray-700,
+body.printing-invoice .bg-red-50 {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
 }
 }

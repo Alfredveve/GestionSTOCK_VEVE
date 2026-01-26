@@ -25,13 +25,17 @@ class Order(models.Model):
     ]
     
     STATUS_CHOICES = [
+        ('draft', _('Brouillon')),
+        ('sent', _('Envoyée')),
         ('pending', _('En attente')),
         ('validated', _('Validée')),
         ('processing', _('En préparation')),
         ('shipped', _('Expédiée')),
         ('delivered', _('Livrée')),
+        ('paid', _('Payée')),
         ('cancelled', _('Annulée')),
     ]
+
     
     PAYMENT_STATUS_CHOICES = [
         ('unpaid', _('Non payée')),
@@ -82,6 +86,11 @@ class Order(models.Model):
     subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Sous-total"))
     tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Montant TVA"))
     total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Total TTC"))
+    amount_paid = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Montant payé"))
+    payment_method = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Mode de paiement"))
+    
+    # Stock management
+    stock_deducted = models.BooleanField(default=False, verbose_name=_("Stock déduit"), help_text=_("Indique si le stock a déjà été déduit pour cette commande"))
     
     # Autres
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
@@ -116,12 +125,93 @@ class Order(models.Model):
     def update_totals(self):
         """Recalcule les totaux en fonction des lignes"""
         items = self.items.all()
+        from decimal import ROUND_HALF_UP
         self.subtotal = sum(item.total_price for item in items)
+        self.subtotal = self.subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         # Taxe simple pour l'exemple (18% par défaut, à configurer)
-        # Idéalement la taxe est calculée par ligne ou via un système de taxes
-        self.tax_amount = self.subtotal * Decimal('0.18') 
-        self.total_amount = self.subtotal + self.tax_amount
+        self.tax_amount = (self.subtotal * Decimal('0.18')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        self.total_amount = (self.subtotal + self.tax_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        # Mettre à jour le statut du paiement
+        if self.amount_paid >= self.total_amount:
+            self.payment_status = 'paid'
+        elif self.amount_paid > 0:
+            self.payment_status = 'partial'
+        else:
+            self.payment_status = 'unpaid'
+            
         self.save()
+    
+    def deduct_stock(self):
+        """Déduit le stock pour cette commande (appelé quand la commande est créée)"""
+        print(f"DEBUG: Entering deduct_stock for Order {self.order_number}")
+        # Éviter de déduire deux fois
+        if self.stock_deducted:
+            print(f"DEBUG: Stock already deducted for Order {self.order_number}")
+            return
+        
+        # Vérifier qu'on a un point de vente
+        if not self.point_of_sale:
+            print(f"DEBUG: No POS for Order {self.order_number}")
+            raise ValueError("Impossible de déduire le stock : aucun point de vente associé à cette commande.")
+        
+        # Import StockMovement here to avoid circular imports
+        from inventory.models import StockMovement
+        
+        # Créer un mouvement de stock pour chaque item de la commande
+        items = self.items.all()
+        for item in items:
+            # Determine if wholesale based on unit price
+            is_wholesale = (item.unit_price == item.product.wholesale_selling_price)
+            
+            StockMovement.objects.create(
+                product=item.product,
+                movement_type='exit',
+                quantity=item.quantity,
+                is_wholesale=is_wholesale,
+                from_point_of_sale=self.point_of_sale,
+                reference=f"Commande {self.order_number}",
+                notes=f"Sortie automatique ({'Gros' if is_wholesale else 'Détail'}) pour commande {self.order_number}",
+                user=self.created_by
+            )
+        
+        # Marquer comme déduit
+        self.stock_deducted = True
+        self.save(update_fields=['stock_deducted'])
+    
+    def restore_stock(self):
+        """Restaure le stock pour cette commande (appelé quand la commande est annulée)"""
+        # Si le stock n'a pas été déduit, rien à faire
+        if not self.stock_deducted:
+            return
+        
+        # Vérifier qu'on a un point de vente
+        if not self.point_of_sale:
+            raise ValueError("Impossible de restaurer le stock : aucun point de vente associé à cette commande.")
+        
+        # Import StockMovement here to avoid circular imports
+        from inventory.models import StockMovement
+        
+        # Créer un mouvement de retour pour chaque item de la commande
+        items = self.items.all()
+        for item in items:
+            # Determine if wholesale based on unit price
+            is_wholesale = (item.unit_price == item.product.wholesale_selling_price)
+            
+            StockMovement.objects.create(
+                product=item.product,
+                movement_type='return',
+                quantity=item.quantity,
+                is_wholesale=is_wholesale,
+                from_point_of_sale=self.point_of_sale,
+                reference=f"Annulation Commande {self.order_number}",
+                notes=f"Retour automatique suite à l'annulation de la commande {self.order_number}",
+                user=self.created_by
+            )
+        
+        # Marquer comme non déduit
+        self.stock_deducted = False
+        self.save(update_fields=['stock_deducted'])
 
 
 class OrderItem(models.Model):
@@ -150,7 +240,8 @@ class OrderItem(models.Model):
         qty = Decimal(self.quantity)
         disc = Decimal(self.discount)
         
-        self.total_price = (price * qty) * (1 - (disc / 100))
+        from decimal import ROUND_HALF_UP
+        self.total_price = ((price * qty) * (1 - (disc / 100))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         super().save(*args, **kwargs)
         
         # Mettre à jour le total de la commande parente

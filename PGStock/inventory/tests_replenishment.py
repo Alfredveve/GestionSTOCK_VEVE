@@ -1,16 +1,28 @@
-from django.test import TestCase, Client
+from rest_framework.test import APITestCase, APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from inventory.models import Category, Product, PointOfSale, Inventory, StockMovement
+from decimal import Decimal
 
-class ReplenishmentTests(TestCase):
+
+class ReplenishmentAPITests(APITestCase):
+    """Tests for stock replenishment via API (using StockMovement endpoints)"""
+    
     def setUp(self):
         # Clean up any existing POS to ensure deterministic behavior
         PointOfSale.objects.all().delete()
         
         # Create user
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.client = Client()
-        self.client.login(username='testuser', password='password')
+        self.user = User.objects.create_superuser(
+            username='testuser',
+            password='password',
+            email='test@test.com'
+        )
+        
+        # Set up API client with JWT authentication
+        self.client = APIClient()
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
         
         # Create category
         self.category = Category.objects.create(name='Test Category')
@@ -20,7 +32,8 @@ class ReplenishmentTests(TestCase):
             name='Test Product',
             sku='TEST-001',
             category=self.category,
-            unit_price=100.00
+            selling_price=Decimal('100.00'),
+            purchase_price=Decimal('50.00')
         )
         
         # Create Warehouse
@@ -53,20 +66,29 @@ class ReplenishmentTests(TestCase):
             quantity=0
         )
 
-    def test_replenish_pos_success(self):
-        """Test successful replenishment from warehouse to store"""
-        response = self.client.post(f'/inventory/pos/{self.store.id}/replenish/', {
+    def test_transfer_stock_success(self):
+        """Test successful stock transfer from warehouse to store via API"""
+        response = self.client.post('/api/v1/movements/', {
             'product': self.product.id,
+            'movement_type': 'transfer',
             'quantity': 10,
+            'from_point_of_sale': self.warehouse.id,
+            'to_point_of_sale': self.store.id,
             'notes': 'Test replenishment'
-        })
+        }, format='json')
         
-        # Check redirect
-        self.assertRedirects(response, f'/inventory/pos/{self.store.id}/')
+        # Check for successful creation
+        self.assertEqual(response.status_code, 201)
         
         # Check stock levels
-        warehouse_stock = Inventory.objects.get(product=self.product, point_of_sale=self.warehouse).quantity
-        store_stock = Inventory.objects.get(product=self.product, point_of_sale=self.store).quantity
+        warehouse_stock = Inventory.objects.get(
+            product=self.product,
+            point_of_sale=self.warehouse
+        ).quantity
+        store_stock = Inventory.objects.get(
+            product=self.product,
+            point_of_sale=self.store
+        ).quantity
         
         self.assertEqual(warehouse_stock, 90)
         self.assertEqual(store_stock, 10)
@@ -78,26 +100,42 @@ class ReplenishmentTests(TestCase):
         self.assertEqual(movement.to_point_of_sale, self.store)
         self.assertEqual(movement.quantity, 10)
 
-    def test_replenish_pos_insufficient_stock(self):
-        """Test replenishment fails if warehouse has insufficient stock"""
-        response = self.client.post(f'/inventory/pos/{self.store.id}/replenish/', {
+    def test_transfer_insufficient_stock(self):
+        """Test that transfer fails if source has insufficient stock"""
+        response = self.client.post('/api/v1/movements/', {
             'product': self.product.id,
+            'movement_type': 'transfer',
             'quantity': 150,  # More than 100 available
+            'from_point_of_sale': self.warehouse.id,
+            'to_point_of_sale': self.store.id,
             'notes': 'Test fail'
-        })
+        }, format='json')
         
-        # Should show error message (implementation detail: form error or message)
-        # In this case, the form should be invalid and re-render the page
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Stock insuffisant")
+        # Should return 400 Bad Request with validation error
+        self.assertEqual(response.status_code, 400)
         
         # Check stock levels unchanged
-        warehouse_stock = Inventory.objects.get(product=self.product, point_of_sale=self.warehouse).quantity
+        warehouse_stock = Inventory.objects.get(
+            product=self.product,
+            point_of_sale=self.warehouse
+        ).quantity
         self.assertEqual(warehouse_stock, 100)
 
-    def test_replenish_warehouse_fail(self):
-        """Test cannot replenish warehouse itself"""
-        response = self.client.get(f'/inventory/pos/{self.warehouse.id}/replenish/')
+    def test_stock_entry_to_warehouse(self):
+        """Test adding stock via entry movement"""
+        response = self.client.post('/api/v1/movements/', {
+            'product': self.product.id,
+            'movement_type': 'entry',
+            'quantity': 50,
+            'from_point_of_sale': self.warehouse.id,
+            'notes': 'New stock arrival'
+        }, format='json')
         
-        # Should redirect with warning
-        self.assertRedirects(response, f'/inventory/pos/{self.warehouse.id}/')
+        self.assertEqual(response.status_code, 201)
+        
+        # Check stock increased
+        warehouse_stock = Inventory.objects.get(
+            product=self.product,
+            point_of_sale=self.warehouse
+        ).quantity
+        self.assertEqual(warehouse_stock, 150)  # 100 + 50

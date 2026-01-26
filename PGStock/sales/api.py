@@ -1,13 +1,74 @@
 from rest_framework import viewsets, filters, permissions
+from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Order
 from .serializers import OrderSerializer
+from inventory.renderers import PDFRenderer
 
-class OrderViewSet(viewsets.ModelViewSet):
+from inventory.permissions import POSFilterMixin, get_user_pos, is_admin
+
+class OrderViewSet(POSFilterMixin, viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'payment_status', 'client', 'order_type']
+    filterset_fields = {
+        'status': ['exact'],
+        'payment_status': ['exact'],
+        'client': ['exact'],
+        'order_type': ['exact'],
+        'date_created': ['gte', 'lte'],
+    }
     search_fields = ['order_number', 'client__name']
     ordering_fields = ['date_created', 'total_amount']
+    pos_field = 'point_of_sale'
+
+    def create(self, request, *args, **kwargs):
+        # Restriction POS pour les vendeurs
+        if not is_admin(request.user):
+            user_pos = get_user_pos(request.user)
+            req_pos_id = request.data.get('point_of_sale')
+            if user_pos and req_pos_id and int(req_pos_id) != user_pos.id:
+                from rest_framework.response import Response
+                return Response(
+                    {"detail": f"Accès refusé. Vous ne pouvez pas vendre pour le point de vente {req_pos_id}."}, 
+                    status=403
+                )
+        
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Order Validation Error: {serializer.errors}")
+            # Also print to stdout for immediate visibility in runserver
+            print(f"Validation Error: {serializer.errors}")
+        return super().create(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'])
+    def export_excel(self, request):
+        orders = self.filter_queryset(self.get_queryset())
+        headers = ['Numéro', 'Client', 'Type', 'Date', 'Statut', 'Total', 'Payé']
+        data = [[
+            o.order_number, o.client.name if o.client else "N/A", o.get_order_type_display(),
+            o.date_created.strftime('%d/%m/%Y'), o.get_status_display(),
+            float(o.total_amount), float(o.amount_paid)
+        ] for o in orders]
+        from inventory.excel_utils import export_to_excel
+        return export_to_excel(headers, data, "Registre des Commandes", "Commandes")
+
+    @action(detail=False, methods=['get'])
+    def export_pdf(self, request):
+        orders = self.filter_queryset(self.get_queryset())
+        headers = ['Numéro', 'Client', 'Date', 'Statut', 'Total']
+        data = [[
+            o.order_number, o.client.name if o.client else "N/A", o.date_created.strftime('%d/%m/%Y'),
+            o.get_status_display(), f"{float(o.total_amount):,.0f} GNF"
+        ] for o in orders]
+        from inventory.pdf_utils import export_to_pdf
+        return export_to_pdf(headers, data, "Journal des Commandes", "Commandes")
+
+    @action(detail=True, methods=['get'], renderer_classes=[PDFRenderer])
+    def download_pdf(self, request, pk=None):
+        from inventory.pdf_utils import export_order_to_pdf
+        order = self.get_object()
+        return export_order_to_pdf(order)

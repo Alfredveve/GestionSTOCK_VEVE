@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Category, Supplier, Client, Product, Inventory, 
     StockMovement, Invoice, InvoiceItem, Receipt, ReceiptItem, Payment, Settings,
-    Quote, QuoteItem
+    Quote, QuoteItem, Notification
 )
 
 
@@ -129,3 +129,9 @@ class QuoteAdmin(admin.ModelAdmin):
     readonly_fields = ['subtotal', 'tax_amount', 'total_amount', 'created_at', 'updated_at']
     inlines = [QuoteItemInline]
     list_per_page = 20
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'recipient', 'notification_type', 'is_read', 'created_at']
+    list_filter = ['notification_type', 'is_read', 'created_at']
+    search_fields = ['title', 'message', 'recipient__username']
+    list_per_page = 50

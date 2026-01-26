@@ -31,7 +31,7 @@ export function ContactForm({ isOpen, onClose, type }: ContactFormProps) {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: { name: string, contact_person?: string, email?: string, phone?: string, city?: string, country?: string, address?: string, client_type?: string }) => 
+    mutationFn: (data: any): Promise<any> => 
       type === 'clients' 
         ? inventoryService.createClient(data) 
         : inventoryService.createSupplier(data),

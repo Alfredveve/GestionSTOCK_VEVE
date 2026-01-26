@@ -121,8 +121,8 @@ class StockService(BaseService):
         
         # Validate point of sale requirements
         if movement_type == 'entry':
-            if not to_pos:
-                raise ValidationError("Point de vente de destination requis pour une entrée.")
+            if not from_pos:
+                raise ValidationError("Point de vente requis pour une entrée.")
         
         elif movement_type in ['exit', 'adjustment', 'return']:
             if not from_pos:
@@ -190,7 +190,7 @@ class StockService(BaseService):
             movement_type='entry',
             quantity=quantity,
             user=user,
-            to_point_of_sale=point_of_sale,
+            from_point_of_sale=point_of_sale,
             reference=reference,
             notes=notes
         )

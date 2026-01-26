@@ -1,0 +1,108 @@
+﻿py : Creating test database for alias 
+'default' ('test_pgstock')...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+inventory.tests.test_exports -v 2 
+*>&1 | Out-File - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpec 
+   ified: (Creating test d...st_pgst  
+  ock')...:String) [], RemoteExcept   
+ ion
+    + FullyQualifiedErrorId : NativeC 
+   ommandError
+ 
+
+Found 3 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: corsheaders, django_filters, humanize, jazzmin, messages, rest_framework, rest_framework_simplejwt, staticfiles
+  Apply all migrations: admin, auth, contenttypes, inventory, purchasing, sales, sessions, sites, stock
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying inventory.0001_initial... OK
+  Applying inventory.0002_client_supplier_product_image_and_more... OK
+  Applying inventory.0003_payment... OK
+  Applying inventory.0004_userprofile... OK
+  Applying inventory.0005_settings... OK
+  Applying inventory.0006_settings_currency_quote_quoteitem... OK
+  Applying inventory.0007_alter_inventory_product_pointofsale_and_more... OK
+  Applying inventory.0008_invoice_point_of_sale_invoice_stock_deducted_and_more... OK
+  Applying inventory.0009_invoice_invoice_type... OK
+  Applying inventory.0010_passwordresetcode... OK
+  Applying inventory.0011_setup_user_groups... OK
+  Applying inventory.0012_invoice_apply_tax_product_margin_and_more... OK
+  Applying inventory.0013_rename_unit_price_to_selling_price... OK
+  Applying inventory.0014_convert_margin_to_amount... OK
+  Applying inventory.0015_receipt_delivery_costs_alter_invoice_subtotal_and_more... OK
+  Applying inventory.0016_alter_invoiceitem_discount... OK
+  Applying inventory.0017_invoiceitem_is_wholesale_product_units_per_box_and_more... OK
+  Applying inventory.0018_quote_quote_type_quoteitem_is_wholesale... OK
+  Applying inventory.0019_add_product_search_indexes... OK
+  Applying inventory.0020_alter_product_units_per_box... OK
+  Applying inventory.0021_invoice_discount_amount... OK
+  Applying inventory.0022_stockmovement_is_wholesale_and_more... OK
+  Applying inventory.0023_remove_quoteitem_is_wholesale... OK
+  Applying inventory.0024_quoteitem_is_wholesale... OK
+  Applying inventory.0025_expensecategory_expense_monthlyprofitreport... OK
+  Applying inventory.0026_invoice_total_profit_invoiceitem_margin_and_more... OK
+  Applying inventory.0027_settings_default_order_type_settings_tax_rate... OK
+  Applying inventory.0028_settings_daily_reports_and_more... OK
+  Applying inventory.0029_settings_smart_rounding... OK
+  Applying inventory.0030_alter_category_options_alter_expense_options_and_more... OK
+  Applying inventory.0031_fix_pos_sequence... OK
+  Applying inventory.0032_alter_category_options_alter_expense_options_and_more... OK
+  Applying inventory.0033_settings_daily_reports_settings_default_order_type_and_more... OK
+  Applying inventory.0034_alter_notification_notification_type... OK
+  Applying inventory.0035_pointofsale_manager_name... OK
+  Applying purchasing.0001_initial... OK
+  Applying purchasing.0002_remove_receipt_created_by_and_more... OK
+  Applying sales.0001_initial... OK
+  Applying sales.0002_order_amount_paid_order_payment_method... OK
+  Applying sales.0003_order_stock_deducted... OK
+  Applying sales.0004_alter_order_status... OK
+  Applying sessions.0001_initial... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+  Applying stock.0001_initial... OK
+  Applying stock.0002_delete_stockmovement... OK
+System check identified no issues (0 silenced).
+test_invoice_pdf_export (inventory.tes
+ts.test_exports.ExportTests.test_invoi
+ce_pdf_export) ... ok
+test_order_pdf_export (inventory.tests
+.test_exports.ExportTests.test_order_p
+df_export) ... ok
+test_renderer_import (inventory.tests.
+test_exports.ExportTests.test_renderer
+_import) ... ok
+
+--------------------------------------
+--------------------------------
+Ran 3 tests in 3.301s
+
+OK
+Destroying test database for alias 
+'default' ('test_pgstock')...
+
+DEBUG: Downloading PDF for invoice INV-001
+DEBUG: Invoice items count: 0

@@ -47,25 +47,75 @@ def check_and_send_low_stock_alert(product):
 
 from rest_framework.views import exception_handler
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework import status
+import logging
+
+logger = logging.getLogger(__name__)
 
 def custom_exception_handler(exc, context):
     """
     Custom exception handler to handle SimpleJWT exceptions gracefully
-    and avoid SystemError deep recursion issues in DRF.
+    and avoid SystemError issues in DRF.
     """
-    # Check for SimpleJWT errors FIRST to avoid default handler side-effects
-    if isinstance(exc, (InvalidToken, TokenError)) or exc.__class__.__name__ in ['InvalidToken', 'TokenError']:
+    # Get the exception class name for robust checking
+    exc_class_name = exc.__class__.__name__
+    print(f"DEBUG: Catching exception in handler: {exc_class_name}")
+    
+    # Check for SimpleJWT errors or AuthenticationFailed
+    # We also catch SystemError because sometimes DRF/SimpleJWT interactions cause 
+    # a SystemError when wrapping the original InvalidToken exception.
+    is_simplejwt = exc_class_name in ['InvalidToken', 'TokenError', 'AuthenticationFailed'] or \
+                   exc.__class__.__module__.startswith('rest_framework_simplejwt')
+    
+    # Check if a SystemError is actually masking an InvalidToken
+    if isinstance(exc, SystemError) and exc.__cause__:
+        cause_name = exc.__cause__.__class__.__name__
+        if cause_name in ['InvalidToken', 'TokenError'] or \
+           exc.__cause__.__class__.__module__.startswith('rest_framework_simplejwt'):
+            is_simplejwt = True
+            # Use the cause as the main exception for detail extraction
+            exc = exc.__cause__
+
+    if isinstance(exc, (InvalidToken, TokenError, AuthenticationFailed)) or is_simplejwt:
+        
+        detail_msg = "Token is invalid or expired"
+        messages = []
+        
+        if hasattr(exc, 'detail'):
+            if isinstance(exc.detail, dict):
+                detail_msg = exc.detail.get('detail', detail_msg)
+                messages = exc.detail.get('messages', [])
+            elif isinstance(exc.detail, str):
+                detail_msg = exc.detail
+        
+        logger.warning(f"Auth error caught: {exc_class_name} - {detail_msg}")
+        
         return Response(
             {
-                "detail": "Token is invalid or expired",
+                "detail": detail_msg,
                 "code": "token_not_valid",
-                "messages": getattr(exc, 'detail', {}).get('messages', [])
+                "messages": messages
             },
             status=status.HTTP_401_UNAUTHORIZED
         )
 
+    # Handle Django's built-in ValidationError
+    from django.core.exceptions import ValidationError as DjangoValidationError
+    if isinstance(exc, DjangoValidationError):
+        data = exc.message_dict if hasattr(exc, 'message_dict') else {'detail': exc.messages}
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
     # Call REST framework's default exception handler for other exceptions
     response = exception_handler(exc, context)
+    
+    # Log validation errors for debugging
+    if exc_class_name == 'ValidationError' and hasattr(exc, 'detail'):
+        print(f"DEBUG: ValidationError Details: {exc.detail}")
+    
+    # Log unhandled exceptions for debugging
+    if response is None:
+        logger.error(f"Unhandled exception: {exc_class_name} - {str(exc)}")
+    
     return response

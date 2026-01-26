@@ -1,0 +1,562 @@
+Creating test database for alias 'default'...
+Got an error creating the test database: ERREUR:  la base de données « test_  » existe déjà
+
+Destroying old test database for alias 'default'...
+Found 18 test(s).
+System check identified no issues (0 silenced).
+EEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_handle_expense_changes_signal (inventory.tests.test_all_signals.FinancialSignalsTestCase.test_handle_expense_changes_signal)
+Test expense change tracking
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « category_id » dans la relation « inventory_expense »
+DETAIL:  La ligne en échec contient (1, , 5000.00, 2026-01-25, Test Expense, 2026-01-25 05:01:13.015375+00, 9, 3, null).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 465, in test_handle_expense_changes_signal
+    expense = Expense.objects.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\sql\compiler.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « category_id » dans la relation « inventory_expense »
+DETAIL:  La ligne en échec contient (1, , 5000.00, 2026-01-25, Test Expense, 2026-01-25 05:01:13.015375+00, 9, 3, null).
+
+
+======================================================================
+ERROR: test_update_profit_report_on_expense_signal (inventory.tests.test_all_signals.FinancialSignalsTestCase.test_update_profit_report_on_expense_signal)
+Test profit report update on expense
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « category_id » dans la relation « inventory_expense »
+DETAIL:  La ligne en échec contient (2, , 5000.00, 2026-01-25, Test Expense, 2026-01-25 05:01:14.363227+00, 11, 4, null).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 452, in test_update_profit_report_on_expense_signal
+    expense = Expense.objects.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\sql\compiler.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « category_id » dans la relation « inventory_expense »
+DETAIL:  La ligne en échec contient (2, , 5000.00, 2026-01-25, Test Expense, 2026-01-25 05:01:14.363227+00, 11, 4, null).
+
+
+======================================================================
+ERROR: test_update_profit_report_on_invoice_signal (inventory.tests.test_all_signals.FinancialSignalsTestCase.test_update_profit_report_on_invoice_signal)
+Test profit report update on invoice
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « date_due » dans la relation « inventory_invoice »
+DETAIL:  La ligne en échec contient (1, INV-2026-00001, 2026-01-25, null, paid, 0.00, 16.00, 0.00, 10000.00, , 2026-01-25 05:01:15.722747+00, 2026-01-25 05:01:15.722747+00, 5, 14, 6, f, retail, t, 0.00, 0.00).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 417, in test_update_profit_report_on_invoice_signal
+    invoice = Invoice.objects.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\models.py", line 661, in save
+    super().save(*args, **kwargs)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\sql\compiler.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « date_due » dans la relation « inventory_invoice »
+DETAIL:  La ligne en échec contient (1, INV-2026-00001, 2026-01-25, null, paid, 0.00, 16.00, 0.00, 10000.00, , 2026-01-25 05:01:15.722747+00, 2026-01-25 05:01:15.722747+00, 5, 14, 6, f, retail, t, 0.00, 0.00).
+
+
+======================================================================
+ERROR: test_update_profit_report_on_payment_signal (inventory.tests.test_all_signals.FinancialSignalsTestCase.test_update_profit_report_on_payment_signal)
+Test profit report update on payment
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.NotNullViolation: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « date_due » dans la relation « inventory_invoice »
+DETAIL:  La ligne en échec contient (2, INV-2026-00001, 2026-01-25, null, draft, 0.00, 16.00, 0.00, 10000.00, , 2026-01-25 05:01:17.075743+00, 2026-01-25 05:01:17.075743+00, 6, 16, 7, f, retail, t, 0.00, 0.00).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 431, in test_update_profit_report_on_payment_signal
+    invoice = Invoice.objects.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\models.py", line 661, in save
+    super().save(*args, **kwargs)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\sql\compiler.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: ERREUR:  une valeur NULL viole la contrainte NOT NULL de la colonne « date_due » dans la relation « inventory_invoice »
+DETAIL:  La ligne en échec contient (2, INV-2026-00001, 2026-01-25, null, draft, 0.00, 16.00, 0.00, 10000.00, , 2026-01-25 05:01:17.075743+00, 2026-01-25 05:01:17.075743+00, 6, 16, 7, f, retail, t, 0.00, 0.00).
+
+
+======================================================================
+ERROR: test_check_stock_after_movement_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_check_stock_after_movement_signal)
+Test that low stock check is triggered after stock movement
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_low_stock_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_notify_low_stock_signal)
+Test low stock notification signal
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_new_invoice_paid_no_notification (inventory.tests.test_all_signals.InventorySignalsTestCase.test_notify_new_invoice_paid_no_notification)
+Test that paid invoices don't create notifications
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_new_invoice_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_notify_new_invoice_signal)
+Test invoice creation notification signal
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_payment_received_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_notify_payment_received_signal)
+Test payment notification signal
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_track_product_price_changes_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_track_product_price_changes_signal)
+Test product price change tracking
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_validate_product_deletion_signal (inventory.tests.test_all_signals.InventorySignalsTestCase.test_validate_product_deletion_signal)
+Test product deletion validation
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 31, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_handle_receipt_status_change_signal (inventory.tests.test_all_signals.PurchasingSignalsTestCase.test_handle_receipt_status_change_signal)
+Test receipt status change notification
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 296, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_receipt_created_signal (inventory.tests.test_all_signals.PurchasingSignalsTestCase.test_notify_receipt_created_signal)
+Test receipt creation notification
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 296, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_handle_order_status_change_signal (inventory.tests.test_all_signals.SalesSignalsTestCase.test_handle_order_status_change_signal)
+Test order status change handling
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 191, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_order_created_signal (inventory.tests.test_all_signals.SalesSignalsTestCase.test_notify_order_created_signal)
+Test order creation notification
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 191, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_order_cancellation_restores_stock (inventory.tests.test_all_signals.SalesSignalsTestCase.test_order_cancellation_restores_stock)
+Test that cancelling order restores stock
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 191, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_handle_transfer_validation_signal (inventory.tests.test_all_signals.StockSignalsTestCase.test_handle_transfer_validation_signal)
+Test transfer validation
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 355, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+======================================================================
+ERROR: test_notify_transfer_completed_signal (inventory.tests.test_all_signals.StockSignalsTestCase.test_notify_transfer_completed_signal)
+Test transfer completion notification
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\inventory\tests\test_all_signals.py", line 355, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword arguments: 'retail_selling_price'
+
+----------------------------------------------------------------------
+Ran 18 tests in 27.459s
+
+FAILED (errors=18)
+Destroying test database for alias 'default'...
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.ObjectInUse: ERREUR:  la base de données « test_  » est en cours d'utilisation par d'autres utilisateurs
+DETAIL:  1 autre session utilise la base de données.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\manage.py", line 22, in <module>
+    main()
+  File "C:\Users\codeshester0011\Desktop\GestionSTOCK\PGStock\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\commands\test.py", line 24, in run_from_argv
+    super().run_from_argv(argv)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\base.py", line 413, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\base.py", line 459, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\core\management\commands\test.py", line 63, in handle
+    failures = test_runner.run_tests(test_labels)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\test\runner.py", line 1080, in run_tests
+    self.teardown_databases(old_config)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\test\runner.py", line 1008, in teardown_databases
+    _teardown_databases(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\test\utils.py", line 369, in teardown_databases
+    connection.creation.destroy_test_db(old_name, verbosity, keepdb)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\base\creation.py", line 311, in destroy_test_db
+    self._destroy_test_db(test_database_name, verbosity)
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\postgresql\creation.py", line 91, in _destroy_test_db
+    return super()._destroy_test_db(test_database_name, verbosity)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\base\creation.py", line 327, in _destroy_test_db
+    cursor.execute(
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\db\backends\utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: ERREUR:  la base de données « test_  » est en cours d'utilisation par d'autres utilisateurs
+DETAIL:  1 autre session utilise la base de données.
+

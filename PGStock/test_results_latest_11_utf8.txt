@@ -1,0 +1,87 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+--settings=PGStock.test_settings 
+--noinput > test_r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecif 
+   ied: (Creating test d...as 'default  
+  '...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCom 
+   mandError
+ 
+
+Found 151 test(s).
+System check identified no issues (0 silenced).
+........................................
+................C:\Users\codeshester0011
+\AppData\Local\Programs\Python\Python312
+\Lib\site-packages\django\db\models\fiel
+ds\__init__.py:1665: RuntimeWarning: 
+DateTimeField Notification.created_at 
+received a naive datetime (2025-10-17 
+06:49:09.531165) while time zone 
+support is active.
+  warnings.warn(
+C:\Users\codeshester0011\AppData\Local\P
+rograms\Python\Python312\Lib\site-packag
+es\django\db\models\fields\__init__.py:1
+665: RuntimeWarning: DateTimeField 
+Notification.created_at received a 
+naive datetime (2025-10-27 
+06:49:09.540877) while time zone 
+support is active.
+  warnings.warn(
+DEBUG: StockMovement return: adding 10 to Test POS Sales
+DEBUG: StockMovement return: adding 10 to Test POS Ord
+DEBUG: StockMovement return: adding 10 to Test POS Ord
+DEBUG: StockMovement return: adding 10 to Test POS Ord
+DEBUG: StockMovement return: adding 5 to Magasin de Test Unique
+DEBUG: StockMovement return: adding 10 to Test Store Adv
+DEBUG: StockMovement return: adding 2 to Shop Central
+DEBUG: Catching exception in handler: ValidationError
+DEBUG: deduct_stock skipped (already deducted) for INV-2026-00001
+DEBUG: restore_stock starting for INV-2026-00001
+DEBUG: calling process_return for Produit Test Inv, quantity 5
+DEBUG: StockMovement return: adding 5 to Magasin Facture
+DEBUG: deduct_stock skipped (already deducted) for INV-2026-00001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: StockMovement return: adding 5 to POS 1
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Stock already deducted for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order GROS-2026-000001
+........................................
+........................F...............
+...............
+========================================
+==============================
+FAIL: 
+test_cancel_invoice_restores_stock (inve
+ntory.tests_services.InvoiceServiceTest.
+test_cancel_invoice_restores_stock)
+Test that cancelling an invoice 
+restores stock
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 248, in 
+test_cancel_invoice_restores_stock
+    
+self.assertEqual(inventory.quantity, 
+Decimal('100'))
+AssertionError: 95 != Decimal('100')
+
+----------------------------------------
+------------------------------
+Ran 151 tests in 3.804s
+
+FAILED (failures=1)
+Destroying test database for alias 
+'default'...
+

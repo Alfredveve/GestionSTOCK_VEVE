@@ -1,0 +1,49 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test inventory.tests_services.In
+voiceServiceTest.test_ca ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C 
+   reating test d...as 'default'...:String) [  
+  ], RemoteException
+    + FullyQualifiedErrorId : NativeCommandErr 
+   or
+ 
+
+Found 1 test(s).
+System check identified no issues (0 silenced).
+F
+===============================================
+=======================
+FAIL: test_cancel_invoice_restores_stock (inven
+tory.tests_services.InvoiceServiceTest.test_can
+cel_invoice_restores_stock)
+Test that cancelling an invoice restores stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 248, in test_cancel_invoice_restores_stock
+    self.assertEqual(inventory.quantity, 
+Decimal('100'))
+AssertionError: 95 != Decimal('100')
+
+-----------------------------------------------
+-----------------------
+Ran 1 test in 0.055s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'...
+
+DEBUG: Invoice.deduct_stock called for INV-2026-00001, stock_deducted=False
+DEBUG: Invoice.deduct_stock called for INV-2026-00001, stock_deducted=False
+DEBUG: StockMovement exit: removing 5 from Magasin Facture
+DEBUG: deduct_stock skipped (already deducted) for INV-2026-00001
+DEBUG: restore_stock starting for INV-2026-00001
+DEBUG: calling process_return for Produit Test Inv, quantity 5
+DEBUG: StockMovement return: adding 5 to Magasin Facture
+DEBUG: Invoice.deduct_stock called for INV-2026-00001, stock_deducted=False
+DEBUG: StockMovement exit: removing 5 from Magasin Facture

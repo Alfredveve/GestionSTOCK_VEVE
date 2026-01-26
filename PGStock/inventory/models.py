@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from decimal import Decimal
@@ -139,6 +139,12 @@ class Product(models.Model):
         verbose_name="Prix de vente (Gros)"
     )
     # ------------------------------------
+    reorder_level = models.IntegerField(
+        default=5, 
+        validators=[MinValueValidator(0)],
+        verbose_name="Seuil de réapprovisionnement",
+        help_text="Le stock est considéré comme faible en dessous de ce seuil"
+    )
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="Image")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
@@ -232,7 +238,7 @@ class Product(models.Model):
 
     def get_inventory(self):
         """
-        OBSOLÈTE: Méthode conservée pour compatibilité mais dépréciée.
+        OBSOLÃˆTE: Méthode conservée pour compatibilité mais dépréciée.
         Retourne le premier inventaire trouvé ou None.
         Pour le multi-magasin, utilisez inventory_set.all() ou get_total_stock_quantity().
         """
@@ -242,14 +248,9 @@ class Product(models.Model):
         """Retourne le statut du stock global"""
         total_quantity = self.get_total_stock_quantity()
         
-        # On prend le seuil de réapprovisionnement du premier inventaire trouvé comme référence
-        # ou une valeur par défaut si aucun inventaire n'existe
-        first_inventory = self.inventory_set.first()
-        reorder_level = first_inventory.reorder_level if first_inventory else 10
-        
         if total_quantity == 0:
             return 'out_of_stock'
-        elif total_quantity <= reorder_level:
+        elif total_quantity <= self.reorder_level:
             return 'low_stock'
         else:
             return 'in_stock'
@@ -286,6 +287,7 @@ class PointOfSale(models.Model):
         blank=True,
         verbose_name="Responsable"
     )
+    manager_name = models.CharField(max_length=200, blank=True, verbose_name="Nom du Gérant (Texte)")
     is_active = models.BooleanField(default=True, verbose_name="Actif")
     is_warehouse = models.BooleanField(
         default=False, 
@@ -335,7 +337,7 @@ class Inventory(models.Model):
         verbose_name="Seuil de réapprovisionnement"
     )
     location = models.CharField(max_length=100, blank=True, verbose_name="Emplacement")
-    last_updated = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
+    last_updated = models.DateTimeField(auto_now=True, verbose_name="Dernière mise Ã  jour")
 
     class Meta:
         verbose_name = "Inventaire"
@@ -463,7 +465,7 @@ class StockMovement(models.Model):
 
     def __str__(self):
         if self.movement_type == 'transfer' and self.to_point_of_sale:
-            return f"Transfert: {self.product.name} ({self.quantity}) - {self.from_point_of_sale.code} → {self.to_point_of_sale.code}"
+            return f"Transfert: {self.product.name} ({self.quantity}) - {self.from_point_of_sale.code} â†’ {self.to_point_of_sale.code}"
         return f"{self.get_movement_type_display()} - {self.product.name} ({self.quantity}) @ {self.from_point_of_sale.code}"
     
     def clean(self):
@@ -490,7 +492,7 @@ class StockMovement(models.Model):
                     point_of_sale=self.from_point_of_sale
                 )
                 
-                # Gérer le cas où quantity ou reorder_level pourrait être None
+                # Gérer le cas oÃ¹ quantity ou reorder_level pourrait être None
                 current_quantity = inventory.quantity if inventory.quantity is not None else 0
                 min_quantity = inventory.reorder_level if inventory.reorder_level is not None else 0
                 
@@ -509,20 +511,20 @@ class StockMovement(models.Model):
                         return f"{qty} Unité(s)"
 
                     raise ValidationError(
-                        f"❌ Opération refusée au {self.from_point_of_sale.code}: "
-                        f"Cette sortie ramènerait le stock à {format_qty(stock_after_movement, self.product)}, "
+                        f"âŒ Opération refusée au {self.from_point_of_sale.code}: "
+                        f"Cette sortie ramènerait le stock Ã  {format_qty(stock_after_movement, self.product)}, "
                         f"en dessous du stock minimum requis de {format_qty(min_quantity, self.product)}. "
                         f"Stock actuel : {format_qty(current_quantity, self.product)}. "
-                        f"Quantité maximum autorisée à sortir : {format_qty(max(0, current_quantity - min_quantity), self.product)}."
+                        f"Quantité maximum autorisée Ã  sortir : {format_qty(max(0, current_quantity - min_quantity), self.product)}."
                     )
             except Inventory.DoesNotExist:
                 raise ValidationError(
-                    f"❌ Impossible de faire une sortie : aucun inventaire existant pour "
+                    f"âŒ Impossible de faire une sortie : aucun inventaire existant pour "
                     f"le produit '{self.product.name}' au point de vente '{self.from_point_of_sale.code}'."
                 )
 
     def save(self, *args, **kwargs):
-        """Mise à jour automatique de l'inventaire multi-points de vente"""
+        """Mise Ã  jour automatique de l'inventaire multi-points de vente"""
         # Valider avant de sauvegarder
         if not kwargs.pop('skip_validation', False):
             self.clean()
@@ -536,7 +538,7 @@ class StockMovement(models.Model):
             # Sauf si on passe un flag spécial (pour les admins/devs si besoin urgent)
             if not kwargs.pop('force_update', False):
                 from django.core.exceptions import ValidationError
-                raise ValidationError("Les mouvements de stock ne peuvent pas être modifiés une fois créés. Créez un mouvement de correction à la place.")
+                raise ValidationError("Les mouvements de stock ne peuvent pas être modifiés une fois créés. Créez un mouvement de correction Ã  la place.")
         
         # Force is_wholesale=True for entries as per user request
         if is_new and self.movement_type == 'entry':
@@ -545,7 +547,7 @@ class StockMovement(models.Model):
         super().save(*args, **kwargs)
         
         if is_new:
-            # Mise à jour de l'inventaire au point de vente source
+            # Mise Ã  jour de l'inventaire au point de vente source
             inventory_from, created = Inventory.objects.get_or_create(
                 product=self.product,
                 point_of_sale=self.from_point_of_sale,
@@ -598,7 +600,7 @@ class StockMovement(models.Model):
     def delete(self, *args, **kwargs):
         from django.core.exceptions import ValidationError
         if not kwargs.pop('force_delete', False):
-            raise ValidationError("Les mouvements de stock ne peuvent pas être supprimés. Créez un mouvement de correction à la place.")
+            raise ValidationError("Les mouvements de stock ne peuvent pas être supprimés. Créez un mouvement de correction Ã  la place.")
         super().delete(*args, **kwargs)
 
 
@@ -625,7 +627,7 @@ class Invoice(models.Model):
         null=True,
         blank=True,
         verbose_name="Point de vente",
-        help_text="Point de vente d'où provient cette facture"
+        help_text="Point de vente d'oÃ¹ provient cette facture"
     )
     date_issued = models.DateField(verbose_name="Date d'émission")
     date_due = models.DateField(verbose_name="Date d'échéance")
@@ -640,7 +642,7 @@ class Invoice(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
-    stock_deducted = models.BooleanField(default=False, verbose_name="Stock déduit", help_text="Indique si le stock a déjà été déduit pour cette facture")
+    stock_deducted = models.BooleanField(default=False, verbose_name="Stock déduit", help_text="Indique si le stock a déjÃ  été déduit pour cette facture")
     apply_tax = models.BooleanField(default=True, verbose_name="Appliquer TVA")
 
     class Meta:
@@ -651,22 +653,42 @@ class Invoice(models.Model):
     def __str__(self):
         return f"Facture {self.invoice_number} - {self.client.name}"
 
+    def save(self, *args, **kwargs):
+        # Génération automatique du numéro de facture
+        if not self.invoice_number:
+            self.invoice_number = self.generate_invoice_number()
+            
+        super().save(*args, **kwargs)
+        
+        # Déduction automatique du stock si la facture est validée (payée ou envoyée)
+        # et que le stock n'a pas encore été déduit.
+        # Skip this if we're doing a partial update with update_fields
+        if 'update_fields' not in kwargs:
+            if self.status in ['paid', 'sent'] and not self.stock_deducted and self.point_of_sale:
+                try:
+                    self.deduct_stock()
+                except Exception:
+                    # On ne bloque pas la sauvegarde si la déduction échoue ici
+                    # (déjà géré par les logs ou d'autres mécanismes)
+                    pass
+
+
     def calculate_totals(self):
         """Calcule les totaux de la facture"""
         from decimal import Decimal, ROUND_HALF_UP
         items = self.invoiceitem_set.all()
-        # Calculer le sous-total et quantifier à 2 décimales
+        # Calculer le sous-total et quantifier Ã  2 décimales
         self.subtotal = sum(item.get_total() for item in items)
         self.subtotal = Decimal(str(self.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
-        # Calculer la TVA et quantifier à 2 décimales si applicable
+        # Calculer la TVA et quantifier Ã  2 décimales si applicable
         if self.apply_tax:
             tax_rate_decimal = Decimal(str(self.tax_rate))
             self.tax_amount = (self.subtotal * (tax_rate_decimal / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         else:
             self.tax_amount = Decimal('0.00')
             
-        # Calculer le total et quantifier à 2 décimales
+        # Calculer le total et quantifier Ã  2 décimales
         self.total_amount = (self.subtotal + self.tax_amount - self.discount_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         # Calculer le bénéfice total (Somme des marges des lignes - remise globale)
@@ -697,12 +719,12 @@ class Invoice(models.Model):
         from decimal import ROUND_HALF_UP
         total = self.payment_set.aggregate(total=Sum('amount'))['total']
         if total:
-            # Quantifier à 2 décimales pour éviter les erreurs d'arrondi
+            # Quantifier Ã  2 décimales pour éviter les erreurs d'arrondi
             return Decimal(str(total)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         return Decimal('0.00')
 
     def get_remaining_amount(self):
-        """Retourne le solde à payer (Decimal)"""
+        """Retourne le solde Ã  payer (Decimal)"""
         from decimal import ROUND_HALF_UP
         
         # Si la facture est marquée comme payée, le solde est 0
@@ -710,15 +732,15 @@ class Invoice(models.Model):
             return Decimal('0.00')
             
         balance = self.total_amount - self.get_amount_paid()
-        # Quantifier à 2 décimales
+        # Quantifier Ã  2 décimales
         balance = Decimal(str(balance)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        # Si le solde est très proche de zéro (erreur d'arrondi), le mettre à zéro
+        # Si le solde est très proche de zéro (erreur d'arrondi), le mettre Ã  zéro
         if abs(balance) < Decimal('0.01'):
             balance = Decimal('0.00')
         return balance
 
     def get_balance(self):
-        """Retourne le solde à payer formaté (String)"""
+        """Retourne le solde Ã  payer formaté (String)"""
         balance = self.get_remaining_amount()
         
         # Récupérer la devise depuis les paramètres
@@ -740,9 +762,9 @@ class Invoice(models.Model):
         return self.status != 'paid' and self.date_due < date.today()
 
     def update_status(self):
-        """Met à jour le statut de la facture en fonction des paiements"""
+        """Met Ã  jour le statut de la facture en fonction des paiements"""
         balance = self.get_remaining_amount()
-        # Utiliser == pour zéro exact grâce à la quantification dans get_balance
+        # Utiliser == pour zéro exact grÃ¢ce Ã  la quantification dans get_balance
         if balance == Decimal('0.00') and self.status != 'paid':
             self.status = 'paid'
             self.save()
@@ -761,13 +783,18 @@ class Invoice(models.Model):
         if self.stock_deducted:
             return
         
+        # Vérifier qu'on a des items à déduire
+        items = self.invoiceitem_set.all()
+        if not items.exists():
+            return
+
         # Vérifier qu'on a un point de vente
         if not self.point_of_sale:
             raise ValueError("Impossible de déduire le stock : aucun point de vente associé à cette facture.")
         
         # Créer un mouvement de stock pour chaque item de la facture
-        items = self.invoiceitem_set.all()
         for item in items:
+
             StockMovement.objects.create(
                 product=item.product,
                 movement_type='exit',
@@ -785,13 +812,13 @@ class Invoice(models.Model):
 
     def restore_stock(self):
         """Restaure le stock pour cette facture (appelé quand la facture est annulée)"""
-        # Si le stock n'a pas été déduit, rien à faire
+        # Si le stock n'a pas été déduit, rien Ã  faire
         if not self.stock_deducted:
             return
         
         # Vérifier qu'on a un point de vente
         if not self.point_of_sale:
-            raise ValueError("Impossible de restaurer le stock : aucun point de vente associé à cette facture.")
+            raise ValueError("Impossible de restaurer le stock : aucun point de vente associé Ã  cette facture.")
         
         # Créer un mouvement de retour pour chaque item de la facture
         items = self.invoiceitem_set.all()
@@ -803,7 +830,7 @@ class Invoice(models.Model):
                 is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Annulation Facture {self.invoice_number}",
-                notes=f"Retour automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite à annulation facture {self.invoice_number}",
+                notes=f"Retour automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite Ã  annulation facture {self.invoice_number}",
                 user=self.created_by
             )
         
@@ -836,13 +863,13 @@ class InvoiceItem(models.Model):
         from decimal import Decimal, ROUND_HALF_UP
         subtotal = self.quantity * self.unit_price
         
-        # Gérer le cas où discount est None
+        # Gérer le cas oÃ¹ discount est None
         discount_value = self.discount if self.discount is not None else Decimal('0')
         discount_decimal = Decimal(str(discount_value))
         
         discount_amount = subtotal * (discount_decimal / Decimal('100'))
         total = subtotal - discount_amount
-        # Quantifier à 2 décimales
+        # Quantifier Ã  2 décimales
         return Decimal(str(total)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
@@ -880,7 +907,7 @@ class Receipt(models.Model):
         null=True,
         blank=True,
         verbose_name="Point de vente",
-        help_text="Point de vente où les marchandises sont reçues"
+        help_text="Point de vente oÃ¹ les marchandises sont reçues"
     )
     date_received = models.DateField(verbose_name="Date de réception")
     supplier_reference = models.CharField(max_length=100, blank=True, verbose_name="Référence fournisseur")
@@ -890,8 +917,8 @@ class Receipt(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
-    stock_added = models.BooleanField(default=False, verbose_name="Stock ajouté", help_text="Indique si le stock a déjà été ajouté pour ce bon")
-    delivery_costs = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Frais de livraison", help_text="Frais de transport, douane, etc. à repartir sur le coût des produits")
+    stock_added = models.BooleanField(default=False, verbose_name="Stock ajouté", help_text="Indique si le stock a déjÃ  été ajouté pour ce bon")
+    delivery_costs = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Frais de livraison", help_text="Frais de transport, douane, etc. Ã  repartir sur le coût des produits")
 
     class Meta:
         verbose_name = "Bon de réception"
@@ -906,7 +933,7 @@ class Receipt(models.Model):
         from decimal import Decimal, ROUND_HALF_UP
         items = self.receiptitem_set.all()
         total = sum(item.get_total() for item in items)
-        # Quantifier à 2 décimales
+        # Quantifier Ã  2 décimales
         self.total_amount = Decimal(str(total)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         self.save()
 
@@ -925,7 +952,7 @@ class Receipt(models.Model):
     def distribute_delivery_costs(self):
         """
         Répartit les frais de livraison sur les articles du bon au prorata de leur valeur.
-        Met à jour le coût unitaire (unit_cost) de chaque ligne.
+        Met Ã  jour le coût unitaire (unit_cost) de chaque ligne.
         Cette méthode doit être appelée AVANT l'ajout en stock.
         """
         from decimal import Decimal, ROUND_HALF_UP
@@ -956,7 +983,7 @@ class Receipt(models.Model):
             if item.quantity > 0:
                 cost_per_unit_increase = line_share / quantity_decimal
                 
-                # Mise à jour du coût unitaire
+                # Mise Ã  jour du coût unitaire
                 # On force la conversion en string puis decimal pour éviter tout float résiduel
                 raw_new_cost = unit_cost_decimal + cost_per_unit_increase
                 item.unit_cost = Decimal(str(raw_new_cost)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
@@ -968,16 +995,16 @@ class Receipt(models.Model):
 
     def add_stock(self):
         """Ajoute le stock pour ce bon de réception (appelé quand le bon est reçu/validé)"""
-        # Éviter d'ajouter deux fois
+        # Ã‰viter d'ajouter deux fois
         if self.stock_added:
             return
         
         # Vérifier qu'on a un point de vente
         if not self.point_of_sale:
-            raise ValueError("Impossible d'ajouter le stock : aucun point de vente associé à ce bon de réception.")
+            raise ValueError("Impossible d'ajouter le stock : aucun point de vente associé Ã  ce bon de réception.")
         
         # Appliquer la répartition des frais avant d'ajouter en stock
-        # UNIQUEMENT si cela n'a pas déjà été fait (difficile à savoir, donc on le fait ici pour être sûr au moment de la validation)
+        # UNIQUEMENT si cela n'a pas déjÃ  été fait (difficile Ã  savoir, donc on le fait ici pour être sûr au moment de la validation)
         # Note: Idéalement on devrait le faire une seule fois.
         self.distribute_delivery_costs()
 
@@ -1001,13 +1028,13 @@ class Receipt(models.Model):
 
     def revert_stock(self):
         """Annule l'ajout de stock pour ce bon (appelé quand le bon est annulé/brouillon)"""
-        # Si le stock n'a pas été ajouté, rien à faire
+        # Si le stock n'a pas été ajouté, rien Ã  faire
         if not self.stock_added:
             return
         
         # Vérifier qu'on a un point de vente
         if not self.point_of_sale:
-            raise ValueError("Impossible d'annuler le stock : aucun point de vente associé à ce bon.")
+            raise ValueError("Impossible d'annuler le stock : aucun point de vente associé Ã  ce bon.")
         
         # Créer un mouvement de correction (sortie/ajustement) pour chaque item
         # On utilise 'adjustment' ou 'exit' pour retirer le stock ajouté par erreur
@@ -1020,7 +1047,7 @@ class Receipt(models.Model):
                 is_wholesale=item.is_wholesale,
                 from_point_of_sale=self.point_of_sale,
                 reference=f"Annulation Bon {self.receipt_number}",
-                notes=f"Correction automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite à annulation bon {self.receipt_number}",
+                notes=f"Correction automatique ({'Gros' if item.is_wholesale else 'Détail'}) suite Ã  annulation bon {self.receipt_number}",
                 user=self.created_by
             )
         
@@ -1049,7 +1076,7 @@ class ReceiptItem(models.Model):
         """Calcule le total de la ligne"""
         from decimal import Decimal, ROUND_HALF_UP
         total = self.quantity * self.unit_cost
-        # Quantifier à 2 décimales
+        # Quantifier Ã  2 décimales
         return Decimal(str(total)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
@@ -1087,7 +1114,7 @@ class Payment(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Mettre à jour le statut de la facture
+        # Mettre Ã  jour le statut de la facture
         self.invoice.update_status()
 
 
@@ -1123,7 +1150,7 @@ class UserProfile(models.Model):
         null=True,
         blank=True,
         verbose_name="Point de vente assigné",
-        help_text="Point de vente où travaille cet utilisateur"
+        help_text="Point de vente oÃ¹ travaille cet utilisateur"
     )
     
     class Meta:
@@ -1133,7 +1160,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Profil de {self.user.username}"
 
-# Signal pour créer/mettre à jour le profil automatiquement
+# Signal pour créer/mettre Ã  jour le profil automatiquement
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -1144,10 +1171,15 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'profile'):
+    # Only try to save if the profile exists
+    # We do not attempt to create it here to avoid conflicts with create_user_profile
+    try:
         instance.profile.save()
-    else:
-        UserProfile.objects.create(user=instance)
+    except UserProfile.DoesNotExist:
+        # If it doesn't exist and wasn't created by the other signal (e.g. legacy data),
+        # we might want to create it, but for now let's be safe.
+        # Actually, create_user_profile handles creation.
+        pass
 
 class Settings(models.Model):
     """Paramètres globaux de l'application"""
@@ -1159,7 +1191,12 @@ class Settings(models.Model):
     company_logo = models.ImageField(upload_to='company_logos/', blank=True, null=True, verbose_name="Logo de l'entreprise")
     language = models.CharField(max_length=10, choices=[('fr', 'Français'), ('en', 'English')], default='fr', verbose_name="Langue")
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='GNF', verbose_name="Devise")
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=18, verbose_name="Taux TVA (%)")
+    default_order_type = models.CharField(max_length=20, choices=[('retail', 'Détail'), ('wholesale', 'Gros')], default='retail', verbose_name="Type de vente par défaut")
     email_notifications = models.BooleanField(default=True, verbose_name="Notifications par email")
+    daily_reports = models.BooleanField(default=False, verbose_name="Rapports journaliers")
+    new_customer_notifications = models.BooleanField(default=False, verbose_name="Notifications nouveaux clients")
+    smart_rounding = models.BooleanField(default=False, verbose_name="Arrondi intelligent")
     
     class Meta:
         verbose_name = "Paramètres"
@@ -1218,12 +1255,12 @@ class Quote(models.Model):
         """Calcule les totaux du devis"""
         from decimal import Decimal, ROUND_HALF_UP
         items = self.quoteitem_set.all()
-        # Calculer le sous-total et quantifier à 2 décimales
+        # Calculer le sous-total et quantifier Ã  2 décimales
         self.subtotal = sum(item.get_total() for item in items)
         self.subtotal = Decimal(str(self.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         # Calculer la TVA et quantifier à 2 décimales
-        self.tax_amount = (self.subtotal * (self.tax_rate / 100)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        # Calculer le total et quantifier à 2 décimales
+        self.tax_amount = (self.subtotal * (self.tax_rate / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        # Calculer le total et quantifier Ã  2 décimales
         self.total_amount = (self.subtotal + self.tax_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         self.save()
 
@@ -1275,7 +1312,7 @@ class Quote(models.Model):
                 total=quote_item.total
             )
         
-        # Mettre à jour le statut du devis
+        # Mettre Ã  jour le statut du devis
         self.status = 'converted'
         self.save()
         
@@ -1302,10 +1339,10 @@ class QuoteItem(models.Model):
     def get_total(self):
         """Calcule le total de la ligne"""
         from decimal import Decimal, ROUND_HALF_UP
-        subtotal = self.quantity * self.unit_price
-        discount_amount = subtotal * (self.discount / 100)
+        subtotal = Decimal(str(self.quantity)) * self.unit_price
+        discount_amount = subtotal * (self.discount / Decimal('100'))
         total = subtotal - discount_amount
-        # Quantifier à 2 décimales
+        # Quantifier Ã  2 décimales
         return Decimal(str(total)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def save(self, *args, **kwargs):
@@ -1314,7 +1351,7 @@ class QuoteItem(models.Model):
 
 
 class ExpenseCategory(models.Model):
-    """Catégorie de dépense (Salaires, Loyer, Électricité/eau, Marketing, Transport, etc.)"""
+    """Catégorie de dépense (Salaires, Loyer, Ã‰lectricité/eau, Marketing, Transport, etc.)"""
     name = models.CharField(max_length=100, unique=True, verbose_name="Nom de la catégorie")
     description = models.TextField(blank=True, verbose_name="Description")
 
@@ -1377,7 +1414,7 @@ class MonthlyProfitReport(models.Model):
         return f"Profit {self.month}/{self.year} - {self.point_of_sale.name}"
 
     def calculate_totals(self):
-        """Met à jour les calculs du rapport"""
+        """Met Ã  jour les calculs du rapport"""
         # Gross Profit = Total Sales (After Item Discounts) - COGS
         # Net Interest = Gross Profit - Global Discounts - Expenses
         # Note: In our model, InvoiceItem.total already subtracts item-level discounts.
@@ -1385,5 +1422,33 @@ class MonthlyProfitReport(models.Model):
         self.gross_profit = self.total_sales_brut - self.total_discounts - self.total_cost_of_goods
         self.net_interest = self.gross_profit - self.total_expenses
         # We don't save here to avoid recursion if called from save
+
+
+
+
+class Notification(models.Model):
+    '''Notification utilisateur'''
+    NOTIFICATION_TYPES = [
+        ('info', 'Information'),
+        ('warning', 'Avertissement'),
+        ('success', 'Succès'),
+        ('error', 'Erreur'),
+    ]
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', verbose_name='Destinataire')
+    title = models.CharField(max_length=255, verbose_name='Titre')
+    message = models.TextField(verbose_name='Message')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='info', verbose_name='Type')
+    link = models.CharField(max_length=255, blank=True, verbose_name='Lien')
+    is_read = models.BooleanField(default=False, verbose_name='Lu')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Date de création')
+
+    class Meta:
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.title} - {self.recipient.username}'
 
 

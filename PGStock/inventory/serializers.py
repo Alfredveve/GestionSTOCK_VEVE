@@ -1,6 +1,16 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Category, Supplier, Product, Inventory, StockMovement
+from .models import Category, Supplier, Product, Inventory, StockMovement, Client, PointOfSale, Settings, Notification
 from django.db.models import Sum
+
+class SettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Settings
+        fields = [
+            'id', 'company_name', 'language', 'currency', 'tax_rate', 
+            'default_order_type', 'email_notifications', 'daily_reports', 
+            'new_customer_notifications', 'smart_rounding'
+        ]
 
 class CategorySerializer(serializers.ModelSerializer):
     product_count = serializers.IntegerField(source='get_product_count', read_only=True)
@@ -14,11 +24,34 @@ class SupplierSerializer(serializers.ModelSerializer):
         model = Supplier
         fields = '__all__'
 
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = '__all__'
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
+class PointOfSaleSerializer(serializers.ModelSerializer):
+    manager_username = serializers.CharField(source='manager.username', read_only=True)
+    
+    class Meta:
+        model = PointOfSale
+        fields = ['id', 'name', 'code', 'address', 'city', 'phone', 'manager', 'manager_username', 'manager_name', 'is_active', 'is_warehouse', 'created_at']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     supplier_name = serializers.CharField(source='supplier.name', read_only=True, allow_null=True)
     current_stock = serializers.IntegerField(source='get_total_stock_quantity', read_only=True)
     stock_status = serializers.CharField(source='get_stock_status', read_only=True)
+    stock_analysis = serializers.SerializerMethodField()
+    
+    def get_stock_analysis(self, obj):
+        """Retourne les données d'analyse du stock (Colis, Unités, Analyse)"""
+        return obj.get_analysis_data()
     
     class Meta:
         model = Product
@@ -29,15 +62,32 @@ class ProductSerializer(serializers.ModelSerializer):
             'purchase_price', 'selling_price', 'margin',
             'units_per_box', 'wholesale_purchase_price', 
             'wholesale_selling_price', 'wholesale_margin',
-            'image', 'current_stock', 'stock_status',
-            'created_at', 'updated_at'
+            'image', 'current_stock', 'stock_status', 'stock_analysis',
+            'reorder_level', 'created_at', 'updated_at'
         ]
+        extra_kwargs = {
+            'sku': {'required': False, 'allow_blank': True}
+        }
 
 class InventorySerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_sku = serializers.CharField(source='product.sku', read_only=True)
     pos_name = serializers.CharField(source='point_of_sale.name', read_only=True)
     status_label = serializers.CharField(source='get_status_display', read_only=True)
+    selling_price = serializers.DecimalField(source='product.selling_price', read_only=True, max_digits=12, decimal_places=2)
+    total_value = serializers.SerializerMethodField()
+    stock_analysis = serializers.SerializerMethodField()
+    
+    def get_total_value(self, obj):
+        """Calcule la valeur monétaire totale de cet inventaire (quantité * prix de vente)"""
+        try:
+            return float(obj.quantity * obj.product.selling_price)
+        except (TypeError, ValueError, AttributeError):
+            return 0.0
+        
+    def get_stock_analysis(self, obj):
+        """Retourne les données d'analyse du stock (Colis, Unités, Analyse) pour cet inventaire"""
+        return obj.get_analysis_data()
     
     class Meta:
         model = Inventory
@@ -45,7 +95,8 @@ class InventorySerializer(serializers.ModelSerializer):
             'id', 'product', 'product_name', 'product_sku',
             'point_of_sale', 'pos_name',
             'quantity', 'reorder_level', 'location', 
-            'last_updated', 'status_label'
+            'last_updated', 'status_label', 'stock_analysis',
+            'selling_price', 'total_value'
         ]
 
 class StockMovementSerializer(serializers.ModelSerializer):
@@ -78,15 +129,20 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'product', 'product_name', 'product_sku',
             'quantity', 'unit_price', 'is_wholesale',
-            'discount', 'total', 'margin'
+            'discount', 'total', 'margin', 'purchase_price'
         ]
+        read_only_fields = ['total', 'margin', 'purchase_price']
 
 class InvoiceSerializer(serializers.ModelSerializer):
-    items = InvoiceItemSerializer(source='invoiceitem_set', many=True, read_only=True)
+    items = InvoiceItemSerializer(source='invoiceitem_set', many=True, required=False)
     client_name = serializers.CharField(source='client.name', read_only=True)
     pos_name = serializers.CharField(source='point_of_sale.name', read_only=True, allow_null=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
     balance = serializers.DecimalField(source='get_remaining_amount', max_digits=20, decimal_places=2, read_only=True)
+    date_issued = serializers.DateField(required=False, allow_null=True)
+    date_due = serializers.DateField(required=False, allow_null=True)
+    payment_method = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    amount_paid = serializers.DecimalField(write_only=True, required=False, max_digits=20, decimal_places=2)
     
     class Meta:
         model = Invoice
@@ -98,8 +154,123 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'discount_amount', 'total_amount', 'total_profit',
             'balance', 'notes', 
             'created_by', 'created_by_name',
-            'created_at', 'items'
+            'created_at', 'items', 'payment_method', 'amount_paid', 'apply_tax'
         ]
+        read_only_fields = ['invoice_number', 'subtotal', 'tax_amount', 'total_amount', 'total_profit', 'created_by']
+    
+    def create(self, validated_data):
+        from datetime import date, timedelta
+        
+        # Extract items data
+        items_data = validated_data.pop('items', [])
+        # Also check for 'invoiceitem_set' which matches the error
+        if 'invoiceitem_set' in validated_data:
+             items_data = validated_data.pop('invoiceitem_set')
+        
+        payment_method = validated_data.pop('payment_method', None)
+        amount_paid = validated_data.pop('amount_paid', None)
+        
+        # Set default dates if missing
+        if 'date_issued' not in validated_data:
+            validated_data['date_issued'] = date.today()
+        if 'date_due' not in validated_data:
+            validated_data['date_due'] = date.today() + timedelta(days=30)
+            
+        # Set created_by
+        request = self.context.get('request')
+        if request and request.user:
+            validated_data['created_by'] = request.user
+            
+        # Generate invoice number if missing
+        # We don't need to create a dummy instance just to generate ID if we have the logic
+        if 'invoice_number' not in validated_data:
+             temp_instance = Invoice()
+             validated_data['invoice_number'] = temp_instance.generate_invoice_number()
+        
+        # Validation stricte du stock (Règle: Interdit si Stock <= 2)
+        point_of_sale = validated_data.get('point_of_sale')
+        
+        # Validation stricte du stock (Règle: Interdit si Stock <= 2)
+        point_of_sale = validated_data.get('point_of_sale')
+        
+        # Fallback pour récupérer le point_of_sale si non présent dans validated_data
+        if not point_of_sale and 'point_of_sale' in self.initial_data:
+            try:
+                pos_id = self.initial_data.get('point_of_sale')
+                if pos_id:
+                     point_of_sale = PointOfSale.objects.get(pk=pos_id)
+            except PointOfSale.DoesNotExist:
+                pass
+
+        if point_of_sale:
+            # Note: Inventory is already imported at the top of this file
+            if not items_data and self.initial_data.get('items'):
+                 # Si items_data est vide mais présent dans initial_data, il y a un problème de mapping
+                 # On essaie de récupérer basiquement pour la validation
+                 raw_items = self.initial_data.get('items')
+                 if isinstance(raw_items, list):
+                      for raw_item in raw_items:
+                          try:
+                               prod_id = raw_item.get('product')
+                               product = Product.objects.get(pk=prod_id)
+                               # Check logic
+                               try:
+                                    inventory = Inventory.objects.get(product=product, point_of_sale=point_of_sale)
+                                    if inventory.quantity <= 2:
+                                        raise serializers.ValidationError({
+                                            'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2, donc veuillez approvisonner le stock"
+                                        })
+                               except Inventory.DoesNotExist:
+                                    raise serializers.ValidationError({
+                                        'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2 (Stock inexistant), donc veuillez approvisonner le stock"
+                                    })
+                          except Product.DoesNotExist:
+                               pass
+            
+            for item_data in items_data:
+                product = item_data.get('product')
+                try:
+                    inventory = Inventory.objects.get(product=product, point_of_sale=point_of_sale)
+                    if inventory.quantity <= 2:
+                        raise serializers.ValidationError({
+                            'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2, donc veuillez approvisonner le stock"
+                        })
+                except Inventory.DoesNotExist:
+                     raise serializers.ValidationError({
+                        'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2 (Stock inexistant), donc veuillez approvisonner le stock"
+                    })
+
+        # Create the invoice
+        invoice = Invoice.objects.create(**validated_data)
+        
+        # Create items
+        for item_data in items_data:
+            # Let the model handle calculations (total, purchase_price, margin)
+            # as it already correctly handles Decimal conversion and logic.
+            InvoiceItem.objects.create(
+                invoice=invoice,
+                **item_data
+            )
+            
+        # Recalculate totals
+        invoice.calculate_totals()
+        
+        # Handle payment if provided
+        if payment_method and amount_paid is not None:
+            Payment.objects.create(
+                invoice=invoice,
+                amount=amount_paid,
+                payment_date=date.today(),
+                payment_method=payment_method,
+                reference=f"POS - {invoice.invoice_number}",
+                notes="Paiement enregistré depuis le POS",
+                created_by=invoice.created_by
+            )
+            
+            # Update status based on balance
+            invoice.update_status()
+            
+        return invoice
 
 class ReceiptItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
@@ -163,15 +334,19 @@ class MonthlyProfitReportSerializer(serializers.ModelSerializer):
 
 class QuoteItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
+    product_sku = serializers.CharField(source='product.sku', read_only=True)
     
     class Meta:
         model = QuoteItem
-        fields = ['id', 'product', 'product_name', 'quantity', 'unit_price', 'is_wholesale', 'discount', 'total']
+        fields = ['id', 'product', 'product_name', 'product_sku', 'quantity', 'unit_price', 'is_wholesale', 'discount', 'total']
+        read_only_fields = ['total']
 
 class QuoteSerializer(serializers.ModelSerializer):
-    items = QuoteItemSerializer(source='quoteitem_set', many=True, read_only=True)
+    items = QuoteItemSerializer(source='quoteitem_set', many=True, required=False)
     client_name = serializers.CharField(source='client.name', read_only=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    date_issued = serializers.DateField(required=False, allow_null=True)
+    valid_until = serializers.DateField(required=False, allow_null=True)
     
     class Meta:
         model = Quote
@@ -182,4 +357,63 @@ class QuoteSerializer(serializers.ModelSerializer):
             'notes', 'created_by', 'created_by_name',
             'created_at', 'items'
         ]
+        read_only_fields = ['quote_number', 'subtotal', 'tax_amount', 'total_amount', 'created_by']
 
+    def create(self, validated_data):
+        from .models import QuoteItem
+        from datetime import date
+        
+        items_data = validated_data.pop('quoteitem_set', [])
+        
+        # Set default dates if missing or null
+        if not validated_data.get('date_issued'):
+            validated_data['date_issued'] = date.today()
+            
+        if not validated_data.get('valid_until'):
+            from datetime import timedelta
+            validated_data['valid_until'] = date.today() + timedelta(days=30)
+            
+        # Set created_by
+        request = self.context.get('request')
+        if request and request.user:
+            validated_data['created_by'] = request.user
+            
+        # Generate quote number
+        temp_instance = Quote()
+        validated_data['quote_number'] = temp_instance.generate_quote_number()
+        
+        quote = Quote.objects.create(**validated_data)
+        
+        for item_data in items_data:
+            QuoteItem.objects.create(quote=quote, **item_data)
+            
+        quote.calculate_totals()
+        return quote
+
+    def update(self, instance, validated_data):
+        from .models import QuoteItem
+        
+        items_data = validated_data.pop('quoteitem_set', None)
+        
+        # Update basic fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        # Update items if provided
+        if items_data is not None:
+            # Simple approach: delete existing and recreateto ensure consistency
+            instance.quoteitem_set.all().delete()
+            for item_data in items_data:
+                QuoteItem.objects.create(quote=instance, **item_data)
+            
+            instance.calculate_totals()
+            
+        return instance
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'recipient', 'title', 'message', 'notification_type', 'link', 'is_read', 'created_at']
+        read_only_fields = ['created_at']

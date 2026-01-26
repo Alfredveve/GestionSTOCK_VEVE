@@ -25,16 +25,17 @@ class StockServiceTest(TestCase):
     
     def setUp(self):
         """Set up test data"""
-        self.user = User.objects.create_user(username='testuser', password='12345')
-        self.category = Category.objects.create(name='Test Category')
+        self.user = User.objects.create_user(username='testuser_stock', password='12345')
+        self.category = Category.objects.create(name='Test Category Stock')
         self.pos = PointOfSale.objects.create(
-            name='Magasin Principal',
-            code='MAG01',
-            address='123 Rue Test'
+            name='Magasin Stock',
+            code='MAG_STOCK',
+            address='123 Rue Test',
+            manager_name='Manager Test'
         )
         self.product = Product.objects.create(
-            name='Produit Test',
-            sku='TEST001',
+            name='Produit Test Stock',
+            sku='TEST_STOCK',
             category=self.category,
             purchase_price=Decimal('100.00'),
             selling_price=Decimal('150.00')
@@ -72,9 +73,10 @@ class StockServiceTest(TestCase):
         """Test stock transfer between points of sale"""
         # Create second POS
         pos2 = PointOfSale.objects.create(
-            name='Magasin 2',
-            code='MAG02',
-            address='456 Rue Test'
+            name='Magasin 2 Stock',
+            code='MAG02_STOCK',
+            address='456 Rue Test',
+            manager_name='Manager Test'
         )
         
         # Add stock to first POS
@@ -135,20 +137,21 @@ class InvoiceServiceTest(TestCase):
     
     def setUp(self):
         """Set up test data"""
-        self.user = User.objects.create_user(username='testuser', password='12345')
-        self.category = Category.objects.create(name='Test Category')
+        self.user = User.objects.create_user(username='testuser_inv', password='12345')
+        self.category = Category.objects.create(name='Test Category Inv')
         self.pos = PointOfSale.objects.create(
-            name='Magasin Principal',
-            code='MAG01',
-            address='123 Rue Test'
+            name='Magasin Facture',
+            code='MAG_INV',
+            address='123 Rue Test',
+            manager_name='Manager Test'
         )
         self.client = Client.objects.create(
-            name='Client Test',
-            email='client@test.com'
+            name='Client Test Inv',
+            email='client@testinv.com'
         )
         self.product = Product.objects.create(
-            name='Produit Test',
-            sku='TEST001',
+            name='Produit Test Inv',
+            sku='TEST_INV',
             category=self.category,
             purchase_price=Decimal('100.00'),
             selling_price=Decimal('150.00')
@@ -252,26 +255,49 @@ class PaymentServiceTest(TestCase):
     
     def setUp(self):
         """Set up test data"""
-        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.user = User.objects.create_user(username='testuser_pay', password='12345')
         self.pos = PointOfSale.objects.create(
-            name='Magasin Principal',
-            code='MAG01',
-            address='123 Rue Test'
+            name='Magasin Paiement',
+            code='MAG_PAY',
+            address='123 Rue Test',
+            manager_name='Manager Test'
         )
         self.client = Client.objects.create(
-            name='Client Test',
-            email='client@test.com'
+            name='Client Test Pay',
+            email='client@testpay.com'
         )
         
         # Create an invoice
+        from datetime import date
+        from inventory.models import Category
+        self.invoice_category = Category.objects.create(name='Payment Category')
         self.invoice = Invoice.objects.create(
             client=self.client,
             point_of_sale=self.pos,
             created_by=self.user,
-            invoice_number='INV-001',
+            invoice_number='INV-PAY-001',
+            date_issued=date.today(),
+            date_due=date.today(),
             subtotal=Decimal('1000.00'),
             total_amount=Decimal('1000.00'),
             status='sent'
+        )
+        
+        # Add an item to allow payments
+        from inventory.models import InvoiceItem, Product
+        self.invoice_product = Product.objects.create(
+            name='Product for Payment',
+            sku='PAY001',
+            category=self.invoice_category,
+            purchase_price=Decimal('500.00'),
+            selling_price=Decimal('1000.00')
+        )
+        InvoiceItem.objects.create(
+            invoice=self.invoice,
+            product=self.invoice_product,
+            quantity=1,
+            unit_price=Decimal('1000.00'),
+            total=Decimal('1000.00')
         )
         
         self.payment_service = PaymentService()
@@ -333,7 +359,3 @@ class PaymentServiceTest(TestCase):
         self.assertEqual(summary['payment_count'], 1)
         self.assertTrue(summary['is_partially_paid'])
         self.assertFalse(summary['is_fully_paid'])
-
-
-# Run tests with:
-# python manage.py test inventory.tests_services

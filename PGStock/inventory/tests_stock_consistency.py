@@ -6,23 +6,23 @@ from .models import Category, Product, PointOfSale, Inventory, StockMovement
 class StockConsistencyTests(TestCase):
     def setUp(self):
         # Create User
-        self.user = User.objects.create_user(username='testadmin', password='password')
+        self.user = User.objects.create_user(username='testadmin_cons', password='password')
         
         # Create Basic Setup
-        self.category = Category.objects.create(name="Electronics")
+        self.category = Category.objects.create(name="Electronics Cons")
         self.product = Product.objects.create(
-            name="iPhone 15",
-            sku="IPH-15",
+            name="iPhone 15 Cons",
+            sku="IPH-15-CONS",
             category=self.category,
-            unit_price=Decimal('1000.00')
+            selling_price=Decimal('1000.00'),
+            purchase_price=Decimal('800.00')
         )
         
         # Create Points of Sale
-        # Use unique codes to avoid conflicts with potential initial data
-        self.pos_main = PointOfSale.objects.create(name="Test Main Store", code="TEST_MAIN")
-        self.pos_warehouse = PointOfSale.objects.create(name="Test Warehouse", code="TEST_WH")
+        self.pos_main = PointOfSale.objects.create(name="Store Main Cons", code="CONS_MAIN", manager_name="Manager Main")
+        self.pos_warehouse = PointOfSale.objects.create(name="Store WH Cons", code="CONS_WH", manager_name="Manager WH")
         
-        # Initialize Inventory (0 stock initially, reorder level 0 to allow low stock tests)
+        # Initialize Inventory
         self.inv_main = Inventory.objects.create(product=self.product, point_of_sale=self.pos_main, quantity=0, reorder_level=0)
         self.inv_wh = Inventory.objects.create(product=self.product, point_of_sale=self.pos_warehouse, quantity=0, reorder_level=0)
 

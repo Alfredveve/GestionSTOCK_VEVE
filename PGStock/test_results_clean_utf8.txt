@@ -1,0 +1,50 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+--settings=PGStock.test_settings --noinput > 
+test_r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C 
+   reating test d...as 'default'...:String) [  
+  ], RemoteException
+    + FullyQualifiedErrorId : NativeCommandErr 
+   or
+ 
+
+Found 151 test(s).
+System check identified no issues (0 silenced).
+...............................................
+.........C:\Users\codeshester0011\AppData\Local
+\Programs\Python\Python312\Lib\site-packages\dj
+ango\db\models\fields\__init__.py:1665: 
+RuntimeWarning: DateTimeField 
+Notification.created_at received a naive 
+datetime (2025-10-17 07:01:03.167464) while 
+time zone support is active.
+  warnings.warn(
+C:\Users\codeshester0011\AppData\Local\Programs
+\Python\Python312\Lib\site-packages\django\db\m
+odels\fields\__init__.py:1665: RuntimeWarning: 
+DateTimeField Notification.created_at received 
+a naive datetime (2025-10-27 07:01:03.168972) 
+while time zone support is active.
+  warnings.warn(
+DEBUG: Catching exception in handler: ValidationError
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Stock already deducted for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order GROS-2026-000001
+...............................................
+...............................................
+.
+-----------------------------------------------
+-----------------------
+Ran 151 tests in 2.824s
+
+OK
+Destroying test database for alias 'default'...
+

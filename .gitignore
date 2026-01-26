@@ -1,8 +1,9 @@
 # Python
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
-__pycache__/
+.Python
 *.pyc
 
 # Django
@@ -10,41 +11,81 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media
-/staticfiles
-/static
+PGStock/media/
+PGStock/staticfiles/
+PGStock/static/
+sent_emails/
 
-# Environnement virtuel
+# Virtual Environments
 venv/
 vert/
 env/
 ENV/
-env.bak/
-venv.bak/
+*.bak/
+*.old/
 
-# Fichiers sensibles - NE JAMAIS COMMITER
+# Environment variables
 .env
 .env.local
 .env.*.local
 *.env
+frontend/.env
+frontend/.env.local
 
-# IDE
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+frontend/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE / Editors
 .vscode/
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 
-# Base de données
-*.sqlite3
+# System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary / Backup files
+*.tmp
+*.bak
+*.old
+*.new_backup
+junk_files.txt
+vert/
+
+# Database (backup & extractions)
 *.db
+*.sqlite3
+PGStock/*.backup_*
+PGStock/db.sqlite3.backup*
+PGStock/*_log.txt
+PGStock/*_output.txt
+PGStock/db_extraction*.txt
+PGStock/error_log*.txt
+PGStock/result_log*.txt
+PGStock/traceback_output*.txt
+PGStock/simulation*.txt
 
-# Fichiers de migration (optionnel - décommenter si nécessaire)
-# */migrations/*.py
-# !*/migrations/__init__.py
-
-# Fichiers de couverture de tests
+# Testing / Coverage
 htmlcov/
 .tox/
 .coverage
@@ -55,70 +96,9 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+frontend/coverage/
 
-# Fichiers de build
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-# lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Fichiers système Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Fichiers temporaires
-*.tmp
-*.bak
-*.swp
-*~.nib
-
-# Dossier pour stocker les e-mails de test (généré en dev si EMAIL_FILE_BASED activé)
-sent_emails/
-
-# Scripts de debug et utilitaires temporaires
-PGStock/check_db_connection.py
-PGStock/check_db_info.py
-PGStock/clean_env.py
-PGStock/create_admin.py
-PGStock/debug_conversion.py
-PGStock/debug_reportlab.py
-PGStock/extract_db.py
-PGStock/extract_invoices.py
-PGStock/find_duplicates.py
-PGStock/list_data.py
-PGStock/reproduce_issue.py
-PGStock/simulate_fresh.py
-PGStock/simulate_q1.py
-PGStock/verify_search.py
-
-# Fichiers de logs, extractions et outputs temporaires
-PGStock/*_log.txt
-PGStock/*_output.txt
-PGStock/db_extraction*.txt
-PGStock/error_log*.txt
-PGStock/result_log*.txt
-PGStock/traceback_output*.txt
-PGStock/simulation*.txt
-
-# Backups de base de données
-PGStock/*.backup_*
-PGStock/db.sqlite3.backup*
+# OS X
+.DS_Store
+.AppleDouble
+.LSOverride

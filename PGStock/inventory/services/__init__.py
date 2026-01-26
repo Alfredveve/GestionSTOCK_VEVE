@@ -14,6 +14,12 @@ from .invoice_service import InvoiceService
 from .receipt_service import ReceiptService
 from .payment_service import PaymentService
 from .finance_service import FinanceService
+from .order_service import OrderService
+from .quote_service import QuoteService
+from .notification_service import NotificationService
+from .report_service import ReportService
+from .analytics_service import AnalyticsService
+from .export_service import ExportService
 
 __all__ = [
     'StockService',
@@ -21,5 +27,11 @@ __all__ = [
     'ReceiptService',
     'PaymentService',
     'FinanceService',
+    'OrderService',
+    'QuoteService',
+    'NotificationService',
+    'ReportService',
+    'AnalyticsService',
+    'ExportService',
 ]
 

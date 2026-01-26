@@ -1,0 +1,13 @@
+--- Inspecting GinWisky ---
+
+Product: GinWisky (SKU: ALC-0004)
+Units per box: 12
+Selling Price: 16000.00
+
+Inventory per POS:
+- POS: GOMBOYAH MOSQUEE (G0M_001) | Quantity: 12
+
+Stock Movements (Last 10):
+- 2025-12-24 17:57:51.047051+00:00: Type=entry, Qty=12, Notes=''
+
+Receipt Items (Purchases):

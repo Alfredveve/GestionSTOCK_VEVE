@@ -1,0 +1,2052 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+--settings=PGStock.test_settings 
+--noinput > test_r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecif 
+   ied: (Creating test d...as 'default  
+  '...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCom 
+   mandError
+ 
+
+Found 151 test(s).
+System check identified no issues (0 silenced).
+........................................
+................C:\Users\codeshester0011
+\AppData\Local\Programs\Python\Python312
+\Lib\site-packages\django\db\models\fiel
+ds\__init__.py:1665: RuntimeWarning: 
+DateTimeField Notification.created_at 
+received a naive datetime (2025-10-17 
+06:37:59.772673) while time zone 
+support is active.
+  warnings.warn(
+C:\Users\codeshester0011\AppData\Local\P
+rograms\Python\Python312\Lib\site-packag
+es\django\db\models\fields\__init__.py:1
+665: RuntimeWarning: DateTimeField 
+Notification.created_at received a 
+naive datetime (2025-10-27 
+06:37:59.774649) while time zone 
+support is active.
+  warnings.warn(
+........................................
+..F..................Unhandled 
+exception: ValidationError - ['Ô\x9dî 
+OpÚration refusÚe au WH-001: Cette 
+sortie ramÞnerait le stock ├\xa0 -50 
+UnitÚ(s), en dessous du stock minimum 
+requis de 10 UnitÚ(s). Stock actuel : 
+100 UnitÚ(s). QuantitÚ maximum 
+autorisÚe ├\xa0 sortir : 90 UnitÚ(s).']
+DEBUG: Catching exception in handler: ValidationError
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Stock already deducted for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order GROS-2026-000001
+E..EEEEEEEEEEEEEEEE...............
+========================================
+==============================
+ERROR: test_transfer_insufficient_stock 
+(inventory.tests_replenishment.Replenish
+mentAPITests.test_transfer_insufficient_
+stock)
+Test that transfer fails if source has 
+insufficient stock
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_re
+plenishment.py", line 105, in 
+test_transfer_insufficient_stock
+    response = 
+self.client.post('/api/v1/movements/', {
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\test.py", 
+line 299, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\test.py", 
+line 213, in post
+    return self.generic('POST', path, 
+data, content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\test.py", 
+line 237, in generic
+    return super().generic(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\test\client.py", line 
+676, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\test.py", 
+line 289, in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\test.py", 
+line 241, in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\test\client.py", line 
+1092, in request
+    self.check_exception(response)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\test\client.py", line 
+805, in check_exception
+    raise exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\core\handlers\exceptio
+n.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\core\handlers\base.py"
+, line 197, in _get_response
+    response = 
+wrapped_callback(request, 
+*callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\views\decorators\csrf.
+py", line 65, in _view_wrapper
+    return view_func(request, *args, 
+**kwargs)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\viewsets.py", 
+line 125, in view
+    return self.dispatch(request, 
+*args, **kwargs)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\views.py", 
+line 515, in dispatch
+    response = 
+self.handle_exception(exc)
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\views.py", 
+line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\views.py", 
+line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\views.py", 
+line 512, in dispatch
+    response = handler(request, *args, 
+**kwargs)
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\mixins.py", 
+line 19, in create
+    self.perform_create(serializer)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\mixins.py", 
+line 24, in perform_create
+    serializer.save()
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\serializers.py
+", line 210, in save
+    self.instance = 
+self.create(validated_data)
+                    
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\rest_framework\serializers.py
+", line 991, in create
+    instance = ModelClass._default_manag
+er.create(**validated_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\models.p
+y", line 530, in save
+    self.clean()
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\models.p
+y", line 513, in clean
+    raise ValidationError(
+django.core.exceptions.ValidationError: 
+['Ô\x9dî OpÚration refusÚe au WH-001: 
+Cette sortie ramÞnerait le stock ├\xa0 
+-50 UnitÚ(s), en dessous du stock 
+minimum requis de 10 UnitÚ(s). Stock 
+actuel : 100 UnitÚ(s). QuantitÚ maximum 
+autorisÚe ├\xa0 sortir : 90 UnitÚ(s).']
+
+========================================
+==============================
+ERROR: 
+test_cancel_invoice_restores_stock (inve
+ntory.tests_services.InvoiceServiceTest.
+test_cancel_invoice_restores_stock)
+Test that cancelling an invoice 
+restores stock
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 140, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_create_invoice_draft (invent
+ory.tests_services.InvoiceServiceTest.te
+st_create_invoice_draft)
+Test creating a draft invoice (no stock 
+deduction)
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 140, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_create_invoice_paid (invento
+ry.tests_services.InvoiceServiceTest.tes
+t_create_invoice_paid)
+Test creating a paid invoice (with 
+stock deduction)
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 140, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_get_payment_summary (invento
+ry.tests_services.PaymentServiceTest.tes
+t_get_payment_summary)
+Test getting payment summary
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 256, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_payment_exceeds_balance (inv
+entory.tests_services.PaymentServiceTest
+.test_payment_exceeds_balance)
+Test that payment exceeding balance 
+raises exception
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 256, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_register_full_payment (inven
+tory.tests_services.PaymentServiceTest.t
+est_register_full_payment)
+Test registering a full payment
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 256, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_register_partial_payment (in
+ventory.tests_services.PaymentServiceTes
+t.test_register_partial_payment)
+Test registering a partial payment
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 256, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_check_stock_availability (in
+ventory.tests_services.StockServiceTest.
+test_check_stock_availability)
+Test stock availability check
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 30, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_process_entry (inventory.tes
+ts_services.StockServiceTest.test_proces
+s_entry)
+Test stock entry
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 30, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: 
+test_process_exit_insufficient_stock (in
+ventory.tests_services.StockServiceTest.
+test_process_exit_insufficient_stock)
+Test exit with insufficient stock 
+raises exception
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 30, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_process_transfer (inventory.
+tests_services.StockServiceTest.test_pro
+cess_transfer)
+Test stock transfer between points of 
+sale
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+The above exception was the direct 
+cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 30, in setUp
+    self.pos = 
+PointOfSale.objects.create(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 679, in create
+    obj.save(force_insert=True, 
+using=self.db)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1161, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 1202, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 1847, in _insert
+    return query.get_compiler(using=usin
+g).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\sql\compiler
+.py", line 1836, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 92, in _execute_with_wrappers
+    return executor(sql, params, many, 
+context)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\utils.py", line 
+91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) 
+from exc_value
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\utils.py",
+ line 105, in _execute
+    return self.cursor.execute(sql, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\backends\sqlite3\ba
+se.py", line 354, in execute
+    return super().execute(query, 
+params)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: 
+inventory_pointofsale.name
+
+========================================
+==============================
+ERROR: test_complex_scenario (inventory.
+tests_stock_consistency.StockConsistency
+Tests.test_complex_scenario)
+Test a sequence of operations
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_st
+ock_consistency.py", line 13, in setUp
+    self.product = 
+Product.objects.create(
+                   
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected 
+keyword arguments: 'unit_price'
+
+========================================
+==============================
+ERROR: test_entry_movement_consistency (
+inventory.tests_stock_consistency.StockC
+onsistencyTests.test_entry_movement_cons
+istency)
+Test that adding stock to one POS 
+increases total correctly
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_st
+ock_consistency.py", line 13, in setUp
+    self.product = 
+Product.objects.create(
+                   
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected 
+keyword arguments: 'unit_price'
+
+========================================
+==============================
+ERROR: test_exit_movement_consistency (i
+nventory.tests_stock_consistency.StockCo
+nsistencyTests.test_exit_movement_consis
+tency)
+Test that removing stock decreases 
+total correctly
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_st
+ock_consistency.py", line 13, in setUp
+    self.product = 
+Product.objects.create(
+                   
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected 
+keyword arguments: 'unit_price'
+
+========================================
+==============================
+ERROR: test_initial_stock_consistency (i
+nventory.tests_stock_consistency.StockCo
+nsistencyTests.test_initial_stock_consis
+tency)
+Test that initial total stock is 0 and 
+matches sum of POS
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_st
+ock_consistency.py", line 13, in setUp
+    self.product = 
+Product.objects.create(
+                   
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected 
+keyword arguments: 'unit_price'
+
+========================================
+==============================
+ERROR: 
+test_transfer_movement_consistency (inve
+ntory.tests_stock_consistency.StockConsi
+stencyTests.test_transfer_movement_consi
+stency)
+Test that transferring stock keeps 
+total constant but shifts distribution
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_st
+ock_consistency.py", line 13, in setUp
+    self.product = 
+Product.objects.create(
+                   
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\manager.py",
+ line 87, in manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\query.py", 
+line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\django\db\models\base.py", 
+line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected 
+keyword arguments: 'unit_price'
+
+========================================
+==============================
+FAIL: 
+test_payment_and_status_auto_update (inv
+entory.tests.test_sales_logic.SalesLogic
+Tests.test_payment_and_status_auto_updat
+e)
+Test de la mise Ó jour automatique du 
+statut de facture lors des paiements
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests\te
+st_sales_logic.py", line 212, in 
+test_payment_and_status_auto_update
+    
+self.assertTrue(invoice.stock_deducted)
+AssertionError: False is not true
+
+----------------------------------------
+------------------------------
+Ran 151 tests in 4.317s
+
+FAILED (failures=1, errors=17)
+Destroying test database for alias 
+'default'...
+

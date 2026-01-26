@@ -1,0 +1,321 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+--settings=PGStock.test_settings 
+--noinput > test_r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecif 
+   ied: (Creating test d...as 'default  
+  '...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCom 
+   mandError
+ 
+
+Found 151 test(s).
+System check identified no issues (0 silenced).
+........................................
+................C:\Users\codeshester0011
+\AppData\Local\Programs\Python\Python312
+\Lib\site-packages\django\db\models\fiel
+ds\__init__.py:1665: RuntimeWarning: 
+DateTimeField Notification.created_at 
+received a naive datetime (2025-10-17 
+06:46:19.498661) while time zone 
+support is active.
+  warnings.warn(
+C:\Users\codeshester0011\AppData\Local\P
+rograms\Python\Python312\Lib\site-packag
+es\django\db\models\fields\__init__.py:1
+665: RuntimeWarning: DateTimeField 
+Notification.created_at received a 
+naive datetime (2025-10-27 
+06:46:19.502108) while time zone 
+support is active.
+  warnings.warn(
+DEBUG: Catching exception in handler: ValidationError
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Stock already deducted for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order GROS-2026-000001
+........................................
+........................F..E.EEEE.E.....
+...............
+========================================
+==============================
+ERROR: test_get_payment_summary (invento
+ry.tests_services.PaymentServiceTest.tes
+t_get_payment_summary)
+Test getting payment summary
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 328, in 
+test_get_payment_summary
+    
+self.payment_service.register_payment(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\payment_service.py", line 67, in 
+register_payment
+    raise ServiceException(
+inventory.services.base.ServiceException
+: Impossible d'enregistrer un paiement 
+: La facture INV-PAY-001 ne contient 
+aucun article.
+
+========================================
+==============================
+ERROR: test_register_full_payment (inven
+tory.tests_services.PaymentServiceTest.t
+est_register_full_payment)
+Test registering a full payment
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 288, in 
+test_register_full_payment
+    payment = self.payment_service.proce
+ss_full_payment(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\payment_service.py", line 158, in 
+process_full_payment
+    return self.register_payment(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\payment_service.py", line 67, in 
+register_payment
+    raise ServiceException(
+inventory.services.base.ServiceException
+: Impossible d'enregistrer un paiement 
+: La facture INV-PAY-001 ne contient 
+aucun article.
+
+========================================
+==============================
+ERROR: test_register_partial_payment (in
+ventory.tests_services.PaymentServiceTes
+t.test_register_partial_payment)
+Test registering a partial payment
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 302, in 
+test_register_partial_payment
+    payment = 
+self.payment_service.register_payment(
+              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\payment_service.py", line 67, in 
+register_payment
+    raise ServiceException(
+inventory.services.base.ServiceException
+: Impossible d'enregistrer un paiement 
+: La facture INV-PAY-001 ne contient 
+aucun article.
+
+========================================
+==============================
+ERROR: test_check_stock_availability (in
+ventory.tests_services.StockServiceTest.
+test_check_stock_availability)
+Test stock availability check
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 119, in 
+test_check_stock_availability
+    self.stock_service.process_entry(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 188, in 
+process_entry
+    return self.create_stock_movement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 67, in 
+create_stock_movement
+    self._validate_movement_params(
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 125, in 
+_validate_movement_params
+    raise ValidationError("Point de 
+vente de destination requis pour une 
+entrÚe.")
+django.core.exceptions.ValidationError: 
+['Point de vente de destination requis 
+pour une entrÚe.']
+
+========================================
+==============================
+ERROR: test_process_entry (inventory.tes
+ts_services.StockServiceTest.test_proces
+s_entry)
+Test stock entry
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 47, in 
+test_process_entry
+    movement = 
+self.stock_service.process_entry(
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 188, in 
+process_entry
+    return self.create_stock_movement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 67, in 
+create_stock_movement
+    self._validate_movement_params(
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 125, in 
+_validate_movement_params
+    raise ValidationError("Point de 
+vente de destination requis pour une 
+entrÚe.")
+django.core.exceptions.ValidationError: 
+['Point de vente de destination requis 
+pour une entrÚe.']
+
+========================================
+==============================
+ERROR: test_process_transfer (inventory.
+tests_services.StockServiceTest.test_pro
+cess_transfer)
+Test stock transfer between points of 
+sale
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 83, in 
+test_process_transfer
+    self.stock_service.process_entry(
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 188, in 
+process_entry
+    return self.create_stock_movement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\con
+textlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 67, in 
+create_stock_movement
+    self._validate_movement_params(
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\services
+\stock_service.py", line 125, in 
+_validate_movement_params
+    raise ValidationError("Point de 
+vente de destination requis pour une 
+entrÚe.")
+django.core.exceptions.ValidationError: 
+['Point de vente de destination requis 
+pour une entrÚe.']
+
+========================================
+==============================
+FAIL: 
+test_cancel_invoice_restores_stock (inve
+ntory.tests_services.InvoiceServiceTest.
+test_cancel_invoice_restores_stock)
+Test that cancelling an invoice 
+restores stock
+----------------------------------------
+------------------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\tests_se
+rvices.py", line 248, in 
+test_cancel_invoice_restores_stock
+    
+self.assertEqual(inventory.quantity, 
+Decimal('100'))
+AssertionError: 95 != Decimal('100')
+
+----------------------------------------
+------------------------------
+Ran 151 tests in 3.976s
+
+FAILED (failures=1, errors=6)
+Destroying test database for alias 
+'default'...
+

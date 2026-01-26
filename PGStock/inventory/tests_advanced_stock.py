@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+from datetime import date
 from .models import (
     Category, Product, PointOfSale, Inventory, StockMovement,
     Invoice, InvoiceItem, Receipt, ReceiptItem, Client, Supplier
@@ -11,17 +12,18 @@ class StockReversionTests(TestCase):
     """Tests for stock reversion when cancelling invoices/receipts"""
     
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.category = Category.objects.create(name="Electronics")
+        self.user = User.objects.create_user(username='testuser_adv', password='password')
+        self.category = Category.objects.create(name="Electronics Adv")
         self.product = Product.objects.create(
-            name="Test Product",
-            sku="TEST-001",
+            name="Test Product Adv",
+            sku="TEST-ADV-001",
             category=self.category,
-            unit_price=Decimal('100.00')
+            selling_price=Decimal('100.00'),
+            purchase_price=Decimal('80.00')
         )
-        self.pos = PointOfSale.objects.create(name="Test Store", code="TEST_STORE")
-        self.client = Client.objects.create(name="Test Client")
-        self.supplier = Supplier.objects.create(name="Test Supplier")
+        self.pos = PointOfSale.objects.create(name="Test Store Adv", code="TEST_STORE_ADV", manager_name="Test Manager")
+        self.client = Client.objects.create(name="Test Client Adv")
+        self.supplier = Supplier.objects.create(name="Test Supplier Adv")
         
         # Initialize inventory
         self.inventory = Inventory.objects.create(
@@ -39,8 +41,8 @@ class StockReversionTests(TestCase):
         invoice = Invoice.objects.create(
             client=self.client,
             point_of_sale=self.pos,
-            date_issued="2023-01-01",
-            date_due="2023-01-01",
+            date_issued=date(2023, 1, 1),
+            date_due=date(2023, 1, 1),
             status='draft',
             created_by=self.user
         )
@@ -77,7 +79,7 @@ class StockReversionTests(TestCase):
         receipt = Receipt.objects.create(
             supplier=self.supplier,
             point_of_sale=self.pos,
-            date_received="2023-01-01",
+            date_received=date(2023, 1, 1),
             status='draft',
             created_by=self.user
         )
@@ -111,15 +113,16 @@ class StockMovementImmutabilityTests(TestCase):
     """Tests for StockMovement immutability"""
     
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.category = Category.objects.create(name="Electronics")
+        self.user = User.objects.create_user(username='testuser_imm', password='password')
+        self.category = Category.objects.create(name="Electronics Imm")
         self.product = Product.objects.create(
-            name="Test Product",
-            sku="TEST-002",
+            name="Test Product Imm",
+            sku="TEST-IMM-002",
             category=self.category,
-            unit_price=Decimal('100.00')
+            selling_price=Decimal('100.00'),
+            purchase_price=Decimal('80.00')
         )
-        self.pos = PointOfSale.objects.create(name="Test Store", code="TEST_STORE2")
+        self.pos = PointOfSale.objects.create(name="Test Store Imm", code="TEST_STORE_IMM", manager_name="Test Manager")
         Inventory.objects.create(
             product=self.product,
             point_of_sale=self.pos,
@@ -181,24 +184,25 @@ class DecimalCalculationTests(TestCase):
     """Tests for Decimal type safety in calculations"""
     
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='password')
-        self.category = Category.objects.create(name="Electronics")
+        self.user = User.objects.create_user(username='testuser_dec', password='password')
+        self.category = Category.objects.create(name="Electronics Dec")
         self.product = Product.objects.create(
-            name="Test Product",
-            sku="TEST-003",
+            name="Test Product Dec",
+            sku="TEST-DEC-003",
             category=self.category,
-            unit_price=Decimal('99.99')
+            selling_price=Decimal('99.99'),
+            purchase_price=Decimal('80.00')
         )
-        self.pos = PointOfSale.objects.create(name="Test Store", code="TEST_STORE3")
-        self.client = Client.objects.create(name="Test Client")
+        self.pos = PointOfSale.objects.create(name="Test Store Dec", code="TEST_STORE_DEC", manager_name="Test Manager")
+        self.client = Client.objects.create(name="Test Client Dec")
     
     def test_invoice_calculation_with_tax(self):
         """Test that invoice calculations handle Decimal correctly"""
         invoice = Invoice.objects.create(
             client=self.client,
             point_of_sale=self.pos,
-            date_issued="2023-01-01",
-            date_due="2023-01-01",
+            date_issued=date(2023, 1, 1),
+            date_due=date(2023, 1, 1),
             status='draft',
             tax_rate=Decimal('16.00'),
             created_by=self.user

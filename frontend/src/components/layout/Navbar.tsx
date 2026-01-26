@@ -13,7 +13,9 @@ import {
   TrendingUp,
   Users,
   FileSearch,
-  Box
+  Box,
+  Tags,
+  BarChart3
 } from 'lucide-react';
 // Removed invalid import
 import { useAuthStore } from '@/store/authStore';
@@ -85,13 +87,18 @@ export function Navbar() {
       icon: TrendingUp,
       children: [
         { name: 'Vue d\'ensemble', href: '/finance', icon: TrendingUp },
+        { name: 'Dépenses', href: '/finance?tab=expenses', icon: FileText },
+        { name: 'Catégories', href: '/finance?tab=categories', icon: Tags },
+        { name: 'Rapport de profit', href: '/finance?tab=profit', icon: BarChart3 },
       ]
     },
     { 
       name: 'Rapports', 
       icon: FileSearch,
       children: [
-        { name: 'Rapports', href: '/reports', icon: FileSearch },
+        { name: 'Vue d\'ensemble', href: '/reports', icon: FileSearch },
+        { name: 'Finance & Paiements', href: '/reports/finance', icon: TrendingUp },
+        { name: 'Analyses Avancés', href: '/reports/analytics', icon: LayoutDashboard },
       ]
     },
   ];
@@ -127,17 +134,18 @@ export function Navbar() {
                   
                   <DropdownMenuPrimitive.Portal>
                     <DropdownMenuPrimitive.Content 
-                      className="bg-[#1e1e2e] border border-gray-700 rounded-md shadow-xl p-1 min-w-[200px] z-50 text-gray-200 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
-                      sideOffset={5}
+                      className="bg-[#1e1e2e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-2 min-w-[220px] z-50 text-gray-200 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
+                      sideOffset={8}
                     >
                       {item.children.map((child, childIndex) => (
                         <DropdownMenuPrimitive.Item key={childIndex} asChild>
                           <Link 
                             to={child.href}
-                            className="flex items-center px-2 py-2 text-sm rounded-sm hover:bg-white/10 hover:text-white cursor-pointer outline-none"
+                            className="flex items-center px-3 py-2.5 text-sm rounded-lg hover:bg-white/10 transition-all cursor-pointer outline-none group mb-1 last:mb-0 relative overflow-hidden"
                           >
-                            <child.icon className="mr-2 h-4 w-4" />
-                            {child.name}
+                            <div className="absolute inset-0 bg-linear-to-r from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <child.icon className="mr-3 h-4 w-4 text-gray-400 group-hover:text-blue-400 transition-colors relative z-10" />
+                            <span className="font-medium text-gray-300 group-hover:text-white transition-colors relative z-10">{child.name}</span>
                           </Link>
                         </DropdownMenuPrimitive.Item>
                       ))}

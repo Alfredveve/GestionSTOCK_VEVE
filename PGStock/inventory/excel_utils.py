@@ -1,9 +1,6 @@
 import sys
 from datetime import datetime
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
 
 def export_to_excel(headers, data, title, filename_prefix="Export"):
     """
@@ -14,6 +11,11 @@ def export_to_excel(headers, data, title, filename_prefix="Export"):
     sys.modules['lxml'] = None
     
     try:
+        import openpyxl
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+
         wb = Workbook()
         ws = wb.active
         ws.title = title[:30] # Excel sheet title limit

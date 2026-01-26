@@ -21,17 +21,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('test-404/', lambda request: render(request, '404.html')),
-    path('test-500/', lambda request: render(request, '500.html')),
-    path('test-403/', lambda request: render(request, '403.html')),
-    path('test-400/', lambda request: render(request, '400.html')),
     path('admin/', admin.site.urls),
-    path('', lambda request: redirect('inventory:dashboard'), name='home'),
     path('api/v1/', include('PGStock.api_urls')),
-    path('inventory/', include('inventory.urls')),
-    path('sales/', include('sales.urls')),
-    path('purchasing/', include('purchasing.urls')),
-    path('stock/', include('stock.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 

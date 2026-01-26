@@ -27,10 +27,12 @@ export function ExpenseForm({ isOpen, onClose }: ExpenseFormProps) {
   });
 
   // Need categories for expenses
-  const { data: categories } = useQuery({
+  const { data: categoriesData } = useQuery({
     queryKey: ['expense-categories'],
-    queryFn: () => inventoryService.getExpenseCategories().then((res: { results: any[] }) => res.results),
+    queryFn: () => inventoryService.getExpenseCategories(),
   });
+
+  const categories = categoriesData?.results || (Array.isArray(categoriesData) ? categoriesData : []);
 
   const mutation = useMutation({
     mutationFn: (data: { amount: string, category: string, description: string, date: string, reference: string }) => inventoryService.createExpense({
@@ -79,7 +81,7 @@ export function ExpenseForm({ isOpen, onClose }: ExpenseFormProps) {
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors outline-none"
               >
                 <option value="">Sélectionner</option>
-                {categories?.results?.map((cat: { id: number, name: string }) => (
+                {categories?.map((cat: { id: number, name: string }) => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>

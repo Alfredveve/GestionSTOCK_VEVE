@@ -1,0 +1,69 @@
+﻿python : Traceback (most recent call 
+last):
+Au caractère Ligne:1 : 1
++ python reproduce_issue.py > 
+traceback_output.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecif 
+   ied: (Traceback (most recent call l  
+  ast)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCom 
+   mandError
+ 
+  File "C:\Users\codeshester0011\Desktop
+\GestionSTOCK\PGStock\inventory\views\ol
+d_views.py", line 6664, in 
+export_stock_movements_pdf
+    from reportlab.lib.styles import 
+getSampleStyleSheet, ParagraphStyle
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\reportlab\lib\styles.py", 
+line 26, in <module>
+    from reportlab.lib.colors import 
+black
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\reportlab\lib\colors.py", 
+line 43, in <module>
+    from reportlab.lib.rl_accel import 
+fp_str
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\reportlab\lib\rl_accel.py", 
+line 34, in <module>
+    from reportlab.lib.utils import 
+isUnicode, isSeq, rawBytes, asNative, 
+asBytes
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\reportlab\lib\utils.py", 
+line 15, in <module>
+    from PIL import Image
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\PIL\Image.py", line 59, in 
+<module>
+    from ._util import DeferredError, 
+is_path
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\PIL\_util.py", line 6, in 
+<module>
+    from ._typing import 
+StrOrBytesPath, TypeGuard
+  File "C:\Users\codeshester0011\AppData
+\Local\Programs\Python\Python312\Lib\sit
+e-packages\PIL\_typing.py", line 25, in 
+<module>
+    from collections.abc import Buffer
+ImportError: cannot import name 
+'Buffer' from 'collections.abc' (C:\User
+s\codeshester0011\AppData\Local\Programs
+\Python\Python312\Lib\collections\abc.py
+)
+Erreur PDF: cannot import name 'Buffer' from 'collections.abc' (C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\collections\abc.py)
+Success! Response Status: 500
+Response Content:
+Erreur lors de la gÚnÚration du PDF: cannot import name 'Buffer' from 'collections.abc' (C:\Users\codeshester0011\AppData\Local\Programs\Python\Python312\Lib\collections\abc.py)

@@ -1,7 +1,5 @@
 import { 
-  Bell, 
   Search, 
-  User, 
   Settings, 
   LogOut, 
   Zap, 
@@ -10,10 +8,10 @@ import {
   Menu 
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationDropdown } from './NotificationDropdown';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -33,6 +31,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center w-full md:w-1/3 gap-3">
         <button 
           onClick={onMenuClick}
+          title="Ouvrir le menu"
           className="md:hidden p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted"
         >
           <Menu className="h-6 w-6" />
@@ -50,13 +49,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       
       <div className="flex items-center space-x-2 md:space-x-4">
         <ThemeToggle />
-        <button 
-          title="Notifications"
-          aria-label="Voir les notifications"
-          className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
-        >
-          <Bell className="h-5 w-5" />
-        </button>
+        <NotificationDropdown />
         
         <div className="pl-4 border-l">
           <DropdownMenuPrimitive.Root>
@@ -111,6 +104,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <DropdownMenuPrimitive.Item asChild>
                     <Link 
                       to="/settings" 
+                      state={{ activeTab: 'general' }}
                       className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-md cursor-pointer outline-none transition-colors"
                     >
                       <Settings className="h-4 w-4 text-muted-foreground" />
@@ -121,6 +115,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <DropdownMenuPrimitive.Item asChild>
                     <Link 
                       to="/settings" 
+                      state={{ activeTab: 'users' }}
                       className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-md cursor-pointer outline-none transition-colors"
                     >
                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -131,6 +126,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <DropdownMenuPrimitive.Item asChild>
                     <Link 
                       to="/settings" 
+                      state={{ activeTab: 'administration' }}
                       className="flex items-center gap-3 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-md cursor-pointer outline-none transition-colors"
                     >
                       <Shield className="h-4 w-4 text-muted-foreground" />

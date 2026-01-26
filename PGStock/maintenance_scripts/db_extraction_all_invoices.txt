@@ -1,0 +1,36 @@
+--- ALL INVOICES ---
+ID: 35, Num: INV-2025-00025, Status: paid, Notes: 'NOTE DE FACT002'
+ID: 40, Num: INV-2025-00029, Status: draft, Notes: 'First essaei non paie non article'
+ID: 38, Num: INV-2025-00028, Status: draft, Notes: ''
+ID: 36, Num: INV-2025-00026, Status: paid, Notes: 'jjjjjvvvv'
+ID: 37, Num: INV-2025-00027, Status: paid, Notes: 'la vente de 10 moteur de 5kva'
+ID: 32, Num: INV-2025-00022, Status: paid, Notes: 'le premier statut commande en attente'
+ID: 20, Num: INV-2025-00016, Status: paid, Notes: "la vente d'impremante"
+ID: 33, Num: INV-2025-00023, Status: paid, Notes: 'TEST REMISE'
+ID: 31, Num: INV-2025-00021, Status: paid, Notes: 'first test Q = 5'
+ID: 21, Num: INV-2025-00017, Status: paid, Notes: "Achat d'epson"
+ID: 26, Num: INV-2025-00018, Status: paid, Notes: 'Epson de q = 5'
+ID: 18, Num: INV-2025-00014, Status: paid, Notes: 'Achat en gros avec Sia'
+ID: 11, Num: INV-2025-00009, Status: paid, Notes: 'la vente de soumah'
+ID: 14, Num: INV-2025-00010, Status: paid, Notes: "Le teste d'achat"
+ID: 15, Num: INV-2025-00011, Status: paid, Notes: 'Essaie de la desactivate de TVA'
+ID: 27, Num: INV-2025-00019, Status: paid, Notes: 'veve q = 5'
+ID: 28, Num: INV-2025-00020, Status: paid, Notes: 'hp vente'
+ID: 6, Num: INV-2025-00004, Status: cancelled, Notes: 'ACHAT AGNES'
+ID: 7, Num: INV-2025-00005, Status: paid, Notes: 'LA DEUXIEME FACTURE'
+ID: 9, Num: INV-2025-00007, Status: paid, Notes: 'LE PAYEMENT DE MR SOUMAH'
+ID: 10, Num: INV-2025-00008, Status: paid, Notes: 'Votre note'
+ID: 17, Num: INV-2025-00013, Status: paid, Notes: 'The First invoice'
+ID: 8, Num: INV-2025-00006, Status: paid, Notes: "ESSAIE D'ACHAT"
+ID: 1, Num: INV-2025-00001, Status: paid, Notes: 'first facture'
+ID: 2, Num: INV-2025-00002, Status: paid, Notes: ''
+ID: 3, Num: INV-2025-00003, Status: paid, Notes: 'la vente nouvelle'
+ID: 16, Num: INV-2025-00012, Status: draft, Notes: 'FACTURE DE CLAVIER DE VEVE'
+ID: 29, Num: , Status: paid, Notes: ''
+ID: 30, Num: TEST-INV-6562, Status: paid, Notes: ''
+ID: 34, Num: INV-2025-00024, Status: paid, Notes: 'BOOTSTRAP 5'
+
+--- QUOTES ---
+ID: 2, Num: QUO-2025-00002, Status: sent
+ID: 1, Num: QUO-2025-00001, Status: converted
+ID: 3, Num: QUO-2025-00003, Status: sent

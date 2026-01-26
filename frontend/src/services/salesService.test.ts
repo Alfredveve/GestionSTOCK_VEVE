@@ -19,7 +19,7 @@ describe('salesService', () => {
     it('should call api.post with correct data', async () => {
       const mockOrder = {
         client: 1,
-        order_type: 'retail' as const,
+        invoice_type: 'retail' as const,
         items: [{ product: 1, quantity: 2, unit_price: '1000' }],
         payment_method: 'cash'
       };
@@ -29,7 +29,7 @@ describe('salesService', () => {
 
       const result = await salesService.createOrder(mockOrder);
 
-      expect(api.post).toHaveBeenCalledWith('sales/', mockOrder);
+      expect(api.post).toHaveBeenCalledWith('invoices/', mockOrder);
       expect(result).toEqual(mockResponse);
     });
   });

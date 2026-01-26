@@ -1,0 +1,3739 @@
+﻿py : Creating test database for alias 
+'default'...
+Au caractère Ligne:1 : 1
++ py manage.py test 
+--settings=PGStock.test_settings --noinput > 
+test_r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C 
+   reating test d...as 'default'...:String) [  
+  ], RemoteException
+    + FullyQualifiedErrorId : NativeCommandErr 
+   or
+ 
+
+Found 151 test(s).
+System check identified no issues (0 silenced).
+...............................................
+.......EEEEEEEEEEEEEEEEEEEEEEEEEEEEE..EEEEEEEEE
+EEE.F....EEEEEE....EEE.Unhandled exception: 
+ValidationError - ['Ô\x9dî OpÚration refusÚe 
+au WH-001: Cette sortie ramÞnerait le stock 
+├\xa0 -50 UnitÚ(s), en dessous du stock 
+minimum requis de 10 UnitÚ(s). Stock actuel : 
+100 UnitÚ(s). QuantitÚ maximum autorisÚe ├\xa0 
+sortir : 90 UnitÚ(s).']
+DEBUG: Catching exception in handler: ValidationError
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order CMD-2026-000001
+DEBUG: Stock already deducted for Order CMD-2026-000001
+DEBUG: Entering deduct_stock for Order GROS-2026-000001
+E..EEEEEEEEEEEEEEEE...............
+===============================================
+=======================
+ERROR: test_bulk_create_for_staff (inventory.te
+sts.test_notification_service.NotificationServi
+ceTestCase.test_bulk_create_for_staff)
+Test creating notifications for all staff users
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_notification (inventory.test
+s.test_notification_service.NotificationService
+TestCase.test_create_notification)
+Test creating a single notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_delete_old_notifications (inventory
+.tests.test_notification_service.NotificationSe
+rviceTestCase.test_delete_old_notifications)
+Test deleting old read notifications
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_get_unread_count (inventory.tests.t
+est_notification_service.NotificationServiceTes
+tCase.test_get_unread_count)
+Test getting unread notification count
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_mark_all_as_read (inventory.tests.t
+est_notification_service.NotificationServiceTes
+tCase.test_mark_all_as_read)
+Test marking all notifications as read for a 
+user
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_mark_as_read (inventory.tests.test_
+notification_service.NotificationServiceTestCas
+e.test_mark_as_read)
+Test marking notification as read
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_invoice_already_paid_no_noti
+fication (inventory.tests.test_notification_ser
+vice.NotificationServiceTestCase.test_notify_in
+voice_already_paid_no_notification)
+Test that paid invoices don't create 
+notifications
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_invoice_created (inventory.t
+ests.test_notification_service.NotificationServ
+iceTestCase.test_notify_invoice_created)
+Test invoice creation notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_low_stock (inventory.tests.t
+est_notification_service.NotificationServiceTes
+tCase.test_notify_low_stock)
+Test low stock notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_order_created (inventory.tes
+ts.test_notification_service.NotificationServic
+eTestCase.test_notify_order_created)
+Test order creation notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_order_status_changed (invent
+ory.tests.test_notification_service.Notificatio
+nServiceTestCase.test_notify_order_status_chang
+ed)
+Test order status change notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_payment_received (inventory.
+tests.test_notification_service.NotificationSer
+viceTestCase.test_notify_payment_received)
+Test payment received notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_notify_product_price_changed (inven
+tory.tests.test_notification_service.Notificati
+onServiceTestCase.test_notify_product_price_cha
+nged)
+Test product price change notification
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_notificatio
+n_service.py", line 56, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_add_order_item (inventory.tests.tes
+t_order_service.OrderServiceTestCase.test_add_o
+rder_item)
+Test adding item to order
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_calculate_totals (inventory.tests.t
+est_order_service.OrderServiceTestCase.test_cal
+culate_totals)
+Test order totals calculation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_cancel_order (inventory.tests.test_
+order_service.OrderServiceTestCase.test_cancel_
+order)
+Test order cancellation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_change_status_invalid (inventory.te
+sts.test_order_service.OrderServiceTestCase.tes
+t_change_status_invalid)
+Test changing to invalid status fails
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_change_status_to_cancelled (invento
+ry.tests.test_order_service.OrderServiceTestCas
+e.test_change_status_to_cancelled)
+Test changing status to cancelled restores 
+stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_change_status_to_validated (invento
+ry.tests.test_order_service.OrderServiceTestCas
+e.test_change_status_to_validated)
+Test changing status to validated deducts stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_order_invalid_type (inventor
+y.tests.test_order_service.OrderServiceTestCase
+.test_create_order_invalid_type)
+Test order creation with invalid type
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_order_success (inventory.tes
+ts.test_order_service.OrderServiceTestCase.test
+_create_order_success)
+Test successful order creation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: 
+test_create_order_with_validation_status (inven
+tory.tests.test_order_service.OrderServiceTestC
+ase.test_create_order_with_validation_status)
+Test order creation with validated status 
+deducts stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_order_without_items (invento
+ry.tests.test_order_service.OrderServiceTestCas
+e.test_create_order_without_items)
+Test order creation fails without items
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_deduct_stock (inventory.tests.test_
+order_service.OrderServiceTestCase.test_deduct_
+stock)
+Test stock deduction
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_deduct_stock_twice_fails (inventory
+.tests.test_order_service.OrderServiceTestCase.
+test_deduct_stock_twice_fails)
+Test that deducting stock twice doesn't 
+duplicate
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_remove_order_item (inventory.tests.
+test_order_service.OrderServiceTestCase.test_re
+move_order_item)
+Test removing item from order
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_restore_stock (inventory.tests.test
+_order_service.OrderServiceTestCase.test_restor
+e_stock)
+Test stock restoration
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_update_order (inventory.tests.test_
+order_service.OrderServiceTestCase.test_update_
+order)
+Test order update
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_wholesale_order (inventory.tests.te
+st_order_service.OrderServiceTestCase.test_whol
+esale_order)
+Test wholesale order creation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_order_servi
+ce.py", line 56, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_calculate_totals (inventory.tests.t
+est_quote_service.QuoteServiceTestCase.test_cal
+culate_totals)
+Test quote totals calculation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_convert_expired_quote_fails (invent
+ory.tests.test_quote_service.QuoteServiceTestCa
+se.test_convert_expired_quote_fails)
+Test converting expired quote fails
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_convert_rejected_quote_fails (inven
+tory.tests.test_quote_service.QuoteServiceTestC
+ase.test_convert_rejected_quote_fails)
+Test converting rejected quote fails
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_convert_to_invoice (inventory.tests
+.test_quote_service.QuoteServiceTestCase.test_c
+onvert_to_invoice)
+Test converting quote to invoice
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_convert_to_order (inventory.tests.t
+est_quote_service.QuoteServiceTestCase.test_con
+vert_to_order)
+Test converting quote to order
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_quote_success (inventory.tes
+ts.test_quote_service.QuoteServiceTestCase.test
+_create_quote_success)
+Test successful quote creation
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: 
+test_create_quote_with_custom_expiration (inven
+tory.tests.test_quote_service.QuoteServiceTestC
+ase.test_create_quote_with_custom_expiration)
+Test quote creation with custom expiration date
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_create_quote_without_items (invento
+ry.tests.test_quote_service.QuoteServiceTestCas
+e.test_create_quote_without_items)
+Test quote creation fails without items
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_expire_old_quotes (inventory.tests.
+test_quote_service.QuoteServiceTestCase.test_ex
+pire_old_quotes)
+Test expiring multiple old quotes
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_expire_quote (inventory.tests.test_
+quote_service.QuoteServiceTestCase.test_expire_
+quote)
+Test expiring a quote
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_update_accepted_quote_fails (invent
+ory.tests.test_quote_service.QuoteServiceTestCa
+se.test_update_accepted_quote_fails)
+Test updating accepted quote fails
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_update_quote (inventory.tests.test_
+quote_service.QuoteServiceTestCase.test_update_
+quote)
+Test quote update
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_quote_servi
+ce.py", line 50, in setUp
+    self.product1 = Product.objects.create(
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'retail_selling_price'
+
+===============================================
+=======================
+ERROR: test_invoice_calculation_with_tax (inven
+tory.tests_advanced_stock.DecimalCalculationTes
+ts.test_invoice_calculation_with_tax)
+Test that invoice calculations handle Decimal 
+correctly
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 186, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_cannot_delete_stock_movement (inven
+tory.tests_advanced_stock.StockMovementImmutabi
+lityTests.test_cannot_delete_stock_movement)
+Test that deleting a StockMovement raises 
+ValidationError
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 116, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_cannot_update_stock_movement (inven
+tory.tests_advanced_stock.StockMovementImmutabi
+lityTests.test_cannot_update_stock_movement)
+Test that updating a StockMovement raises 
+ValidationError
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 116, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_force_update_allowed (inventory.tes
+ts_advanced_stock.StockMovementImmutabilityTest
+s.test_force_update_allowed)
+Test that force_update flag allows updates 
+(for admin/dev use)
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 116, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: 
+test_invoice_cancellation_restores_stock (inven
+tory.tests_advanced_stock.StockReversionTests.t
+est_invoice_cancellation_restores_stock)
+Test that cancelling an invoice restores the 
+stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 16, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_receipt_revert_removes_stock (inven
+tory.tests_advanced_stock.StockReversionTests.t
+est_receipt_revert_removes_stock)
+Test that reverting a receipt removes the 
+added stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_advanced_stock.p
+y", line 16, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_dashboard_financial_stats (inventor
+y.tests_dashboard_new.DashboardNewAPITests.test
+_dashboard_financial_stats)
+Test retrieval of financial stats (revenue, 
+expenses, net_profit)
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.code
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_dashboard_new.py
+", line 26, in setUp
+    self.pos = 
+PointOfSale.objects.create(name="Main Store", 
+code="MAIN")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.code
+
+===============================================
+=======================
+ERROR: test_remaining_products (inventory.tests
+_dashboard_new.DashboardNewAPITests.test_remain
+ing_products)
+Test remaining products list
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.code
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_dashboard_new.py
+", line 26, in setUp
+    self.pos = 
+PointOfSale.objects.create(name="Main Store", 
+code="MAIN")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.code
+
+===============================================
+=======================
+ERROR: test_top_selling_products (inventory.tes
+ts_dashboard_new.DashboardNewAPITests.test_top_
+selling_products)
+Test top selling products list
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.code
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_dashboard_new.py
+", line 26, in setUp
+    self.pos = 
+PointOfSale.objects.create(name="Main Store", 
+code="MAIN")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.code
+
+===============================================
+=======================
+ERROR: test_transfer_insufficient_stock (invent
+ory.tests_replenishment.ReplenishmentAPITests.t
+est_transfer_insufficient_stock)
+Test that transfer fails if source has 
+insufficient stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_replenishment.py
+", line 105, in 
+test_transfer_insufficient_stock
+    response = 
+self.client.post('/api/v1/movements/', {
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\test.py", line 299, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\test.py", line 213, in post
+    return self.generic('POST', path, data, 
+content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\test.py", line 237, in generic
+    return super().generic(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\test\client.py", line 676, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\test.py", line 289, in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\test.py", line 241, in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\test\client.py", line 1092, in request
+    self.check_exception(response)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\test\client.py", line 805, in 
+check_exception
+    raise exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\core\handlers\exception.py", line 55, in 
+inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\core\handlers\base.py", line 197, in 
+_get_response
+    response = wrapped_callback(request, 
+*callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\views\decorators\csrf.py", line 65, in 
+_view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, 
+**kwargs)
+           
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\views.py", line 475, in 
+handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\views.py", line 486, in 
+raise_uncaught_exception
+    raise exc
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, 
+**kwargs)
+               
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\mixins.py", line 24, in 
+perform_create
+    serializer.save()
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\res
+t_framework\serializers.py", line 991, in 
+create
+    instance = ModelClass._default_manager.crea
+te(**validated_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\models.py", line 530, 
+in save
+    self.clean()
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\models.py", line 513, 
+in clean
+    raise ValidationError(
+django.core.exceptions.ValidationError: 
+['Ô\x9dî OpÚration refusÚe au WH-001: Cette 
+sortie ramÞnerait le stock ├\xa0 -50 UnitÚ(s), 
+en dessous du stock minimum requis de 10 
+UnitÚ(s). Stock actuel : 100 UnitÚ(s). 
+QuantitÚ maximum autorisÚe ├\xa0 sortir : 90 
+UnitÚ(s).']
+
+===============================================
+=======================
+ERROR: test_cancel_invoice_restores_stock (inve
+ntory.tests_services.InvoiceServiceTest.test_ca
+ncel_invoice_restores_stock)
+Test that cancelling an invoice restores stock
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 140, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_create_invoice_draft (inventory.tes
+ts_services.InvoiceServiceTest.test_create_invo
+ice_draft)
+Test creating a draft invoice (no stock 
+deduction)
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 140, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_create_invoice_paid (inventory.test
+s_services.InvoiceServiceTest.test_create_invoi
+ce_paid)
+Test creating a paid invoice (with stock 
+deduction)
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 140, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_get_payment_summary (inventory.test
+s_services.PaymentServiceTest.test_get_payment_
+summary)
+Test getting payment summary
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 256, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_payment_exceeds_balance (inventory.
+tests_services.PaymentServiceTest.test_payment_
+exceeds_balance)
+Test that payment exceeding balance raises 
+exception
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 256, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_register_full_payment (inventory.te
+sts_services.PaymentServiceTest.test_register_f
+ull_payment)
+Test registering a full payment
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 256, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_register_partial_payment (inventory
+.tests_services.PaymentServiceTest.test_registe
+r_partial_payment)
+Test registering a partial payment
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 256, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_check_stock_availability (inventory
+.tests_services.StockServiceTest.test_check_sto
+ck_availability)
+Test stock availability check
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 30, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_process_entry (inventory.tests_serv
+ices.StockServiceTest.test_process_entry)
+Test stock entry
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 30, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_process_exit_insufficient_stock (in
+ventory.tests_services.StockServiceTest.test_pr
+ocess_exit_insufficient_stock)
+Test exit with insufficient stock raises 
+exception
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 30, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_process_transfer (inventory.tests_s
+ervices.StockServiceTest.test_process_transfer)
+Test stock transfer between points of sale
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint 
+failed: inventory_pointofsale.name
+
+The above exception was the direct cause of 
+the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_services.py", 
+line 30, in setUp
+    self.pos = PointOfSale.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 679, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 892, in save
+    self.save_base(
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 998, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1161, in 
+_save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 1202, in 
+_do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 1847, in _insert
+    return query.get_compiler(using=using).exec
+ute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\sql\compiler.py", line 1836, in 
+execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 92, in 
+_execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 100, in 
+_execute
+    with self.db.wrap_database_errors:
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\utils.py", line 91, in __exit__
+    raise 
+dj_exc_value.with_traceback(traceback) from 
+exc_value
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\utils.py", line 105, in 
+_execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\backends\sqlite3\base.py", line 354, in 
+execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE 
+constraint failed: inventory_pointofsale.name
+
+===============================================
+=======================
+ERROR: test_complex_scenario (inventory.tests_s
+tock_consistency.StockConsistencyTests.test_com
+plex_scenario)
+Test a sequence of operations
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_stock_consistenc
+y.py", line 13, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_entry_movement_consistency (invento
+ry.tests_stock_consistency.StockConsistencyTest
+s.test_entry_movement_consistency)
+Test that adding stock to one POS increases 
+total correctly
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_stock_consistenc
+y.py", line 13, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_exit_movement_consistency (inventor
+y.tests_stock_consistency.StockConsistencyTests
+.test_exit_movement_consistency)
+Test that removing stock decreases total 
+correctly
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_stock_consistenc
+y.py", line 13, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_initial_stock_consistency (inventor
+y.tests_stock_consistency.StockConsistencyTests
+.test_initial_stock_consistency)
+Test that initial total stock is 0 and matches 
+sum of POS
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_stock_consistenc
+y.py", line 13, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+ERROR: test_transfer_movement_consistency (inve
+ntory.tests_stock_consistency.StockConsistencyT
+ests.test_transfer_movement_consistency)
+Test that transferring stock keeps total 
+constant but shifts distribution
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests_stock_consistenc
+y.py", line 13, in setUp
+    self.product = Product.objects.create(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\manager.py", line 87, in 
+manager_method
+    return getattr(self.get_queryset(), 
+name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\query.py", line 677, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\codeshester0011\AppData\Local\
+Programs\Python\Python312\Lib\site-packages\dja
+ngo\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Product() got unexpected keyword 
+arguments: 'unit_price'
+
+===============================================
+=======================
+FAIL: test_payment_and_status_auto_update (inve
+ntory.tests.test_sales_logic.SalesLogicTests.te
+st_payment_and_status_auto_update)
+Test de la mise Ó jour automatique du statut 
+de facture lors des paiements
+-----------------------------------------------
+-----------------------
+Traceback (most recent call last):
+  File "C:\Users\codeshester0011\Desktop\Gestio
+nSTOCK\PGStock\inventory\tests\test_sales_logic
+.py", line 212, in 
+test_payment_and_status_auto_update
+    self.assertTrue(invoice.stock_deducted)
+AssertionError: False is not true
+
+-----------------------------------------------
+-----------------------
+Ran 151 tests in 2.218s
+
+FAILED (failures=1, errors=67)
+Destroying test database for alias 'default'...
+

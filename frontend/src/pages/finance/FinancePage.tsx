@@ -1,55 +1,129 @@
 import { useQuery } from '@tanstack/react-query';
 import { 
   TrendingUp, 
-  TrendingDown, 
   DollarSign, 
   Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
-  Plus
+  Plus,
+  LayoutDashboard,
+  Receipt,
+  Tags,
+  BarChart3,
+  Search
 } from 'lucide-react';
 import inventoryService from '@/services/inventoryService';
+import dashboardService from '@/services/dashboardService';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
 import { useState } from 'react';
 import { ExpenseForm } from '@/components/finance/ExpenseForm';
+import { FinanceOverview } from '@/components/finance/FinanceOverview';
+import { ExpenseList } from '@/components/finance/ExpenseList';
+import { CategoryManager } from '@/components/finance/CategoryManager';
+import { ProfitReport } from '@/components/finance/ProfitReport';
+import { toast } from 'sonner';
+
+import { useSearchParams } from 'react-router-dom';
 
 export function FinancePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
+
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState<'excel' | 'pdf' | null>(null);
+  
+  // Date filter state
+  const [startDate, setStartDate] = useState<string>(
+    new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]
+  );
+  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+
   const { data: expenses, isLoading: isLoadingExpenses } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: () => inventoryService.getExpenses(),
+    queryKey: ['expenses', startDate, endDate],
+    queryFn: () => inventoryService.getExpenses({ start_date: startDate, end_date: endDate }),
   });
 
-  const formatCurrency = (amount: string | number) => {
-    return new Intl.NumberFormat('fr-FR', { 
-      style: 'currency', 
-      currency: 'GNF',
-      maximumFractionDigits: 0
-    }).format(typeof amount === 'string' ? parseFloat(amount) : amount);
+  const { data: stats } = useQuery({
+    queryKey: ['dashboard-stats', startDate, endDate],
+    queryFn: () => dashboardService.getStats({ start_date: startDate, end_date: endDate }),
+  });
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting('excel');
+      await inventoryService.exportExpensesExcel();
+      toast.success("Registre des dépenses exporté (Excel)");
+    } catch {
+      toast.error("Erreur lors de l'exportation Excel");
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      setIsExporting('pdf');
+      await inventoryService.exportExpensesPdf();
+      toast.success("État des dépenses exporté (PDF)");
+    } catch {
+      toast.error("Erreur lors de l'exportation PDF");
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-black tracking-tight text-foreground">Finance</h2>
-          <p className="text-muted-foreground">Suivez vos revenus, dépenses et rentabilité en temps réel.</p>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header section with glass effect */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/40 p-6 rounded-3xl border border-white/20 backdrop-blur-md shadow-2xl">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-primary/10 rounded-2xl shadow-inner">
+            <DollarSign className="h-8 w-8 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-4xl font-black tracking-tighter bg-linear-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              Finance
+            </h2>
+            <p className="text-muted-foreground font-medium flex items-center gap-2">
+              <TrendingUp className="h-3 w-3 text-emerald-500" />
+              Pilotage financier et rentabilité opérationnelle
+            </p>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="border-primary/20 hover:bg-primary/5">Exporer Rapport</Button>
-          <Button onClick={() => setIsFormOpen(true)} className="shadow-lg shadow-primary/20">
-            <Plus className="mr-2 h-4 w-4" />
+
+        <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+            <div className="flex items-center gap-2 bg-muted/30 p-2 rounded-2xl border border-muted/50 shadow-inner group transition-all hover:bg-muted/40">
+                <Calendar className="h-4 w-4 text-muted-foreground ml-2 group-hover:text-primary transition-colors" />
+                <input 
+                    type="date" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="bg-transparent border-none text-xs font-bold p-1 outline-none text-muted-foreground focus:text-foreground"
+                    aria-label="Date de début"
+                />
+                <span className="text-muted-foreground font-black">→</span>
+                <input 
+                    type="date" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="bg-transparent border-none text-xs font-bold p-1 outline-none text-muted-foreground focus:text-foreground"
+                    aria-label="Date de fin"
+                />
+            </div>
+
+          <Button 
+            onClick={() => setIsFormOpen(true)} 
+            className="rounded-2xl h-11 px-6 font-bold shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all hover:-translate-y-1 active:scale-95"
+          >
+            <Plus className="mr-2 h-5 w-5" />
             Nouvelle Dépense
           </Button>
         </div>
@@ -57,118 +131,49 @@ export function FinancePage() {
 
       <ExpenseForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20 shadow-xl shadow-emerald-500/5">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-1">Revenus (Ce mois)</p>
-                <h3 className="text-3xl font-black">24.500.000 <span className="text-sm font-normal text-muted-foreground">GNF</span></h3>
-              </div>
-              <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-600">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-xs text-emerald-600 font-bold">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
-              +12.5% par rapport au mois dernier
-            </div>
-          </CardContent>
-        </Card>
+      {/* Main Tabs Navigation */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
+        <TabsList className="bg-card/50 p-1.5 rounded-2xl h-auto backdrop-blur-sm border border-white/10 shadow-lg inline-flex">
+          <TabsTrigger value="overview" className="rounded-xl px-6 py-2.5 font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            Aperçu
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="rounded-xl px-6 py-2.5 font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            <Receipt className="h-4 w-4 mr-2" />
+            Dépenses
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="rounded-xl px-6 py-2.5 font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            <Tags className="h-4 w-4 mr-2" />
+            Catégories
+          </TabsTrigger>
+          <TabsTrigger value="profit" className="rounded-xl px-6 py-2.5 font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Rapports Profit
+          </TabsTrigger>
+        </TabsList>
 
-        <Card className="bg-linear-to-br from-rose-500/10 to-rose-500/5 border-rose-500/20 shadow-xl shadow-rose-500/5">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-bold text-rose-600 dark:text-rose-400 mb-1">Dépenses (Ce mois)</p>
-                <h3 className="text-3xl font-black">4.200.000 <span className="text-sm font-normal text-muted-foreground">GNF</span></h3>
-              </div>
-              <div className="p-2 bg-rose-500/20 rounded-lg text-rose-600">
-                <TrendingDown className="h-6 w-6" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-xs text-rose-600 font-bold">
-              <ArrowDownRight className="h-3 w-3 mr-1" />
-              -5.2% par rapport au mois dernier
-            </div>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <FinanceOverview stats={stats} />
+        </TabsContent>
 
-        <Card className="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20 shadow-xl shadow-primary/5">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-bold text-primary mb-1">Profit Net Estimé</p>
-                <h3 className="text-3xl font-black">20.300.000 <span className="text-sm font-normal text-muted-foreground">GNF</span></h3>
-              </div>
-              <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                <DollarSign className="h-6 w-6" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-xs text-primary font-bold">
-              Stable
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="expenses" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <ExpenseList 
+            expenses={expenses} 
+            isLoading={isLoadingExpenses}
+            onExportExcel={handleExportExcel}
+            onExportPdf={handleExportPdf}
+            isExporting={isExporting}
+          />
+        </TabsContent>
 
-      <Card className="border-none shadow-2xl bg-card/40 backdrop-blur-md overflow-hidden">
-        <CardHeader className="bg-muted/30 pb-4 border-b">
-          <CardTitle className="text-xl font-black flex items-center">
-            <Calendar className="mr-3 h-5 w-5 text-primary" />
-            Dépenses Récentes
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent bg-muted/10 border-muted/30">
-                <TableHead className="py-4 pl-6 font-bold uppercase text-[10px] tracking-widest">Référence</TableHead>
-                <TableHead className="font-bold uppercase text-[10px] tracking-widest">Catégorie</TableHead>
-                <TableHead className="font-bold uppercase text-[10px] tracking-widest">Description</TableHead>
-                <TableHead className="font-bold uppercase text-[10px] tracking-widest">Montant</TableHead>
-                <TableHead className="pr-6 font-bold uppercase text-[10px] tracking-widest">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoadingExpenses ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic">
-                    Chargement des transactions...
-                  </TableCell>
-                </TableRow>
-              ) : expenses?.results?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic">
-                    Aucune dépense enregistrée.
-                  </TableCell>
-                </TableRow>
-              ) : expenses?.results?.map((expense: { id: number, reference: string, category_name: string, amount: string, date: string, description: string }) => (
-                <TableRow key={expense.id} className="group border-muted/20 hover:bg-muted/10 transition-colors">
-                  <TableCell className="pl-6 font-mono text-[10px] text-muted-foreground">
-                    {expense.reference}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[10px] font-bold uppercase tracking-wider">
-                      {expense.category_name}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-black text-rose-500">
-                    -{formatCurrency(expense.amount)}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground italic">
-                    {new Date(expense.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </TableCell>
-                  <TableCell className="max-w-[200px] truncate text-muted-foreground opacity-70">
-                    {expense.description || '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+        <TabsContent value="categories" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <CategoryManager />
+        </TabsContent>
+
+        <TabsContent value="profit" className="outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <ProfitReport />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

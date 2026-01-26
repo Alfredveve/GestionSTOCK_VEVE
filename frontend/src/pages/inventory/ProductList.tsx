@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { 
   Plus, 
@@ -12,15 +13,19 @@ import {
   LayoutGrid, 
   List,
   Box,
+  Package,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
 import inventoryService from '@/services/inventoryService';
-import type { Product, Category } from '@/services/inventoryService';
+import type { Product, Category } from '@/types';
 import { cn } from '@/lib/utils';
 import { ProductDetailsDrawer } from '@/components/inventory/ProductDetailsDrawer';
 import { ProductForm } from '@/components/inventory/ProductForm';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { useRef } from 'react';
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -47,8 +52,12 @@ export function ProductList() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [isExporting, setIsExporting] = useState<'excel' | 'pdf' | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleOpenDetails = (product: Product) => {
     setSelectedProduct(product);
@@ -66,7 +75,8 @@ export function ProductList() {
       search: searchTerm, 
       category: categoryFilter || undefined,
       // status: statusFilter || undefined, // Backend might need support for this
-      page
+      page,
+      page_size: 12
     }),
   });
 
@@ -96,11 +106,60 @@ export function ProductList() {
   });
 
   const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('fr-FR', { 
-      style: 'currency', 
-      currency: 'GNF', 
-      maximumFractionDigits: 0 
-    }).format(typeof value === 'string' ? parseFloat(value) : value);
+    return new Intl.NumberFormat('fr-GN', {
+      maximumFractionDigits: 0
+    }).format(typeof value === 'string' ? parseFloat(value) : value) + ' GNF';
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting('excel');
+      await inventoryService.exportProductsExcel();
+      toast.success("Inventaire exporté avec succès vers Excel");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de l'exportation Excel");
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      setIsExporting('pdf');
+      await inventoryService.exportProductsPdf();
+      toast.success("Inventaire exporté avec succès vers PDF");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de l'exportation PDF");
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsImporting(true);
+      const result = await inventoryService.importProducts(file);
+      toast.success(result.message || "Produits importés avec succès");
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      if (result.errors && result.errors.length > 0) {
+        toast.warning(`${result.errors.length} erreurs lors de l'importation`);
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.error || "Erreur lors de l'importation des produits");
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -117,16 +176,39 @@ export function ProductList() {
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all">
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            className="hidden" 
+            accept=".xlsx, .xls"
+            aria-label="Importer des produits"
+          />
+          <Button 
+            variant="outline" 
+            onClick={handleExportExcel}
+            disabled={isExporting !== null}
+            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
+          >
+            {isExporting === 'excel' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
             Excel
           </Button>
-          <Button variant="outline" className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all">
-            <FileText className="mr-2 h-4 w-4" />
+          <Button 
+            variant="outline" 
+            onClick={handleExportPdf}
+            disabled={isExporting !== null}
+            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
+          >
+            {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
             PDF
           </Button>
-          <Button variant="outline" className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all">
-            <Download className="mr-2 h-4 w-4 rotate-180" />
+          <Button 
+            variant="outline" 
+            onClick={handleImportClick}
+            disabled={isImporting}
+            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
+          >
+            {isImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4 rotate-180" />}
             Importer
           </Button>
           <Button onClick={() => setIsFormOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6">
@@ -136,45 +218,79 @@ export function ProductList() {
         </div>
       </div>
 
-      <Card className="border-none shadow-2xl rounded-3xl overflow-hidden bg-white">
-        <div className="p-8 pb-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <h3 className="text-2xl font-black text-[#1a1c23]">Détails des produits</h3>
-              <div className="flex items-center bg-slate-100 p-1 rounded-xl ml-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setViewMode('list')}
-                  className={cn("h-8 w-8 rounded-lg", viewMode === 'list' ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:text-white" : "text-slate-400")}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setViewMode('grid')}
-                  className={cn("h-8 w-8 rounded-lg", viewMode === 'grid' ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:text-white" : "text-slate-400")}
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
+      <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-xl rounded-4xl overflow-hidden">
+        <div className="bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div>
+              <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center gap-3">
+                <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
+                   <Package className="h-6 w-6 text-blue-400" />
+                </div>
+                Détails des produits
+              </h2>
+              <div className="flex items-center gap-4">
+                <p className="text-slate-400 font-medium pl-14">Gérez votre catalogue, vos prix et vos stocks</p>
+                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest backdrop-blur-sm">
+                  {products?.count || 0} PRODUITS AU TOTAL
+                </Badge>
               </div>
             </div>
+            
+            <div className="bg-white/5 p-1.5 rounded-xl border border-white/10 flex items-center gap-1 backdrop-blur-sm">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  "h-9 px-3 rounded-lg font-bold text-xs uppercase tracking-wider transition-all", 
+                  viewMode === 'list' 
+                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" 
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <List className="h-4 w-4" />
+                  <span>Liste</span>
+                </div>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  "h-9 px-3 rounded-lg font-bold text-xs uppercase tracking-wider transition-all", 
+                  viewMode === 'grid' 
+                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" 
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  <span>Grille</span>
+                </div>
+              </Button>
+            </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input 
-                  placeholder="Rechercher..." 
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setPage(1);
-                  }}
-                  className="pl-11 bg-slate-50 border-slate-200 h-12 rounded-xl focus-visible:ring-blue-500/50"
-                />
-              </div>
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+            <div className="relative w-full sm:flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input 
+                placeholder="Rechercher par nom, SKU..." 
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+                className="pl-11 bg-slate-900/50 border-slate-700/50 text-white placeholder:text-slate-500 h-12 rounded-xl focus-visible:ring-2 focus-visible:ring-blue-500/50 border-none transition-all hover:bg-slate-900/70"
+              />
+            </div>
 
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <select 
                 title="Catégorie"
                 value={categoryFilter}
@@ -182,11 +298,11 @@ export function ProductList() {
                   setCategoryFilter(e.target.value);
                   setPage(1);
                 }}
-                className="h-12 w-full sm:w-48 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium outline-none text-slate-600"
+                className="h-12 w-full sm:w-48 rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 text-sm font-bold outline-none text-slate-300 focus:ring-2 focus:ring-blue-500/50 transition-all hover:bg-slate-900/70"
               >
-                <option value="">Toutes les catégories</option>
+                <option value="" className="bg-slate-900">Toutes catégories</option>
                 {categories?.results?.map((category: Category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
+                  <option key={category.id} value={category.id} className="bg-slate-900">{category.name}</option>
                 ))}
               </select>
 
@@ -197,20 +313,13 @@ export function ProductList() {
                   setStatusFilter(e.target.value);
                   setPage(1);
                 }}
-                className="h-12 w-full sm:w-48 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium outline-none text-slate-600"
+                className="h-12 w-full sm:w-40 rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 text-sm font-bold outline-none text-slate-300 focus:ring-2 focus:ring-blue-500/50 transition-all hover:bg-slate-900/70"
               >
-                <option value="">Tous les statuts</option>
-                <option value="in_stock">En Stock</option>
-                <option value="low_stock">Stock Faible</option>
-                <option value="out_of_stock">Rupture</option>
+                <option value="" className="bg-slate-900">Tous statuts</option>
+                <option value="in_stock" className="bg-slate-900">En Stock</option>
+                <option value="low_stock" className="bg-slate-900">Stock Faible</option>
+                <option value="out_of_stock" className="bg-slate-900">Rupture</option>
               </select>
-
-              <Button 
-                onClick={() => setPage(1)}
-                className="h-12 px-8 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20"
-              >
-                Filtrer
-              </Button>
             </div>
           </div>
         </div>
@@ -223,68 +332,63 @@ export function ProductList() {
                 <TableHeader className="bg-slate-50/50">
                   <TableRow className="border-slate-100 hover:bg-transparent">
                     <TableHead className="w-[60px] pl-8 py-5 text-[#94a3b8] font-bold text-xs uppercase tracking-wider">#</TableHead>
-                    <TableHead className="min-w-[200px] text-[#94a3b8] font-bold text-xs uppercase tracking-wider">
+                    <TableHead className="min-w-[250px] text-[#94a3b8] font-bold text-xs uppercase tracking-wider">
                       <div className="flex items-center gap-1 cursor-pointer">
                         PRODUIT <div className="flex flex-col -space-y-1"><ChevronUp className="h-3 w-3" /><ChevronDown className="h-3 w-3" /></div>
                       </div>
                     </TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">CATÉGORIE</TableHead>
                     <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">STOCK</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">PRIX ACHAT</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">MARGE</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">PRIX VENTE</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider font-center">STATUT</TableHead>
+                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">CATÉGORIE</TableHead>
+                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">VALEUR STOCK</TableHead>
+                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider text-center">STATUT</TableHead>
                     <TableHead className="text-[#94a3b8] pr-8 font-bold text-xs uppercase tracking-wider text-center">ACTES</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="h-64 text-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-                          <span className="text-slate-400 font-medium italic">Chargement des produits...</span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell className="pl-8 py-5"><div className="h-4 w-4 bg-slate-100 animate-pulse rounded" /></TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-4 py-2">
+                            <div className="space-y-2">
+                              <div className="h-4 w-32 bg-slate-100 animate-pulse rounded" />
+                              <div className="h-3 w-16 bg-slate-50 animate-pulse rounded" />
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell><div className="h-10 w-24 bg-slate-100 animate-pulse rounded-xl" /></TableCell>
+                        <TableCell><div className="h-6 w-20 bg-slate-100 animate-pulse rounded-lg" /></TableCell>
+                        <TableCell><div className="h-4 w-20 bg-slate-100 animate-pulse rounded" /></TableCell>
+                        <TableCell><div className="h-4 w-16 bg-slate-100 animate-pulse rounded" /></TableCell>
+                        <TableCell><div className="h-4 w-20 bg-slate-100 animate-pulse rounded" /></TableCell>
+                        <TableCell><div className="h-8 w-24 bg-slate-100 animate-pulse rounded-xl" /></TableCell>
+                        <TableCell className="pr-8"><div className="flex justify-center gap-2"><div className="h-10 w-10 bg-slate-100 animate-pulse rounded-xl" /><div className="h-10 w-10 bg-slate-100 animate-pulse rounded-xl" /></div></TableCell>
+                      </TableRow>
+                    ))
                   ) : products?.results?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="h-64 text-center text-slate-400 font-medium italic">
-                        Aucun produit trouvé.
+                      <TableCell colSpan={7} className="h-64 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <Box className="h-12 w-12 text-slate-200" />
+                          <span className="text-slate-400 font-medium font-italic">Aucun produit trouvé.</span>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
                     products?.results?.map((product: Product, index: number) => {
                       const unitsPerBox = product.units_per_box || 1;
-                      const colis = unitsPerBox > 1 ? Math.floor(product.current_stock / unitsPerBox) : 0;
-                      const unites = unitsPerBox > 1 ? product.current_stock % unitsPerBox : product.current_stock;
-                      
-                      const buyingPrice = parseFloat(product.buying_price);
-                      const sellingPrice = parseFloat(product.selling_price);
-                      const margin = sellingPrice - buyingPrice;
 
                       return (
                         <TableRow key={product.id} className="group hover:bg-slate-50/80 transition-all border-slate-100">
-                          <TableCell className="pl-8 font-bold text-slate-500">{(page - 1) * 10 + index + 1}</TableCell>
+                          <TableCell className="pl-8 font-bold text-slate-500">{(page - 1) * 12 + index + 1}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-4 py-2">
-                              <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-100 shadow-sm overflow-hidden shrink-0">
-                                {product.image ? (
-                                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                                ) : (
-                                  <Box className="h-7 w-7 opacity-30" />
-                                )}
-                              </div>
                               <div>
                                 <div className="font-bold text-[#1a1c23] text-base group-hover:text-blue-600 transition-colors uppercase">{product.name}</div>
                                 {product.sku && <div className="text-[11px] font-mono text-slate-400 tracking-wider mt-0.5">#{product.sku}</div>}
                               </div>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-slate-100 text-slate-500 font-bold uppercase text-[10px] px-2.5 py-1">
-                              {product.category_name}
-                            </Badge>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
@@ -293,21 +397,20 @@ export function ProductList() {
                               </Badge>
                               {unitsPerBox > 1 && (
                                 <div className="text-[11px] text-slate-400 font-medium">
-                                  {colis} Colis, {unites} Unité(s)
+                                {product.stock_analysis.analysis}
                                 </div>
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="font-medium text-slate-500">
-                            {formatCurrency(product.buying_price)}
-                          </TableCell>
-                          <TableCell className="font-bold text-emerald-500">
-                            {formatCurrency(margin)}
-                          </TableCell>
-                          <TableCell className="font-black text-[#1a1c23]">
-                            {formatCurrency(product.selling_price)}
-                          </TableCell>
                           <TableCell>
+                            <Badge variant="secondary" className="bg-slate-100 text-slate-500 font-bold uppercase text-[10px] px-2.5 py-1">
+                              {product.category_name}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-bold text-slate-600">
+                            {formatCurrency(product.current_stock * parseFloat(product.purchase_price))}
+                          </TableCell>
+                          <TableCell className="text-center">
                             {product.current_stock > product.reorder_level ? (
                               <Badge className="bg-cyan-50 text-cyan-500 hover:bg-cyan-100 border-none font-bold px-3 py-1.5 rounded-xl transition-all">
                                 En Stock
@@ -362,10 +465,10 @@ export function ProductList() {
             </div>
           ) : (
             <div className="p-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {isLoading ? (
                   Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="h-[400px] rounded-3xl bg-slate-50 animate-pulse" />
+                    <div key={i} className="h-[200px] rounded-3xl bg-slate-50 animate-pulse" />
                   ))
                 ) : products?.results?.length === 0 ? (
                   <div className="col-span-full h-64 flex items-center justify-center text-slate-400 italic">
@@ -373,56 +476,76 @@ export function ProductList() {
                   </div>
                 ) : (
                   products?.results?.map((product: Product) => {
-                    const buyingPrice = parseFloat(product.buying_price);
-                    const sellingPrice = parseFloat(product.selling_price);
-                    const margin = sellingPrice - buyingPrice;
-                    
+                    const unitsPerBox = product.units_per_box || 1;
                     return (
-                      <div key={product.id} className="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-                        <div className="aspect-square bg-slate-50 relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                          {product.image ? (
-                            <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center">
-                              <Box className="h-16 w-16 text-slate-200" />
-                            </div>
-                          )}
-                          <div className="absolute top-4 right-4 group-hover:opacity-100 opacity-0 transition-opacity">
-                            <Badge className="bg-white/90 backdrop-blur-md text-[#1a1c23] border-none font-bold">
+                      <div key={product.id} className="group relative bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden">
+                        {/* Decorative gradient header */}
+                        <div className="absolute top-0 inset-x-0 h-1.5 bg-linear-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="p-4 flex-1 flex flex-col">
+                          {/* Header: Category and SKU */}
+                          <div className="flex items-start justify-between gap-4 mb-2">
+                            <Badge variant="secondary" className="bg-slate-100 text-[#1a1c23] group-hover:bg-blue-50 group-hover:text-blue-600 border-none font-bold px-2 py-1 text-[10px] rounded-lg transition-colors">
                               {product.category_name}
                             </Badge>
+                            <span className="text-[9px] font-mono text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded-lg">#{product.sku}</span>
                           </div>
-                        </div>
-                        <div className="p-6 flex-1 flex flex-col">
-                          <h4 className="text-lg font-black text-[#1a1c23] uppercase truncate">{product.name}</h4>
-                          <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-widest">#{product.sku}</p>
+
+                          {/* Title */}
+                          <h4 className="text-base font-black text-[#1a1c23] uppercase leading-tight mb-3 transition-colors line-clamp-2" title={product.name}>
+                            {product.name}
+                          </h4>
                           
-                          <div className="mt-6 flex items-center justify-between">
-                            <div>
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Prix de vente</p>
-                              <p className="text-xl font-black text-blue-600 mt-1">{formatCurrency(product.selling_price)}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Marge</p>
-                              <p className="text-base font-bold text-emerald-500 mt-1">+{formatCurrency(margin)}</p>
+                          {/* Pricing Grid */}
+                          <div className="bg-slate-50/50 p-2 rounded-xl mb-3 border border-slate-100 group-hover:border-blue-100 group-hover:bg-blue-50/10 transition-colors">
+                            <div className="flex items-center justify-between gap-1">
+                              <div>
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Détail</p>
+                                <p className="text-[10px] font-black text-[#1a1c23] tracking-tight">{formatCurrency(product.selling_price)}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Gros</p>
+                                <p className="text-[10px] font-black text-[#1a1c23] tracking-tight">{formatCurrency(product.wholesale_selling_price)}</p>
+                              </div>
                             </div>
                           </div>
                           
-                          <div className="mt-auto pt-6 flex items-center justify-between gap-2 border-t border-slate-50">
-                            <div className="flex items-center gap-1.5">
+                          {/* Footer: Stock & Actions */}
+                          <div className="mt-auto flex items-center justify-between gap-3 pt-2 border-t border-slate-50">
+                            <div className="flex flex-col gap-1.5">
                               <Badge className={cn(
-                                "px-2 py-0.5 rounded-lg font-black text-[9px] uppercase",
-                                product.current_stock > product.reorder_level ? "bg-cyan-50 text-cyan-500" : "bg-rose-50 text-rose-500"
+                                "px-2 py-1.5 rounded-lg font-bold text-[9px] uppercase shadow-sm border-none w-fit",
+                                product.current_stock > product.reorder_level 
+                                  ? "bg-cyan-50 text-cyan-600" 
+                                  : product.current_stock > 0 
+                                    ? "bg-amber-50 text-amber-600" 
+                                    : "bg-rose-50 text-rose-600"
                               )}>
                                 {product.current_stock} EN STOCK
                               </Badge>
+                              {unitsPerBox > 1 && product.stock_analysis && (
+                                <span className="text-[10px] font-bold text-slate-500 pl-0.5">
+                                  {product.stock_analysis.analysis}
+                                </span>
+                              )}
                             </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button variant="ghost" size="icon" onClick={() => handleOpenDetails(product)} className="h-8 w-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50">
+
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleOpenDetails(product)} 
+                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleEdit(product)} className="h-8 w-8 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50">
-                                <Edit className="h-3.5 w-3.5" />
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleEdit(product)} 
+                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                              >
+                                <Edit className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -470,7 +593,7 @@ export function ProductList() {
           setIsFormOpen(false);
           setSelectedProduct(null);
         }} 
-        product={selectedProduct}
+        product={selectedProduct || undefined}
       />
 
       <ProductDetailsDrawer 
@@ -479,7 +602,18 @@ export function ProductList() {
         onClose={() => {
           setIsDrawerOpen(false);
           setSelectedProduct(null);
-        }} 
+        }}
+        onStartSale={(product) => {
+          // Navigate to POS page with the product pre-selected
+          navigate('/sales', { state: { selectedProduct: product } });
+          setIsDrawerOpen(false);
+        }}
+        onEdit={(product) => {
+          // Close drawer and open edit form
+          setIsDrawerOpen(false);
+          setSelectedProduct(product);
+          setIsFormOpen(true);
+        }}
       />
 
       {/* Delete Confirmation Dialog */}

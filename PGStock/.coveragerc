@@ -1,0 +1,31 @@
+# Test Configuration
+# Add this to your Django settings for testing
+
+# Coverage configuration
+COVERAGE_MODULE_EXCLUDES = [
+    'tests$', 'settings$', 'urls$', 'locale$',
+    '__pycache__', 'migrations', 'management',
+]
+
+COVERAGE_REPORT_HTML_OUTPUT_DIR = 'htmlcov'
+
+# Test settings
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+# Use in-memory database for faster tests
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+}
+
+# Disable migrations for faster tests
+class DisableMigrations:
+    def __contains__(self, item):
+        return True
+    
+    def __getitem__(self, item):
+        return None
+
+MIGRATION_MODULES = DisableMigrations()
