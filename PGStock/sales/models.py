@@ -84,8 +84,8 @@ class Order(models.Model):
     
     # Montants
     subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Sous-total"))
-    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Montant TVA"))
-    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Total TTC"))
+    discount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Remise globale"))
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Total"))
     amount_paid = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name=_("Montant payé"))
     payment_method = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Mode de paiement"))
     
@@ -94,6 +94,10 @@ class Order(models.Model):
     
     # Autres
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
+    
+    # Walk-in Client Details (Client de passage)
+    walk_in_name = models.CharField(max_length=200, blank=True, null=True, verbose_name=_("Nom du client (Passage)"))
+    walk_in_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("Téléphone (Passage)"))
 
     class Meta:
         verbose_name = _("Commande")
@@ -125,12 +129,16 @@ class Order(models.Model):
     def update_totals(self):
         """Recalcule les totaux en fonction des lignes"""
         items = self.items.all()
-        from decimal import ROUND_HALF_UP
+        from decimal import Decimal, ROUND_HALF_UP
         self.subtotal = sum(item.total_price for item in items)
         self.subtotal = self.subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        # Taxe simple pour l'exemple (18% par défaut, à configurer)
-        self.tax_amount = (self.subtotal * Decimal('0.18')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        self.total_amount = (self.subtotal + self.tax_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        # Apply discount (NO TAX)
+        self.total_amount = self.subtotal - self.discount
+        if self.total_amount < 0:
+            self.total_amount = Decimal('0.00')
+            
+        self.total_amount = self.total_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         # Mettre à jour le statut du paiement
         if self.amount_paid >= self.total_amount:

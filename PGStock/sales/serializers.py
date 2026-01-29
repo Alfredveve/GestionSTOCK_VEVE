@@ -5,21 +5,31 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_sku = serializers.CharField(source='product.sku', read_only=True)
     
+    is_wholesale = serializers.BooleanField(write_only=True, required=False)
+    
     class Meta:
         model = OrderItem
         fields = [
             'id', 'product', 'product_name', 'product_sku',
-            'quantity', 'unit_price', 'discount', 'total_price'
+            'quantity', 'unit_price', 'discount', 'total_price',
+            'is_wholesale'
         ]
         read_only_fields = ['total_price']
+
+    def validate_discount(self, value):
+        if value < 0 or value > 100:
+            raise serializers.ValidationError("La remise doit être comprise entre 0 et 100%.")
+        return value
+
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     client_name = serializers.CharField(source='client.name', read_only=True)
     pos_name = serializers.CharField(source='point_of_sale.name', read_only=True, allow_null=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
-    apply_tax = serializers.BooleanField(write_only=True, required=False)
     invoice_type = serializers.CharField(write_only=True, required=False)
+    date_issued = serializers.DateField(write_only=True, required=False)
+    date_due = serializers.DateField(write_only=True, required=False)
 
 
     class Meta:
@@ -30,49 +40,24 @@ class OrderSerializer(serializers.ModelSerializer):
             'point_of_sale', 'pos_name',
             'order_type', 'invoice_type', 'status', 'payment_status',
             'date_created', 'date_delivery_expected',
-            'subtotal', 'tax_amount', 'total_amount',
+            'subtotal', 'discount', 'total_amount',
             'amount_paid', 'payment_method',
             'notes', 'created_by', 'created_by_name',
-            'items', 'apply_tax'
+            'walk_in_name', 'walk_in_phone',
+            'items', 'date_issued', 'date_due'
         ]
         read_only_fields = [
             'order_number', 'payment_status', 
-            'date_created', 'subtotal', 'tax_amount', 'total_amount',
+            'date_created', 'subtotal', 'total_amount',
             'created_by'
         ]
+        extra_kwargs = {
+            'point_of_sale': {'required': False, 'allow_null': True},
+        }
 
     def validate(self, attrs):
-        # Validation stricte du stock (Règle: Interdit si Stock <= 2)
-        point_of_sale = attrs.get('point_of_sale')
-        
-        # Fallback pour récupérer le point_of_sale si non présent dans attrs (cas particuliers DRF)
-        if not point_of_sale and 'point_of_sale' in self.initial_data:
-            try:
-                from inventory.models import PointOfSale
-                pos_id = self.initial_data.get('point_of_sale')
-                if pos_id:
-                     point_of_sale = PointOfSale.objects.get(pk=pos_id)
-            except (PointOfSale.DoesNotExist, ImportError):
-                pass
-
-        items_data = attrs.get('items', [])
-        
-        if point_of_sale and items_data:
-            from inventory.models import Inventory
-            for item in items_data:
-                product = item.get('product')
-                try:
-                    inventory = Inventory.objects.get(product=product, point_of_sale=point_of_sale)
-                    # La règle est stricte : si le stock DISPONIBLE est <= 2, on bloque TOUTE vente
-                    if inventory.quantity <= 2:
-                        raise serializers.ValidationError({
-                            'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2, donc veuillez approvisonner le stock"
-                        })
-                except Inventory.DoesNotExist:
-                    # Pas d'inventaire = Stock 0 -> Donc <= 2 -> Bloqué
-                    raise serializers.ValidationError({
-                        'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2 (Stock inexistant), donc veuillez approvisonner le stock"
-                    })
+        # On ne bloque plus la vente si le stock est faible (<=2)
+        # On laisse le modèle gérer les alertes de stock bas
         return attrs
 
     def create(self, validated_data):
@@ -82,9 +67,10 @@ class OrderSerializer(serializers.ModelSerializer):
         if 'invoice_type' in validated_data and 'order_type' not in validated_data:
             validated_data['order_type'] = validated_data.pop('invoice_type')
         
-        # apply_tax is currently not used in Order model directly, but might be needed for logic
-        # For now we just pop it to avoid unexpected keyword argument errors
-        validated_data.pop('apply_tax', None)
+        # Remove fields not present in Order model
+        validated_data.pop('date_issued', None)
+        validated_data.pop('date_due', None)
+        validated_data.pop('invoice_type', None) # pop if it wasn't popped by order_type mapping
         
         if self.context.get('request') and self.context.get('request').user:
             validated_data['created_by'] = self.context.get('request').user
@@ -92,6 +78,7 @@ class OrderSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
         
         for item_data in items_data:
+            item_data.pop('is_wholesale', None) # Remove if present
             OrderItem.objects.create(order=order, **item_data)
         
         # Recalculate totals after items are added

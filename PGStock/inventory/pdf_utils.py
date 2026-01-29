@@ -278,13 +278,6 @@ def export_invoice_to_pdf(invoice):
         Paragraph(f"{float(invoice.subtotal):,.0f} GNF", style_box_val)
     ])
     
-    # Tax - ONLY SHOW IF > 0
-    if invoice.tax_amount > 0:
-        totals_data.append([
-            Paragraph(f"TVA ({invoice.tax_rate}%)", styles['Normal']), 
-            Paragraph(f"{float(invoice.tax_amount):,.0f} GNF", style_box_val)
-        ])
-    
     # Discount - ONLY SHOW IF > 0
     if invoice.discount_amount > 0:
         totals_data.append([
@@ -479,9 +472,26 @@ def export_order_to_pdf(order):
     elements.append(Spacer(1, 1*cm))
 
     # Client
-    client_content = [[Paragraph("CLIENT", ParagraphStyle('CL', fontSize=8, fontName='Helvetica-Bold'))], [Paragraph(order.client.name, ParagraphStyle('CN', fontSize=14, fontName='Helvetica-Bold'))]]
-    client_table = Table(client_content, colWidths=[18*cm])
-    client_table.setStyle(TableStyle([('BACKGROUND', (0,0), (-1,-1), col_blue_bg), ('LEFTPADDING', (0,0), (-1,-1), 15)]))
+    # Client logic: Use walk-in details if available
+    client_name = order.walk_in_name if order.walk_in_name else order.client.name
+    client_phone = order.walk_in_phone if order.walk_in_phone else (order.client.phone or '')
+    
+    client_rows = [
+        [Paragraph("CLIENT", ParagraphStyle('CL', fontSize=8, fontName='Helvetica-Bold', textColor=col_blue_text))],
+        [Paragraph(client_name, ParagraphStyle('CN', fontSize=14, fontName='Helvetica-Bold'))]
+    ]
+    if client_phone:
+        client_rows.append([Paragraph(f"Tel: {client_phone}", styles['Normal'])])
+
+    client_table = Table(client_rows, colWidths=[18*cm])
+    client_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), col_blue_bg), 
+        ('LEFTPADDING', (0,0), (-1,-1), 15),
+        ('RIGHTPADDING', (0,0), (-1,-1), 15),
+        ('TOPPADDING', (0,0), (-1,-1), 10),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 10),
+        ('ROUNDEDCORNERS', [8, 8, 8, 8])
+    ]))
     elements.append(client_table)
     elements.append(Spacer(1, 1*cm))
 
@@ -502,11 +512,15 @@ def export_order_to_pdf(order):
     elements.append(Spacer(1, 1*cm))
 
     # Totals
-    totals_data = [
-        [Paragraph("Total TTC", styles['Normal']), Paragraph(f"{float(order.total_amount):,.0f} GNF", style_box_val)],
-        [Paragraph("Payé", styles['Normal']), Paragraph(f"{float(order.amount_paid):,.0f} GNF", style_box_val)],
-        [Paragraph("Solde", ParagraphStyle('TL', fontName='Helvetica-Bold')), Paragraph(f"{float(order.total_amount - order.amount_paid):,.0f} GNF", ParagraphStyle('TV', fontName='Helvetica-Bold', textColor=colors.red))]
-    ]
+    totals_data = []
+    totals_data.append([Paragraph("Sous-Total", styles['Normal']), Paragraph(f"{float(order.subtotal):,.0f} GNF", style_box_val)])
+    
+    if order.discount and order.discount > 0:
+        totals_data.append([Paragraph("Remise", styles['Normal']), Paragraph(f"- {float(order.discount):,.0f} GNF", style_box_val)])
+        
+    totals_data.append([Paragraph("Total TTC", styles['Normal']), Paragraph(f"{float(order.total_amount):,.0f} GNF", style_box_val)])
+    totals_data.append([Paragraph("Payé", styles['Normal']), Paragraph(f"{float(order.amount_paid):,.0f} GNF", style_box_val)])
+    totals_data.append([Paragraph("Solde", ParagraphStyle('TL', fontName='Helvetica-Bold')), Paragraph(f"{float(order.total_amount - order.amount_paid):,.0f} GNF", ParagraphStyle('TV', fontName='Helvetica-Bold', textColor=colors.red))])
     elements.append(Table(totals_data, colWidths=[4*cm, 4*cm], hAlign='RIGHT'))
     
     doc.build(elements)

@@ -140,6 +140,10 @@ const inventoryService = {
     return response.data;
   },
 
+  async deleteInvoice(id: number): Promise<void> {
+    await api.delete(`invoices/${id}/`);
+  },
+
   async getReceipts(params?: CommonQueryParams): Promise<PaginatedResponse<Receipt>> {
     const response = await api.get('receipts/', { params });
     return response.data;
@@ -497,6 +501,11 @@ const inventoryService = {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  },
+
+  async getGlobalStockStats(): Promise<any> {
+    const response = await api.get('products/global_stock_stats/');
+    return response.data;
   },
 };
 

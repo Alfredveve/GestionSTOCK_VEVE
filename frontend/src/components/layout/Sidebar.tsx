@@ -53,6 +53,10 @@ const navigation: NavigationItem[] = [
                 href: '/products',
                 icon: Package
             }, {
+                name: 'Liste Globale',
+                href: '/list-global-produits',
+                icon: Monitor
+            }, {
                 name: 'Catégories',
                 href: '/categories',
                 icon: Tags
@@ -66,6 +70,10 @@ const navigation: NavigationItem[] = [
         icon: Archive,
         children: [
             {
+                name: 'Tableau de Bord Global',
+                href: '/inventory/global-dashboard',
+                icon: BarChart3
+            }, {
                 name: 'État du stock',
                 href: '/stock-movements',
                 icon: Archive

@@ -64,8 +64,6 @@ export interface Invoice {
   date_due: string;
   status: 'draft' | 'sent' | 'paid' | 'cancelled';
   subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
   discount_amount: number;
   total_amount: number;
   total_profit: number;
@@ -74,7 +72,6 @@ export interface Invoice {
   created_by: number;
   created_by_name: string;
   created_at: string;
-  apply_tax: boolean;
   items: InvoiceItem[];
 }
 
@@ -102,8 +99,6 @@ export interface Quote {
   valid_until: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'converted';
   subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
   total_amount: number;
   notes: string;
   created_by: number;
@@ -381,3 +376,56 @@ export interface PaginatedResponse<T> {
   next: string | null;
   previous: string | null;
 }
+
+// Global Stock Dashboard Types
+export interface GlobalStockStats {
+  summary: {
+    total_products: number;
+    total_stock_value: number;
+    products_in_stock: number;
+    products_low_stock: number;
+    products_out_of_stock: number;
+  };
+  by_point_of_sale: Array<{
+    id: number;
+    name: string;
+    code: string;
+    city: string;
+    product_count: number;
+    total_quantity: number;
+    total_value: number;
+  }>;
+  imbalanced_products: Array<{
+    id: number;
+    name: string;
+    sku: string;
+    total_stock: number;
+    max_stock: number;
+    min_stock: number;
+    variance: number;
+    distribution: Array<{
+      point_of_sale__name: string;
+      point_of_sale__code: string;
+      quantity: number;
+    }>;
+  }>;
+  low_stock_alerts: Array<{
+    product_id: number;
+    product_name: string;
+    sku: string;
+    pos_name: string;
+    pos_code: string;
+    quantity: number;
+    reorder_level: number;
+    status: string;
+  }>;
+  top_products_by_value: Array<{
+    id: number;
+    name: string;
+    sku: string;
+    total_quantity: number;
+    stock_value: number;
+    selling_price: number;
+  }>;
+}
+

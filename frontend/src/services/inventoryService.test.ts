@@ -61,7 +61,7 @@ describe('inventoryService', () => {
 
       const result = await inventoryService.getStats();
 
-      expect(api.get).toHaveBeenCalledWith('dashboard/');
+      expect(api.get).toHaveBeenCalledWith('dashboard/', { params: undefined });
       expect(result).toEqual(mockStats);
     });
   });

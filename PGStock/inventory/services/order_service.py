@@ -281,21 +281,22 @@ class OrderService(BaseService):
     
     def calculate_totals(self, order):
         """
-        Calculate order totals (subtotal, tax, total).
+        Calculate order totals (subtotal, total).
         
         Args:
             order: Order to calculate totals for
         """
         items = order.items.all()
+        from decimal import Decimal, ROUND_HALF_UP
         
         # Calculate subtotal
         order.subtotal = sum(item.total_price for item in items)
+        order.subtotal = Decimal(str(order.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
-        # Calculate tax (18% by default)
-        order.tax_amount = order.subtotal * Decimal('0.18')
-        
-        # Calculate total
-        order.total_amount = order.subtotal + order.tax_amount
+        # Calculate total (No tax)
+        order.total_amount = (order.subtotal - order.discount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        if order.total_amount < 0:
+            order.total_amount = Decimal('0.00')
         
         # Update payment status
         if order.amount_paid >= order.total_amount:

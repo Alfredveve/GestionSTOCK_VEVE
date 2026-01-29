@@ -220,12 +220,20 @@ export function InvoiceDetailsPage() {
                                     <div>
                                         <Badge className={
                                                 `mt-1 font-bold text-[10px] uppercase ${
-                                                    invoice.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : invoice.status === 'partial' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                                    (Number(invoice.balance) <= 0) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    invoice.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                                                    invoice.status === 'partial' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
+                                                    invoice.status === 'draft' ? 'bg-slate-500/10 text-slate-500 border-slate-500/20' :
+                                                    'bg-rose-500/10 text-rose-500 border-rose-500/20'
                                                 }`
                                             }
                                             variant="outline">
                                             {
-                                            invoice.status === 'paid' ? 'Payée' : invoice.status === 'partial' ? 'Partiel' : 'Impayée'
+                                            (Number(invoice.balance) <= 0) ? 'Payée' :
+                                            invoice.status === 'paid' ? 'Payée' : 
+                                            invoice.status === 'partial' ? 'Partiel' : 
+                                            invoice.status === 'draft' ? 'Brouillon' :
+                                            invoice.status === 'cancelled' ? 'Annulée' : 'Impayée'
                                         } </Badge>
                                     </div>
                                 </div>
@@ -239,7 +247,7 @@ export function InvoiceDetailsPage() {
                                     <Label className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Date d'échéance</Label>
                                     <p className="font-bold text-foreground text-sm">
                                         {
-                                        invoice.due_date && invoice.due_date !== 'Invalid Date' ? new Date(invoice.due_date).toLocaleDateString('fr-FR') : 'Non définie'
+                                        invoice.date_due && invoice.date_due !== 'Invalid Date' ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : 'Non définie'
                                     } </p>
                                 </div>
                             </div>
@@ -460,7 +468,7 @@ export function InvoiceDetailsPage() {
                                         </div>
                                         <div>
                                             <p className="text-[9px] font-bold text-gray-400 uppercase">Date d'échéance</p>
-                                            <p className="text-sm font-black text-gray-700">{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('fr-FR') : '-'}</p>
+                                            <p className="text-sm font-black text-gray-700">{invoice.date_due ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : '-'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -567,7 +575,7 @@ export function InvoiceDetailsPage() {
                                 <div className="bg-gray-100 p-3 mb-4 rounded-md">
                                     <div className="grid grid-cols-2 text-xs font-black uppercase tracking-wider">
                                         <p>Date d'émission: {invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : '-'}</p>
-                                        <p className="text-right">Échéance: {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('fr-FR') : '-'}</p>
+                                        <p className="text-right">Échéance: {invoice.date_due ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : '-'}</p>
                                     </div>
                                 </div>
 
@@ -641,7 +649,7 @@ export function InvoiceDetailsPage() {
                                 <div className="text-right flex flex-col justify-end">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-300 mb-4 italic">Statut</p>
                                     <p className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">
-                                        {invoice.status === 'paid' ? 'Payé' : invoice.status === 'partial' ? 'Partiel' : 'Impayé'}
+                                        {(Number(invoice.balance) <= 0) ? 'Payé' : invoice.status === 'paid' ? 'Payé' : invoice.status === 'partial' ? 'Partiel' : 'Impayé'}
                                     </p>
                                 </div>
                             </div>

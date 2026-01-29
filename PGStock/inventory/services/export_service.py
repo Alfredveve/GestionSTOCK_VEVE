@@ -101,7 +101,6 @@ class ExportService(BaseService):
                 'Client': invoice.client.name,
                 'Point de vente': invoice.point_of_sale.name if invoice.point_of_sale else '',
                 'Sous-total': float(invoice.subtotal),
-                'TVA': float(invoice.tax_amount),
                 'Total': float(invoice.total_amount),
                 'Statut': invoice.status,
                 'Montant payé': float(invoice.get_amount_paid()),

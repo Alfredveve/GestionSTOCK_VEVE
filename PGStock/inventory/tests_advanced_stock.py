@@ -204,7 +204,6 @@ class DecimalCalculationTests(TestCase):
             date_issued=date(2023, 1, 1),
             date_due=date(2023, 1, 1),
             status='draft',
-            tax_rate=Decimal('16.00'),
             created_by=self.user
         )
         InvoiceItem.objects.create(
@@ -221,9 +220,13 @@ class DecimalCalculationTests(TestCase):
         
         # Verify no TypeError and results are Decimal
         self.assertIsInstance(invoice.subtotal, Decimal)
-        self.assertIsInstance(invoice.tax_amount, Decimal)
         self.assertIsInstance(invoice.total_amount, Decimal)
         
         # Verify calculation correctness
-        expected_subtotal = Decimal('284.97')  # 3 * 99.99 * 0.95
-        self.assertEqual(invoice.subtotal, expected_subtotal)
+        # Total = Subtotal - Discount
+        # Item Subtotal = 3 * 99.99 = 299.97
+        # Item Discount (5%) = 299.97 * 0.05 = 14.9985 -> 15.00
+        # Item Total = 299.97 - 15.00 = 284.97
+        expected_total = Decimal('284.97')
+        self.assertEqual(invoice.subtotal, expected_total)
+        self.assertEqual(invoice.total_amount, expected_total)

@@ -32,7 +32,8 @@ import {
   ArrowRightLeft,
   ShoppingBag,
   Truck,
-  XCircle
+  XCircle,
+  DollarSign
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import type { Quote } from '@/types';
@@ -40,6 +41,7 @@ import type { Order } from '@/services/salesService';
 import salesService from '@/services/salesService';
 import dashboardService from '@/services/dashboardService';
 import { toast } from 'sonner';
+import { OrderPaymentDialog } from '@/components/sales/OrderPaymentDialog';
 import {
   Tabs,
   TabsContent,
@@ -88,6 +90,8 @@ export function QuotesPage() {
   const [endDate, setEndDate] = useState<string>('');
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
+  const [showOrderPaymentModal, setShowOrderPaymentModal] = useState(false);
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
@@ -624,6 +628,8 @@ export function QuotesPage() {
         </DialogContent>
       </Dialog>
 
+
+
         </TabsContent>
 
         <TabsContent value="orders" className="space-y-6 mt-0 border-none p-0">
@@ -723,7 +729,16 @@ export function QuotesPage() {
                       <TableCell className="pl-6 font-mono text-xs font-bold text-primary">
                         {order.order_number}
                       </TableCell>
-                      <TableCell className="font-bold">{order.client_name || `Client #${order.client}`}</TableCell>
+                      <TableCell className="font-bold">
+                        {order.walk_in_name ? (
+                          <div className="flex flex-col">
+                            <span>{order.walk_in_name}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Passage</span>
+                          </div>
+                        ) : (
+                          order.client_name || `Client #${order.client}`
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge className={`font-bold capitalize ${
                           order.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
@@ -777,6 +792,19 @@ export function QuotesPage() {
                               </DropdownMenuItem>
                             )}
 
+                            {((Number(order.total_amount) || 0) - (Number(order.amount_paid) || 0)) > 0 && order.status !== 'cancelled' && (
+                                <DropdownMenuItem 
+                                    onClick={() => {
+                                        setSelectedOrderForPayment(order);
+                                        setShowOrderPaymentModal(true);
+                                    }}
+                                    className="text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50"
+                                >
+                                    <DollarSign className="mr-2 h-4 w-4" />
+                                    Enregistrer un paiement
+                                </DropdownMenuItem>
+                            )}
+
                             {order.status !== 'cancelled' && order.status !== 'delivered' && (
                               <>
                                 <DropdownMenuSeparator />
@@ -800,6 +828,16 @@ export function QuotesPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <OrderPaymentDialog 
+        open={showOrderPaymentModal} 
+        onOpenChange={setShowOrderPaymentModal} 
+        order={selectedOrderForPayment} 
+        onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+        }} 
+      />
 
       {/* Pagination (shared or duplicate?) - keeping it shared for quotes mostly for now as per current structure */}
     </div>

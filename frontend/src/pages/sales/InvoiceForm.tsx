@@ -32,7 +32,6 @@ import {
   Search,
   Loader2
 } from 'lucide-react';
-import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from '@/store/authStore';
 
 interface InvoiceFormItem {
@@ -68,8 +67,8 @@ export function InvoiceForm() {
 
   const [items, setItems] = useState<InvoiceFormItem[]>([]);
   const [notes, setNotes] = useState('');
+  const [globalDiscount, setGlobalDiscount] = useState<number>(0);
   const [invoiceType, setOrderType] = useState<'retail' | 'wholesale'>('retail');
-  const [applyTax, setApplyTax] = useState(true);
 
   // Product Search State
   const [productSearch, setProductSearch] = useState('');
@@ -111,7 +110,7 @@ export function InvoiceForm() {
       setDateDue(existingInvoice.due_date || existingInvoice.date_due);
       setOrderType(existingInvoice.order_type || (existingInvoice.invoice_type === 'wholesale' ? 'wholesale' : 'retail'));
       setNotes(existingInvoice.notes || '');
-      setApplyTax(existingInvoice.apply_tax !== false);
+      setGlobalDiscount(Number(existingInvoice.discount || 0));
       
       const formItems: InvoiceFormItem[] = existingInvoice.items.map(item => ({
         product: {
@@ -155,11 +154,11 @@ export function InvoiceForm() {
           quantity: item.quantity,
           unit_price: item.unit_price,
           is_wholesale: item.is_wholesale,
-          discount: item.discount
+          discount: Math.min(100, Math.max(0, item.discount))
         })),
         notes: notes,
-        point_of_sale: parseInt(selectedPosId),
-        apply_tax: applyTax,
+        discount: globalDiscount,
+        point_of_sale: parseInt(selectedPosId)
       };
 
       if (isEdit) {
@@ -213,16 +212,13 @@ export function InvoiceForm() {
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => {
       const price = item.unit_price * item.quantity;
-      const discountAmount = price * (item.discount / 100);
+      const discountAmount = price * (Math.min(100, item.discount) / 100);
       return sum + (price - discountAmount);
     }, 0);
     
-    // Tax hardcoded to 18% for now or fetch settings
-    const taxRate = applyTax ? 0.18 : 0; 
-    const taxAmount = subtotal * taxRate;
-    const total = subtotal + taxAmount;
+    const total = Math.max(0, subtotal - globalDiscount);
 
-    return { subtotal, taxAmount, total };
+    return { subtotal, total };
   };
 
   const totals = calculateTotals();
@@ -435,14 +431,21 @@ export function InvoiceForm() {
                            />
                          </TableCell>
                           <TableCell>
-                           <Input 
-                             type="number" 
-                             min={0}
-                             max={100}
-                             value={item.discount}
-                             onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
-                             className="text-right h-8"
-                           />
+                            <Input 
+                              type="number" 
+                              min={0}
+                              max={100}
+                              value={item.discount}
+                              onChange={(e) => {
+                                let val = parseFloat(e.target.value) || 0;
+                                if (val > 100) {
+                                  toast.warning("La remise par article ne peut pas dépasser 100%.");
+                                  val = 100;
+                                }
+                                updateItem(index, 'discount', val);
+                              }}
+                              className="text-right h-8"
+                            />
                          </TableCell>
                          <TableCell>
                            <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50" onClick={() => handleRemoveItem(index)}>
@@ -479,29 +482,29 @@ export function InvoiceForm() {
                <CardTitle>Résumé</CardTitle>
              </CardHeader>
              <CardContent className="space-y-4">
-               <div className="space-y-2 text-sm">
-                 <div className="flex justify-between">
-                   <span className="text-muted-foreground">Sous-total</span>
-                   <span className="font-bold">{formatCurrency(totals.subtotal)}</span>
-                 </div>
-                 <div className="flex justify-between items-center py-2 border-b border-dashed border-primary/10">
-                   <span className="text-muted-foreground">Appliquer TVA (18%)</span>
-                   <Switch 
-                     checked={applyTax} 
-                     onCheckedChange={setApplyTax}
-                   />
-                 </div>
-                 {applyTax && (
-                   <div className="flex justify-between">
-                     <span className="text-muted-foreground">Montant TVA</span>
-                     <span className="font-bold">{formatCurrency(totals.taxAmount)}</span>
-                   </div>
-                 )}
-                 <div className="pt-4 border-t border-dashed border-primary/20 flex justify-between items-end">
-                   <span className="text-lg font-bold">Total TTC</span>
-                   <span className="text-2xl font-black text-primary">{formatCurrency(totals.total)}</span>
-                 </div>
-               </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Sous-total</span>
+                    <span className="font-bold">{formatCurrency(totals.subtotal)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1 pt-2">
+                    <Label className="text-muted-foreground">Remise Globale (Montant)</Label>
+                    <Input 
+                      type="number"
+                      min={0}
+                      value={globalDiscount}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setGlobalDiscount(val);
+                      }}
+                      className="h-8 text-right font-bold text-rose-600 bg-white"
+                    />
+                  </div>
+                  <div className="pt-4 border-t border-dashed border-primary/20 flex justify-between items-end">
+                    <span className="text-lg font-bold">Total</span>
+                    <span className="text-2xl font-black text-primary">{formatCurrency(totals.total)}</span>
+                  </div>
+                </div>
 
                <div className="pt-6 space-y-3">
                  <Button 

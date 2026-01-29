@@ -51,7 +51,7 @@ def test_quote_conversion():
         date_issued="2025-12-22",
         valid_until="2026-01-22",
         created_by=user,
-        tax_rate=Decimal('18')
+        tax_rate=Decimal('16')
     )
     quote.quote_number = quote.generate_quote_number()
     quote.save()

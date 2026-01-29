@@ -7,7 +7,7 @@ class SettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Settings
         fields = [
-            'id', 'company_name', 'language', 'currency', 'tax_rate', 
+            'id', 'company_name', 'language', 'currency', 
             'default_order_type', 'email_notifications', 'daily_reports', 
             'new_customer_notifications', 'smart_rounding'
         ]
@@ -45,9 +45,23 @@ class PointOfSaleSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     supplier_name = serializers.CharField(source='supplier.name', read_only=True, allow_null=True)
-    current_stock = serializers.IntegerField(source='get_total_stock_quantity', read_only=True)
+    current_stock = serializers.SerializerMethodField()
     stock_status = serializers.CharField(source='get_stock_status', read_only=True)
     stock_analysis = serializers.SerializerMethodField()
+
+    def get_current_stock(self, obj):
+        """Calculer le stock basé sur le point de vente si présent dans les paramètres"""
+        request = self.context.get('request')
+        if request:
+            pos_id = request.query_params.get('point_of_sale') or request.query_params.get('pos_id')
+            if pos_id:
+                try:
+                    from .models import Inventory
+                    inv = Inventory.objects.get(product=obj, point_of_sale_id=pos_id)
+                    return inv.quantity
+                except Exception:
+                    return 0
+        return obj.get_total_stock_quantity()
     
     def get_stock_analysis(self, obj):
         """Retourne les données d'analyse du stock (Colis, Unités, Analyse)"""
@@ -133,6 +147,12 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['total', 'margin', 'purchase_price']
 
+    def validate_discount(self, value):
+        if value is not None and (value < 0 or value > 100):
+            raise serializers.ValidationError("La remise doit être comprise entre 0 et 100%.")
+        return value
+
+
 class InvoiceSerializer(serializers.ModelSerializer):
     items = InvoiceItemSerializer(source='invoiceitem_set', many=True, required=False)
     client_name = serializers.CharField(source='client.name', read_only=True)
@@ -150,13 +170,12 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'id', 'invoice_number', 'client', 'client_name',
             'invoice_type', 'point_of_sale', 'pos_name',
             'date_issued', 'date_due', 'status', 
-            'subtotal', 'tax_rate', 'tax_amount', 
-            'discount_amount', 'total_amount', 'total_profit',
+            'subtotal', 'discount_amount', 'total_amount', 'total_profit',
             'balance', 'notes', 
             'created_by', 'created_by_name',
-            'created_at', 'items', 'payment_method', 'amount_paid', 'apply_tax'
+            'created_at', 'items', 'payment_method', 'amount_paid'
         ]
-        read_only_fields = ['invoice_number', 'subtotal', 'tax_amount', 'total_amount', 'total_profit', 'created_by']
+        read_only_fields = ['invoice_number', 'subtotal', 'total_amount', 'total_profit', 'created_by']
     
     def create(self, validated_data):
         from datetime import date, timedelta
@@ -187,13 +206,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
              temp_instance = Invoice()
              validated_data['invoice_number'] = temp_instance.generate_invoice_number()
         
-        # Validation stricte du stock (Règle: Interdit si Stock <= 2)
+        # Get point of sale for reference (validation logic removed)
         point_of_sale = validated_data.get('point_of_sale')
         
-        # Validation stricte du stock (Règle: Interdit si Stock <= 2)
-        point_of_sale = validated_data.get('point_of_sale')
-        
-        # Fallback pour récupérer le point_of_sale si non présent dans validated_data
+        # Fallback for point_of_sale if not present in validated_data
         if not point_of_sale and 'point_of_sale' in self.initial_data:
             try:
                 pos_id = self.initial_data.get('point_of_sale')
@@ -201,44 +217,6 @@ class InvoiceSerializer(serializers.ModelSerializer):
                      point_of_sale = PointOfSale.objects.get(pk=pos_id)
             except PointOfSale.DoesNotExist:
                 pass
-
-        if point_of_sale:
-            # Note: Inventory is already imported at the top of this file
-            if not items_data and self.initial_data.get('items'):
-                 # Si items_data est vide mais présent dans initial_data, il y a un problème de mapping
-                 # On essaie de récupérer basiquement pour la validation
-                 raw_items = self.initial_data.get('items')
-                 if isinstance(raw_items, list):
-                      for raw_item in raw_items:
-                          try:
-                               prod_id = raw_item.get('product')
-                               product = Product.objects.get(pk=prod_id)
-                               # Check logic
-                               try:
-                                    inventory = Inventory.objects.get(product=product, point_of_sale=point_of_sale)
-                                    if inventory.quantity <= 2:
-                                        raise serializers.ValidationError({
-                                            'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2, donc veuillez approvisonner le stock"
-                                        })
-                               except Inventory.DoesNotExist:
-                                    raise serializers.ValidationError({
-                                        'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2 (Stock inexistant), donc veuillez approvisonner le stock"
-                                    })
-                          except Product.DoesNotExist:
-                               pass
-            
-            for item_data in items_data:
-                product = item_data.get('product')
-                try:
-                    inventory = Inventory.objects.get(product=product, point_of_sale=point_of_sale)
-                    if inventory.quantity <= 2:
-                        raise serializers.ValidationError({
-                            'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2, donc veuillez approvisonner le stock"
-                        })
-                except Inventory.DoesNotExist:
-                     raise serializers.ValidationError({
-                        'detail': f"La vente de ce produit ({product.name}) est interdite car la q<=2 (Stock inexistant), donc veuillez approvisonner le stock"
-                    })
 
         # Create the invoice
         invoice = Invoice.objects.create(**validated_data)
@@ -353,11 +331,11 @@ class QuoteSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'quote_number', 'client', 'client_name',
             'quote_type', 'date_issued', 'valid_until', 'status',
-            'subtotal', 'tax_rate', 'tax_amount', 'total_amount',
+            'subtotal', 'total_amount',
             'notes', 'created_by', 'created_by_name',
             'created_at', 'items'
         ]
-        read_only_fields = ['quote_number', 'subtotal', 'tax_amount', 'total_amount', 'created_by']
+        read_only_fields = ['quote_number', 'subtotal', 'total_amount', 'created_by']
 
     def create(self, validated_data):
         from .models import QuoteItem

@@ -25,8 +25,11 @@ export interface Order {
   status?: string;
   created_at?: string;
   apply_tax?: boolean;
+  discount?: number;
   client_name?: string;
   order_number?: string;
+  walk_in_name?: string;
+  walk_in_phone?: string;
 }
 
 const salesService = {
@@ -59,6 +62,11 @@ const salesService = {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  },
+
+  addPayment: async (id: number, amount: number, paymentMethod: string) => {
+    const response = await api.post(`orders/${id}/add_payment/`, { amount, payment_method: paymentMethod });
+    return response.data;
   },
 
   exportOrdersPdf: async () => {

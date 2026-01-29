@@ -65,6 +65,6 @@ describe('InvoiceForm Component Tests', () => {
     
     // Note: InvoiceForm uses a complex UI, usually with a product search
     // let's verify if the "Total" display is present
-    expect(screen.getByText(/Total TTC/i)).toBeDefined();
+    expect(screen.getByText(/Total/i)).toBeDefined();
   });
 });

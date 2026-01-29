@@ -88,7 +88,12 @@ export function StockMovementsPage() {
   });
 
   // Fetch all products for the dropdown (without pagination)
-  const { data: allProducts, refetch: refetchAllProducts } = useQuery({
+  const { 
+    data: allProducts, 
+    isLoading: isLoadingAllProducts,
+    isError: isErrorProducts,
+    refetch: refetchAllProducts 
+  } = useQuery({
     queryKey: ['products-all-for-dropdown'],
     queryFn: () => inventoryService.getProducts({ 
       page_size: 1000 // Fetch all products for dropdown
@@ -202,6 +207,11 @@ export function StockMovementsPage() {
 
   // Filter products for the dropdown based on search
   const filteredProducts = allProducts?.results?.filter((p: Product) => {
+    // Always include the currently selected product if it exists
+    if (selectedProductId && p.id.toString() === selectedProductId) return true;
+    
+    if (!productSearch) return true;
+    
     const search = productSearch.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const name = (p.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const sku = (p.sku || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -687,14 +697,31 @@ export function StockMovementsPage() {
                            className="h-12 pl-11 bg-white/5 border-white/10 text-white rounded-xl focus:ring-indigo-500/50 mb-2 border-dashed"
                          />
                       </div>
-                      <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                      <Select 
+                        value={selectedProductId} 
+                        onValueChange={setSelectedProductId}
+                        disabled={isLoadingAllProducts}
+                      >
                         <SelectTrigger className="h-14 bg-white/5 border-white/10 text-white rounded-xl focus:ring-indigo-500/50">
-                          <SelectValue placeholder={productSearch ? "Résultats de recherche..." : "Choisir un produit..."} />
+                          <SelectValue placeholder={
+                            isLoadingAllProducts ? "Chargement des produits..." : 
+                            isErrorProducts ? "Erreur de chargement" : 
+                            "Choisir un produit..."
+                          } />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-900 border-white/10 text-white max-h-[300px]">
-                          {filteredProducts.length === 0 ? (
+                          {isLoadingAllProducts ? (
+                            <div className="p-4 text-center text-white/40 text-sm flex items-center justify-center gap-2">
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              Chargement...
+                            </div>
+                          ) : isErrorProducts ? (
+                            <div className="p-4 text-center text-rose-400 text-sm">
+                              Erreur lors du chargement des produits
+                            </div>
+                          ) : filteredProducts.length === 0 ? (
                             <div className="p-4 text-center text-white/40 text-sm">
-                              Aucun produit trouvé
+                              {productSearch ? "Aucun produit correspondant" : "Aucun produit trouvé"}
                             </div>
                           ) : (
                             filteredProducts.map((p: Product) => (

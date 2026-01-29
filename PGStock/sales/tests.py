@@ -89,11 +89,9 @@ class SalesAPITestCase(APITestCase):
         
         order.refresh_from_db()
         expected_subtotal = Decimal('15000') # 10 * 1500
-        expected_tax = expected_subtotal * Decimal('0.18')
-        expected_total = expected_subtotal + expected_tax
+        expected_total = expected_subtotal
         
         self.assertEqual(order.subtotal, expected_subtotal)
-        self.assertEqual(order.tax_amount, expected_tax)
         self.assertEqual(order.total_amount, expected_total)
 
     def test_order_item_discount(self):

@@ -1,17 +1,24 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import inventoryService from '@/services/inventoryService';
 import type { Product } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { Search, ShoppingCart, Zap, Boxes, AlertTriangle } from 'lucide-react';
+
+import { Search, Boxes, AlertTriangle, ShoppingCart, Package } from 'lucide-react';
 import salesService from '@/services/salesService';
 import { CheckoutModal } from '@/components/sales/CheckoutModal';
 import { CartSection } from '@/components/sales/CartSection';
-import { motion, AnimatePresence } from 'framer-motion';
-import settingsService from '@/services/settingsService';
-import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils';
+import { toast } from 'sonner';
+import settingsService from '@/services/settingsService';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CartItem extends Product {
   cartQuantity: number;
@@ -31,11 +38,8 @@ export function POS() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [checkoutBreakdown, setCheckoutBreakdown] = useState({
     subtotal: 0,
-    taxAmount: 0,
-    taxRate: 0,
     discount: 0,
-    total: 0,
-    applyTax: false
+    total: 0
   });
 
   const [searchParams] = useSearchParams();
@@ -57,12 +61,12 @@ export function POS() {
     queryFn: () => inventoryService.getCategories(),
   });
 
-  const { data: productsData, isLoading, isError, error } = useQuery({
+  const { data: productsData, isLoading, isError } = useQuery({
     queryKey: ['products', searchTerm, selectedCategory, selectedPosId],
     queryFn: () => inventoryService.getProducts({ 
       search: searchTerm,
       category: selectedCategory === 'all' ? undefined : selectedCategory,
-      pos_id: selectedPosId || undefined,
+      point_of_sale: selectedPosId || undefined,
       page_size: 100
     }),
   });
@@ -125,7 +129,7 @@ export function POS() {
     }
   };
 
-  const handleCheckoutInit = (breakdown: { subtotal: number; taxAmount: number; taxRate: number; discount: number; total: number; applyTax: boolean }) => {
+  const handleCheckoutInit = (breakdown: { subtotal: number; discount: number; total: number }) => {
     if (!selectedClientId) {
        toast.error('Veuillez sélectionner un client avant de valider la vente.');
        return;
@@ -145,292 +149,247 @@ export function POS() {
       }));
 
       await salesService.createOrder({
-        client: selectedClientId || (clientsData?.results?.[0]?.id || 1),
+        client: selectedClientId!,
         invoice_type: orderType,
-        status: 'paid',
+        status: 'validated',
         payment_method: paymentMethod,
-
         amount_paid: amountPaid,
         items: orderItems,
         point_of_sale: selectedPosId || 1, 
         date_issued: new Date().toISOString().split('T')[0],
         date_due: new Date().toISOString().split('T')[0],
-        apply_tax: checkoutBreakdown.applyTax
+        // Send global discount from checkout breakdown
+        discount: checkoutBreakdown.discount,
+        // Send walk-in details only if Walk-in Client (ID 1) is selected
+        walk_in_name: selectedClientId === 1 ? walkInDetails.name : undefined,
+        walk_in_phone: selectedClientId === 1 ? walkInDetails.phone : undefined
       });
 
       // Invalidate queries to refresh the lists and stock
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
 
       setCart([]);
       setIsCheckoutOpen(false);
-      toast.success('Vente enregistrée avec succès !');
-    } catch (error: unknown) {
-      console.error('Checkout Error:', error);
-      const err = error as any;
-      const errorMessage = err.response?.data?.detail 
-        || (typeof err.response?.data === 'object' ? JSON.stringify(err.response.data) : null)
-        || 'Erreur lors de la validation de la vente.';
-      toast.error(errorMessage);
+      toast.success(isInvoiceMode ? 'Facture générée avec succès !' : 'Vente validée avec succès !');
+      
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || 'Une erreur est survenue lors de la validation.');
     } finally {
       setIsProcessing(false);
     }
   };
 
   const getStockDisplay = (product: Product) => {
-    if (product.stock_analysis) {
-       return `${product.stock_analysis.colis} Colis / ${product.stock_analysis.unites} U.`;
-    }
-    const boxes = Math.floor(product.current_stock / product.units_per_box);
-    const units = product.current_stock % product.units_per_box;
-    return `${boxes} Colis / ${units} U.`;
+    const qty = product.current_stock;
+    if (qty <= 0) return { label: 'Rupture', color: 'text-rose-600 bg-rose-50 border-rose-100' };
+    if (qty <= (product.reorder_level || 5)) return { label: 'Faible', color: 'text-amber-600 bg-amber-50 border-amber-100' };
+    return { label: 'En stock', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' };
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col lg:flex-row gap-6 overflow-hidden bg-background/50 p-4 lg:p-6">
-      {/* Product Selection Area */}
-      <div className="flex-1 flex flex-col space-y-4 overflow-hidden">
-        {/* Header & Search Area */}
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col gap-4 shrink-0">
-           {/* Top Row: Label, Order Type, Category */}
-           <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-primary">
-                 <Search className="h-5 w-5 stroke-[2.5]" />
-                 <span className="font-black text-lg tracking-tight">
-                    {isInvoiceMode ? 'Nouvelle Facture - Sélection Produits' : 'Recherche Produits'}
-                 </span>
-              </div>
+    <div className="flex h-[calc(100vh-4rem)] gap-4 overflow-hidden bg-muted/20 p-2 sm:p-4">
+      {/* Search and Products Section */}
+      <div className="flex flex-1 flex-col gap-4 overflow-hidden">
+        {/* Navigation & Search */}
+        <div className="flex flex-col gap-3 shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 group">
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+               <input
+                 type="text"
+                 placeholder="Scanner un SKU ou rechercher un produit (Nom, Code)..."
+                 className="w-full h-12 pl-11 pr-4 bg-white border-2 border-primary/5 rounded-2xl focus:outline-none focus:border-primary/20 focus:ring-4 focus:ring-primary/5 text-sm font-medium transition-all shadow-sm group-hover:border-primary/10"
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 autoFocus
+               />
+               {searchTerm && (
+                 <button 
+                   onClick={() => setSearchTerm('')}
+                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground hover:text-primary transition-colors"
+                 >
+                   EFFACER
+                 </button>
+               )}
+            </div>
+            
+            {/* Select POS */}
+            <div className="w-[200px] shrink-0">
+               <Select
+                 value={selectedPosId?.toString()}
+                 onValueChange={(value) => setSelectedPosId(parseInt(value))}
+               >
+                 <SelectTrigger className="w-full h-12 rounded-2xl border-2 border-primary/5 bg-white font-bold">
+                   <SelectValue placeholder="Choisir un magasin" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {posData?.results?.map((pos) => (
+                     <SelectItem key={pos.id} value={pos.id.toString()} className="font-medium">
+                       {pos.code}
+                     </SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+            </div>
+          </div>
 
-              <div className="flex items-center gap-3">
-                 {/* Order Type Toggle */}
-                 <div className="bg-gray-100 p-1 rounded-xl flex">
-                    <button 
-                      onClick={() => setOrderType('retail')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${orderType === 'retail' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                      Détail
-                    </button>
-                    <button 
-                      onClick={() => setOrderType('wholesale')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${orderType === 'wholesale' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                      Gros
-                    </button>
-                 </div>
-
-                 {/* Category Select */}
-                  <select 
-                    aria-label="Filtrer par catégorie"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="bg-gray-100 text-sm font-bold text-gray-600 py-2 px-3 rounded-xl border-none outline-none cursor-pointer hover:bg-gray-200 transition-colors"
-                  >
-                    <option value="all">Toutes catégories</option>
-                    {categoriesData?.results?.map((cat: { id: number; name: string }) => (
-                      <option key={cat.id} value={cat.id.toString()}>{cat.name}</option>
-                    ))}
-                  </select>
-
-                 {/* POS Selector */}
-                  <select 
-                    aria-label="Point de Vente"
-                    value={selectedPosId || ''}
-                    onChange={(e) => {
-                      setSelectedPosId(Number(e.target.value));
-                      setCart([]); // Clear cart on POS switch to avoid stock mismatch
-                    }}
-                    className="bg-blue-50 text-sm font-bold text-blue-600 py-2 px-3 rounded-xl border-none outline-none cursor-pointer hover:bg-blue-100 transition-colors"
-                  >
-                    {posData?.results?.map((pos: { id: number; name: string }) => (
-                      <option key={pos.id} value={pos.id}>{pos.name}</option>
-                    ))}
-                  </select>
-              </div>
-           </div>
-
-           {/* Search Input */}
-           <div className="relative">
-             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-             <input 
-               placeholder="Tapez le nom ou le code du produit..." 
-               className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all placeholder:text-gray-400"
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-             />
-           </div>
+          <div className="shrink-0">
+             <Select
+               value={selectedCategory}
+               onValueChange={setSelectedCategory}
+             >
+               <SelectTrigger className="w-full sm:w-[250px] h-10 rounded-xl border-2 border-primary/5 bg-white font-bold text-xs">
+                 <SelectValue placeholder="Toutes les catégories" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="all" className="font-bold text-xs uppercase">
+                   TOUTES LES CATÉGORIES
+                 </SelectItem>
+                 {categoriesData?.results?.map((cat) => (
+                   <SelectItem key={cat.id} value={cat.id.toString()} className="font-bold text-xs uppercase">
+                     {cat.name.toUpperCase()}
+                   </SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+          </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar pb-24 lg:pb-0">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-4">
-               <div className="relative">
-                 <div className="h-16 w-16 rounded-full border-3 border-primary/10 border-t-primary animate-spin" />
-               </div>
-               <p className="text-sm font-bold text-muted-foreground italic">Chargement...</p>
-            </div>
-          ) : isError ? (
-             <div className="flex flex-col items-center justify-center h-full space-y-4 text-center p-6">
-                <div className="h-16 w-16 rounded-full bg-rose-100 flex items-center justify-center">
-                   <Zap className="h-8 w-8 text-rose-500" />
-                </div>
-                <div>
-                   <h3 className="text-lg font-black text-gray-800">Erreur de chargement</h3>
-                   <p className="text-sm text-gray-500 max-w-xs mx-auto mt-2">
-                     Impossible de charger les produits. Veuillez vérifier votre connexion ou réessayer.
-                   </p>
-                   {error && <p className="text-xs text-rose-500 mt-2 font-mono bg-rose-50 p-2 rounded">{(error as Error).message}</p>}
-                </div>
-                <button 
-                  onClick={() => queryClient.invalidateQueries({ queryKey: ['products'] })}
-                  className="px-4 py-2 bg-primary text-white rounded-lg font-bold text-sm shadow hover:bg-primary/90"
-                >
-                  Réessayer
-                </button>
+        {/* Products Grid */}
+        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+           {isLoading ? (
+             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+               {[...Array(10)].map((_, i) => (
+                 <div key={i} className="aspect-[4/5] bg-muted/50 animate-pulse rounded-3xl border-2 border-dashed border-muted" />
+               ))}
              </div>
-          ) : !productsData?.results || productsData.results.length === 0 ? (
-             <div className="flex flex-col items-center justify-center h-full space-y-4 text-center p-6">
-                <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center">
-                   <Search className="h-8 w-8 text-gray-400" />
+           ) : isError ? (
+             <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-white rounded-3xl border-2 border-rose-50 shadow-sm">
+                <div className="p-4 bg-rose-50 rounded-full mb-4">
+                  <AlertTriangle className="h-8 w-8 text-rose-500" />
                 </div>
-                <div>
-                   <h3 className="text-lg font-black text-gray-800">Aucun produit trouvé</h3>
-                   <p className="text-sm text-gray-500 max-w-xs mx-auto mt-2">
-                     Essayez de modifier vos termes de recherche ou sélectionnez une autre catégorie.
-                   </p>
-                </div>
+                <h3 className="text-lg font-black text-rose-950 mb-1">Erreur de chargement</h3>
+                <p className="text-sm text-rose-600/80 font-medium">Impossible de récupérer les produits pour ce point de vente.</p>
              </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              <AnimatePresence mode="popLayout">
-                {productsData?.results?.map((product: Product) => (
-                  <motion.div
-                    key={product.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    whileHover={{ y: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card className={`border shadow-sm hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 rounded-2xl overflow-hidden group bg-white h-full ${
-                        product.current_stock <= product.reorder_level ? 'border-rose-200 bg-rose-50/10' : 'border-gray-200/60'
-                    }`}>
-                      <CardContent className="p-4 flex flex-col h-full relative">
-                         {/* SKU Badge */}
-                         <div className="absolute top-4 left-4 flex gap-2">
-                            <span className="bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider">
-                              {product.sku || `REF-${product.id}`}
-                            </span>
-                            
-                            {/* Low Stock Indicator */}
-                            {product.current_stock <= product.reorder_level && (
-                                <span className="bg-rose-100 text-rose-600 text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider flex items-center gap-1">
-                                    <AlertTriangle className="h-3 w-3" />
-                                    Stock Bas
-                                </span>
-                            )}
-                         </div>
+           ) : productsData?.results?.length === 0 ? (
+             <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-white rounded-3xl border-2 border-primary/5 shadow-sm">
+                <div className="p-4 bg-primary/5 rounded-full mb-4">
+                  <Boxes className="h-8 w-8 text-primary/40" />
+                </div>
+                <h3 className="text-lg font-black text-primary/80 mb-1">Aucun produit trouvé</h3>
+                <p className="text-sm text-muted-foreground font-medium">Essayez de modifier vos critères de recherche.</p>
+             </div>
+           ) : (
+             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+               <AnimatePresence mode="popLayout">
+                 {productsData?.results?.map((product) => {
+                   const stock = getStockDisplay(product);
+                   return (
 
-                         {/* Spacer for SKU */}
-                         <div className="h-6 mb-2"></div>
-                         
-                         {/* Product Name */}
-                         <h4 className="font-bold text-xs text-gray-700 leading-snug mb-3 line-clamp-2">
-                           {product.name}
-                         </h4>
+                      <motion.div
+                        layout
+                        key={product.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="group relative bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col overflow-hidden"
+                      >
+                         <div className="p-3 flex-1 flex flex-col items-center">
+                            {/* SKU Badge */}
+                            <div className="mb-2">
+                               <span className="px-2 py-0.5 bg-slate-50 text-[9px] font-bold text-slate-400 rounded-md tracking-wider">
+                                 {product.sku || 'N/A'}
+                               </span>
+                            </div>
 
-                         {/* Actions Container */}
-                         <div className="space-y-2.5 mt-auto">
-                            {/* Wholesale Button (Primary - Now on top) */}
-                            <button 
-                              onClick={() => addToCart(product, 'wholesale')}
-                              disabled={product.current_stock <= 0}
-                              className="w-full bg-linear-to-br from-emerald-500 via-emerald-500 to-emerald-600 text-white rounded-2xl py-2.5 px-3 shadow-md shadow-emerald-500/25 hover:shadow-lg hover:shadow-emerald-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex flex-col items-center justify-center group/btn border border-emerald-400/20 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                            {/* Product Name */}
+                            <h3 className="font-extrabold text-slate-800 text-sm leading-tight text-center mb-3 px-1 line-clamp-2 min-h-10" title={product.name}>
+                              {product.name}
+                            </h3>
+
+                            {/* Retail Price Button (Purple Gradient) */}
+                            <button
+                               onClick={() => addToCart(product, 'retail')}
+                               className="w-full mb-2 relative group/retail overflow-hidden"
                             >
-                               <div className="flex items-center gap-1.5">
-                                 <Zap className="h-3.5 w-3.5 fill-current" />
-                                 <span className="font-extrabold text-sm tracking-tight">{formatCurrency(product.wholesale_selling_price)}</span>
+                               <div className="absolute inset-0 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] opacity-90 group-hover/retail:opacity-100 transition-opacity rounded-xl" />
+                               <div className="relative py-1.5 px-3 flex items-center justify-between text-white">
+                                  <ShoppingCart className="h-4 w-4 opacity-90 group-hover/retail:scale-110 transition-transform" />
+                                  <div className="flex flex-col items-end">
+                                     <span className="text-[11px] font-black leading-none">
+                                       {formatCurrency(product.selling_price)}
+                                     </span>
+                                     <span className="text-[8px] font-bold opacity-80 mt-0.5">
+                                       (Détail)
+                                     </span>
+                                  </div>
                                </div>
-                               <span className="text-[9px] uppercase font-semibold opacity-90 tracking-wide">(Gros)</span>
                             </button>
 
-                            {/* Retail Button (Secondary - Now below) */}
-                            <button 
-                              onClick={() => addToCart(product, 'retail')}
-                              disabled={product.current_stock <= 0}
-                              className="w-full flex items-center justify-center gap-1.5 text-primary hover:bg-primary/5 py-1.5 rounded-xl transition-all duration-200 group/retail border border-transparent hover:border-primary/20 disabled:text-gray-300 disabled:cursor-not-allowed"
+                            {/* Wholesale Price Row */}
+                            <button
+                               onClick={() => addToCart(product, 'wholesale')}
+                               className="w-full group/wholesale flex items-center justify-between px-3 py-1 hover:bg-emerald-50/50 rounded-lg transition-colors"
                             >
-                               <ShoppingCart className="h-3 w-3 opacity-80 group-hover/retail:opacity-100" />
-                               <div className="flex flex-col items-start leading-none">
-                                 <span className="font-bold text-[11px] tracking-tight">{formatCurrency(product.selling_price)}</span>
-                                 <span className="text-[8px] font-medium uppercase opacity-60 tracking-wider">(Détail)</span>
+                               <Package className="h-4 w-4 text-emerald-600 group-hover/wholesale:scale-110 transition-transform" />
+                               <div className="flex flex-col items-end">
+                                  <span className="text-[11px] font-black text-emerald-700">
+                                    {formatCurrency(product.wholesale_selling_price)}
+                                  </span>
+                                  <span className="text-[8px] font-bold text-emerald-600/70">
+                                    (Gros)
+                                  </span>
                                </div>
                             </button>
                          </div>
 
                          {/* Stock Footer */}
-                         <div className={`mt-4 pt-3 border-t flex items-center justify-center gap-1.5 ${product.current_stock <= product.reorder_level ? 'text-rose-500 border-rose-100' : 'text-gray-500 border-gray-100'}`}>
-                            <Boxes className="h-3.5 w-3.5" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Stock: {getStockDisplay(product)}</span>
+                         <div className="mt-1 bg-slate-50/50 border-t border-slate-100/50 py-2 flex items-center justify-center gap-2">
+                            <Boxes className="h-3.5 w-3.5 text-emerald-600" />
+                            <span className="text-[10px] font-bold text-emerald-700">
+                               Stock: {product.stock_analysis?.colis || 0} Colis / {product.stock_analysis?.unites || 0} U.
+                            </span>
                          </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
+                      </motion.div>
+                   );
+                 })}
+               </AnimatePresence>
+             </div>
+           )}
         </div>
       </div>
 
       {/* Cart Section */}
-      <div className="w-full lg:w-[400px] lg:shrink-0 flex flex-col transition-all duration-300">
-        <CartSection 
-          cart={cart}
-          onUpdateQuantity={updateQuantity}
-          onRemove={removeFromCart}
-          onClear={clearCart}
-          clients={clientsData?.results || []}
-          selectedClientId={selectedClientId || 0}
-          onSelectClient={setSelectedClientId}
-          onCheckout={handleCheckoutInit}
-          orderType={orderType}
-          isProcessing={isProcessing}
-          walkInDetails={walkInDetails}
-          onWalkInChange={setWalkInDetails}
-          isInvoiceMode={isInvoiceMode}
-        />
+      <div className="w-[380px] shrink-0 h-full">
+         <CartSection
+           cart={cart}
+           onUpdateQuantity={updateQuantity}
+           onRemove={removeFromCart}
+           onClear={clearCart}
+           clients={clientsData?.results || []}
+           selectedClientId={selectedClientId}
+           onSelectClient={setSelectedClientId}
+           onCheckout={handleCheckoutInit}
+           orderType={orderType}
+           isProcessing={isProcessing}
+           walkInDetails={walkInDetails}
+           onWalkInChange={setWalkInDetails}
+           isInvoiceMode={isInvoiceMode}
+         />
       </div>
 
-      <CheckoutModal 
+      <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         onConfirm={handleConfirmCheckout}
         subtotal={checkoutBreakdown.subtotal}
-        taxAmount={checkoutBreakdown.taxAmount}
-        taxRate={checkoutBreakdown.taxRate}
         discount={checkoutBreakdown.discount}
         total={checkoutBreakdown.total}
         isProcessing={isProcessing}
         isInvoiceMode={isInvoiceMode}
       />
-
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(var(--primary), 0.1);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(var(--primary), 0.2);
-        }
-      `}</style>
     </div>
   );
 }

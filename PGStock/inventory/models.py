@@ -633,17 +633,14 @@ class Invoice(models.Model):
     date_due = models.DateField(verbose_name="Date d'échéance")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Statut")
     subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Sous-total")
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=16, verbose_name="Taux TVA (%)")
-    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Montant TVA")
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Remise (Montant)")
-    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total TTC")
+    discount_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Remise globale")
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total")
     total_profit = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Bénéfice Total")
     notes = models.TextField(blank=True, verbose_name="Notes")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Dernière modification")
     stock_deducted = models.BooleanField(default=False, verbose_name="Stock déduit", help_text="Indique si le stock a déjÃ  été déduit pour cette facture")
-    apply_tax = models.BooleanField(default=True, verbose_name="Appliquer TVA")
 
     class Meta:
         verbose_name = "Facture"
@@ -677,19 +674,12 @@ class Invoice(models.Model):
         """Calcule les totaux de la facture"""
         from decimal import Decimal, ROUND_HALF_UP
         items = self.invoiceitem_set.all()
-        # Calculer le sous-total et quantifier Ã  2 décimales
+        # Calculer le sous-total et quantifier à 2 décimales
         self.subtotal = sum(item.get_total() for item in items)
         self.subtotal = Decimal(str(self.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        
-        # Calculer la TVA et quantifier Ã  2 décimales si applicable
-        if self.apply_tax:
-            tax_rate_decimal = Decimal(str(self.tax_rate))
-            self.tax_amount = (self.subtotal * (tax_rate_decimal / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        else:
-            self.tax_amount = Decimal('0.00')
-            
-        # Calculer le total et quantifier Ã  2 décimales
-        self.total_amount = (self.subtotal + self.tax_amount - self.discount_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+        # Calculer le total (NO TAX)
+        self.total_amount = (self.subtotal - self.discount_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         # Calculer le bénéfice total (Somme des marges des lignes - remise globale)
         self.total_profit = sum(item.margin for item in items) - self.discount_amount
@@ -1191,7 +1181,6 @@ class Settings(models.Model):
     company_logo = models.ImageField(upload_to='company_logos/', blank=True, null=True, verbose_name="Logo de l'entreprise")
     language = models.CharField(max_length=10, choices=[('fr', 'Français'), ('en', 'English')], default='fr', verbose_name="Langue")
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='GNF', verbose_name="Devise")
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=18, verbose_name="Taux TVA (%)")
     default_order_type = models.CharField(max_length=20, choices=[('retail', 'Détail'), ('wholesale', 'Gros')], default='retail', verbose_name="Type de vente par défaut")
     email_notifications = models.BooleanField(default=True, verbose_name="Notifications par email")
     daily_reports = models.BooleanField(default=False, verbose_name="Rapports journaliers")
@@ -1232,12 +1221,10 @@ class Quote(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT, verbose_name="Client")
     quote_type = models.CharField(max_length=20, choices=QUOTE_TYPES, default='retail', verbose_name="Type de devis")
     date_issued = models.DateField(verbose_name="Date d'émission")
-    valid_until = models.DateField(verbose_name="Date de validité")
+    valid_until = models.DateField(verbose_name="Valide jusqu'au")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Statut")
     subtotal = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Sous-total")
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=16, verbose_name="Taux TVA (%)")
-    tax_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Montant TVA")
-    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total TTC")
+    total_amount = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Total")
     notes = models.TextField(blank=True, verbose_name="Notes")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Créé par")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
@@ -1255,13 +1242,12 @@ class Quote(models.Model):
         """Calcule les totaux du devis"""
         from decimal import Decimal, ROUND_HALF_UP
         items = self.quoteitem_set.all()
-        # Calculer le sous-total et quantifier Ã  2 décimales
+        # Calculer le sous-total et quantifier à 2 décimales
         self.subtotal = sum(item.get_total() for item in items)
         self.subtotal = Decimal(str(self.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        # Calculer la TVA et quantifier à 2 décimales
-        self.tax_amount = (self.subtotal * (self.tax_rate / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        # Calculer le total et quantifier Ã  2 décimales
-        self.total_amount = (self.subtotal + self.tax_amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        # Calculer le total (NO TAX)
+        self.total_amount = self.subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         self.save()
 
     def generate_quote_number(self):
@@ -1289,8 +1275,6 @@ class Quote(models.Model):
             date_due=self.valid_until,
             status='draft',
             subtotal=self.subtotal,
-            tax_rate=self.tax_rate,
-            tax_amount=self.tax_amount,
             total_amount=self.total_amount,
             notes=f"Converti du devis {self.quote_number}\n{self.notes}",
             created_by=self.created_by

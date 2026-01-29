@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -20,7 +21,6 @@ import {
     Download,
     User,
     Calendar,
-    Activity,
     Loader2,
     FileText,
     CheckCircle2,
@@ -30,10 +30,12 @@ import {
     ShieldCheck,
     CreditCard,
     ChevronRight,
-    Hash
+    Hash,
+    DollarSign
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils';
+import { OrderPaymentDialog } from '@/components/sales/OrderPaymentDialog';
 
 const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -56,6 +58,7 @@ export function OrderDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const { data: order, isLoading, error } = useQuery({
         queryKey: ['order', id],
@@ -207,6 +210,16 @@ export function OrderDetailsPage() {
                                 Confirmer Livraison
                             </Button>
                         )}
+
+                        {((Number(order.total_amount) || 0) - (Number(order.amount_paid) || 0)) > 0 && order.status !== 'cancelled' && (
+                            <Button 
+                                onClick={() => setShowPaymentModal(true)}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs h-12 shadow-xl shadow-emerald-200/50 px-8"
+                            >
+                                <DollarSign className="mr-2 h-4 w-4" />
+                                Régler
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -222,7 +235,9 @@ export function OrderDetailsPage() {
                                 </div>
                                 <div className="overflow-hidden">
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Client</p>
-                                    <p className="text-sm font-black text-slate-900 truncate">{order.client_name}</p>
+                                    <p className="text-sm font-black text-slate-900 truncate">
+                                        {order.walk_in_name ? `${order.walk_in_name} (Passage)` : order.client_name}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -321,8 +336,8 @@ export function OrderDetailsPage() {
                                 <span>{formatCurrency(order.subtotal || 0)}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm font-medium text-slate-300">
-                                <span>TVA (GND - 18%)</span>
-                                <span>{formatCurrency(order.tax_amount || 0)}</span>
+                                <span>REMISE</span>
+                                <span>- {formatCurrency(order.discount || 0)}</span>
                             </div>
                             
                             <div className="pt-4 border-t border-white/10">
@@ -339,23 +354,15 @@ export function OrderDetailsPage() {
                                 className="flex justify-between items-center p-5 bg-white/5 rounded-3xl border border-white/10 group-hover:bg-white/10 transition-colors"
                             >
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">Déjà réglé</span>
-                                    <span className="text-2xl font-black text-white">{formatCurrency(order.amount_paid || 0)}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">Reste à payer</span>
+                                    <span className="text-2xl font-black text-white">{formatCurrency((order.total_amount || 0) - (order.amount_paid || 0))}</span>
                                 </div>
                                 <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-inner">
                                     <CheckCircle2 className="h-5 w-5" />
                                 </div>
                             </motion.div>
 
-                            {order.total_amount - order.amount_paid > 0 && (
-                                <div className="flex justify-between items-center p-5 bg-rose-500/10 rounded-3xl border border-rose-500/20">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-rose-400 mb-1">Reste à payer</span>
-                                        <span className="text-xl font-black text-white">{formatCurrency(order.total_amount - order.amount_paid)}</span>
-                                    </div>
-                                    <Activity className="h-5 w-5 text-rose-500" />
-                                </div>
-                            )}
+
                         </div>
                     </motion.div>
 
@@ -434,7 +441,9 @@ export function OrderDetailsPage() {
                     <div>
                         <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Détails du Client</p>
                         <div className="space-y-1">
-                            <p className="text-xl font-black text-slate-900">{order.client_name}</p>
+                            <p className="text-xl font-black text-slate-900">
+                                {order.walk_in_name || order.client_name}
+                            </p>
                             <p className="text-sm font-medium text-slate-500">Référence Client: CL-{order.client_id || '---'}</p>
                         </div>
                     </div>
@@ -487,12 +496,12 @@ export function OrderDetailsPage() {
                             <span className="font-bold text-slate-900">{formatCurrency(order.subtotal || 0)}</span>
                         </div>
                         <div className="flex justify-between items-center px-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TVA (GND 18%)</span>
-                            <span className="font-bold text-slate-900">{formatCurrency(order.tax_amount || 0)}</span>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">REMISE</span>
+                            <span className="font-bold text-slate-900">- {formatCurrency(order.discount || 0)}</span>
                         </div>
                         <div className="flex justify-between items-center px-4 py-3 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
-                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Montant dejà Payé</span>
-                            <span className="font-black text-emerald-600">{formatCurrency(order.amount_paid || 0)}</span>
+                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Reste à payer</span>
+                            <span className="font-black text-emerald-600">{formatCurrency((order.total_amount || 0) - (order.amount_paid || 0))}</span>
                         </div>
                         
                         <div className="h-px bg-slate-200 my-2" />
@@ -502,12 +511,7 @@ export function OrderDetailsPage() {
                             <span className="text-3xl font-black tracking-tighter">{formatCurrency(order.total_amount || 0)}</span>
                         </div>
                         
-                        {order.total_amount - order.amount_paid > 0 && (
-                            <div className="flex justify-between items-center px-6 py-4 bg-rose-500 rounded-2xl text-white text-sm font-black uppercase tracking-widest">
-                                <span>Reste à Régler</span>
-                                <span>{formatCurrency(order.total_amount - order.amount_paid)}</span>
-                            </div>
-                        )}
+
                     </div>
                 </div>
 
@@ -521,6 +525,15 @@ export function OrderDetailsPage() {
                     </div>
                 </div>
             </div>
+            <OrderPaymentDialog 
+                open={showPaymentModal} 
+                onOpenChange={setShowPaymentModal} 
+                order={order} 
+                onSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ['order', id] });
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
+                }} 
+            />
         </motion.div>
     );
 }

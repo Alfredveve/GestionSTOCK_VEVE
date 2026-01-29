@@ -72,7 +72,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_display = ['invoice_number', 'client', 'date_issued', 'date_due', 'status', 'total_amount', 'created_at']
     list_filter = ['status', 'date_issued', 'created_at']
     search_fields = ['invoice_number', 'client__name', 'notes']
-    readonly_fields = ['subtotal', 'tax_amount', 'total_amount', 'created_at', 'updated_at']
+    readonly_fields = ['subtotal', 'total_amount', 'created_at', 'updated_at']
     inlines = [InvoiceItemInline]
     list_per_page = 20
 
@@ -126,7 +126,7 @@ class QuoteAdmin(admin.ModelAdmin):
     list_display = ['quote_number', 'client', 'date_issued', 'valid_until', 'status', 'total_amount', 'created_at']
     list_filter = ['status', 'date_issued', 'created_at']
     search_fields = ['quote_number', 'client__name', 'notes']
-    readonly_fields = ['subtotal', 'tax_amount', 'total_amount', 'created_at', 'updated_at']
+    readonly_fields = ['subtotal', 'total_amount', 'created_at', 'updated_at']
     inlines = [QuoteItemInline]
     list_per_page = 20
 @admin.register(Notification)

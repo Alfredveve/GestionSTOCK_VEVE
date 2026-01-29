@@ -12,5 +12,5 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ['order_type', 'status', 'payment_status', 'date_created']
     search_fields = ['order_number', 'client__name']
     inlines = [OrderItemInline]
-    readonly_fields = ['subtotal', 'tax_amount', 'total_amount']
+    readonly_fields = ['subtotal', 'total_amount']
     date_hierarchy = 'date_created'

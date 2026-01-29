@@ -187,21 +187,20 @@ class QuoteService(BaseService):
     
     def calculate_totals(self, quote):
         """
-        Calculate quote totals (subtotal, tax, total).
+        Calculate quote totals (subtotal, total).
         
         Args:
             quote: Quote to calculate totals for
         """
         items = quote.quoteitem_set.all()
+        from decimal import Decimal, ROUND_HALF_UP
         
         # Calculate subtotal
         quote.subtotal = sum(item.get_total() for item in items)
+        quote.subtotal = Decimal(str(quote.subtotal)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
-        # Calculate tax (18% by default)
-        quote.tax_amount = quote.subtotal * Decimal('0.18')
-        
-        # Calculate total
-        quote.total_amount = quote.subtotal + quote.tax_amount
+        # Calculate total (No Tax)
+        quote.total_amount = quote.subtotal
         
         quote.save()
     

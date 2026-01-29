@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   ShoppingCart, 
   Trash2, 
@@ -10,11 +10,10 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import type { Product } from '@/types';
 import { motion } from 'framer-motion';
-import settingsService from '@/services/settingsService';
+
 
 interface CartItem extends Product {
   cartQuantity: number;
@@ -29,7 +28,7 @@ interface CartSectionProps {
   clients: { id: number; name: string }[];
   selectedClientId: number | null;
   onSelectClient: (id: number | null) => void;
-  onCheckout: (breakdown: { subtotal: number; taxAmount: number; taxRate: number; discount: number; total: number; applyTax: boolean }) => void;
+  onCheckout: (breakdown: { subtotal: number; discount: number; total: number }) => void;
   orderType: 'retail' | 'wholesale';
   isProcessing: boolean;
   walkInDetails?: { name: string; phone: string };
@@ -53,15 +52,8 @@ export function CartSection({
   isInvoiceMode = false
 }: CartSectionProps) {
   const [discount, setDiscount] = useState<number>(0);
-  const [applyTax, setApplyTax] = useState(false);
-  const [taxRate, setTaxRate] = useState(18);
 
-  useEffect(() => {
-    settingsService.getSettings().then(s => {
-      const rate = parseFloat(String(s.tax_rate));
-      setTaxRate(isNaN(rate) ? 18 : rate);
-    }).catch(() => setTaxRate(18));
-  }, []);
+
 
   const subtotal = useMemo(() => {
     return cart.reduce((sum, item) => {
@@ -71,8 +63,7 @@ export function CartSection({
     }, 0);
   }, [cart]);
 
-  const taxAmount = applyTax ? subtotal * (taxRate / 100) : 0;
-  const total = Math.max(0, subtotal + taxAmount - (isNaN(discount) ? 0 : discount));
+  const total = Math.max(0, subtotal - (isNaN(discount) ? 0 : discount));
 
   const formatCurrency = (amount: string | number) => {
     return new Intl.NumberFormat('fr-GN', {
@@ -280,20 +271,6 @@ export function CartSection({
                 <span className="font-black text-foreground">{formatCurrency(subtotal)}</span>
              </div>
 
-             {/* VAT Toggle */}
-             <div className="flex justify-between items-center py-0.5">
-                <div className="flex items-center gap-2">
-                   <Switch 
-                     id="tax-mode" 
-                     checked={applyTax}
-                     onCheckedChange={setApplyTax}
-                     className="scale-[0.6] origin-left data-[state=checked]:bg-primary"
-                   />
-                   <label htmlFor="tax-mode" className="text-[9px] font-black text-muted-foreground/60 cursor-pointer select-none uppercase tracking-wide">TVA ({taxRate}%)</label>
-                </div>
-                <span className="font-black text-muted-foreground/80 text-[12px]">{formatCurrency(taxAmount)}</span>
-             </div>
-
              <div className="h-px bg-primary/5 w-full rounded-full" />
 
               {/* Total */}
@@ -326,7 +303,7 @@ export function CartSection({
           <button 
             className="w-full h-9 text-[11px] font-black shadow-lg shadow-primary/20 rounded-xl active:scale-[0.98] transition-all bg-primary text-white hover:brightness-110 flex items-center justify-center gap-2 group"
             disabled={cart.length === 0 || isProcessing}
-            onClick={() => onCheckout({ subtotal, taxAmount, taxRate, discount, total, applyTax })}
+            onClick={() => onCheckout({ subtotal, discount, total })}
           >
             {isProcessing ? (
                <div className="flex items-center gap-2">

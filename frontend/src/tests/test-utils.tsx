@@ -10,6 +10,9 @@ const queryClient = new QueryClient({
   },
 })
 
+import { MemoryRouter } from 'react-router-dom'
+import { Toaster } from 'sonner';
+
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -22,7 +25,10 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   })
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <MemoryRouter>
+        {children}
+        <Toaster />
+      </MemoryRouter>
     </QueryClientProvider>
   )
 }

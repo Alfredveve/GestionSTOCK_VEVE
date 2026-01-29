@@ -49,8 +49,6 @@ class InvoiceService(BaseService):
         invoice_type: str = 'retail',
         date_issued: Optional[Any] = None,
         date_due: Optional[Any] = None,
-        apply_tax: bool = False,
-        tax_rate: Decimal = Decimal('0'),
         notes: str = ""
     ) -> Invoice:
         """
@@ -63,8 +61,6 @@ class InvoiceService(BaseService):
             items_data: List of dicts with keys: product, quantity, unit_price, discount, is_wholesale
             status: Initial status ('draft', 'sent', 'paid')
             invoice_type: 'standard' or 'wholesale'
-            apply_tax: Whether to apply tax
-            tax_rate: Tax rate percentage
             notes: Additional notes
             
         Returns:
@@ -101,8 +97,6 @@ class InvoiceService(BaseService):
                     invoice_type=invoice_type,
                     date_issued=date_issued or datetime.now().date(),
                     date_due=date_due or datetime.now().date(),
-                    apply_tax=apply_tax,
-                    tax_rate=tax_rate,
                     notes=notes
                 )
                 break  # Success, exit loop
@@ -312,7 +306,7 @@ class InvoiceService(BaseService):
     
     def calculate_totals(self, invoice: Invoice):
         """
-        Calculate invoice totals (subtotal, tax, total).
+        Calculate invoice totals (subtotal, total).
         
         Args:
             invoice: Invoice to calculate totals for
@@ -325,17 +319,8 @@ class InvoiceService(BaseService):
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
         
-        # Calculate tax
-        if invoice.apply_tax:
-            tax_rate_decimal = Decimal(str(invoice.tax_rate))
-            invoice.tax_amount = (
-                invoice.subtotal * (tax_rate_decimal / Decimal('100'))
-            ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        else:
-            invoice.tax_amount = Decimal('0.00')
-        
-        # Calculate total
-        invoice.total_amount = (invoice.subtotal + invoice.tax_amount - invoice.discount_amount).quantize(
+        # Calculate total (No Tax)
+        invoice.total_amount = (invoice.subtotal - invoice.discount_amount).quantize(
             Decimal('0.01'), rounding=ROUND_HALF_UP
         )
         
@@ -554,8 +539,6 @@ class InvoiceService(BaseService):
             invoice_type=quote.quote_type,
             date_issued=quote.date_issued,
             date_due=quote.valid_until,
-            apply_tax=quote.tax_rate > 0,
-            tax_rate=quote.tax_rate,
             notes=f"Converti du devis {quote.quote_number}"
         )
         

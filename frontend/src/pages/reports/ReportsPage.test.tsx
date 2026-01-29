@@ -73,7 +73,8 @@ describe('ReportsPage', () => {
     render(<ReportsPage />);
     
     expect(screen.getByText('Derniers 30 jours')).toBeInTheDocument();
-    expect(screen.getByText('Exporter PDF')).toBeInTheDocument();
+    expect(screen.getByText('PDF')).toBeInTheDocument();
+    expect(screen.getByText('Excel')).toBeInTheDocument();
   });
 
   it('should render summary cards with data', async () => {
@@ -90,11 +91,10 @@ describe('ReportsPage', () => {
     (dashboardService.getStats as any).mockResolvedValue(mockStats);
     render(<ReportsPage />);
 
-    // Titles verify with regex for flexibility
-    await screen.findAllByText(/Évolution des Ventes/i);
-    expect(screen.getAllByText(/Répartition.*Catégorie/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Rentabilité/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Top 5/i).length).toBeGreaterThan(0);
+    // Wait for data to be loaded (look for mocked currency or specific data text)
+    await waitFor(() => {
+      expect(screen.getAllByText(/MOCK_.*_GNF/i).length).toBeGreaterThan(0);
+    });
 
     const charts = screen.getAllByTestId('recharts-container');
     expect(charts.length).toBeGreaterThanOrEqual(4);

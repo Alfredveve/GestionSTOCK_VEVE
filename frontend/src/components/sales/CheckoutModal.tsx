@@ -17,15 +17,13 @@ interface CheckoutModalProps {
   onClose: () => void;
   onConfirm: (paymentMethod: string, amountPaid: number) => void;
   subtotal: number;
-  taxAmount: number;
-  taxRate: number;
   discount: number;
   total: number;
   isProcessing: boolean;
   isInvoiceMode?: boolean;
 }
 
-export function CheckoutModal({ isOpen, onClose, onConfirm, subtotal, taxAmount, taxRate, discount, total, isProcessing, isInvoiceMode = false }: CheckoutModalProps) {
+export function CheckoutModal({ isOpen, onClose, onConfirm, subtotal, discount, total, isProcessing, isInvoiceMode = false }: CheckoutModalProps) {
   const [paymentMethod, setPaymentMethod] = useState(isInvoiceMode ? 'credit' : 'cash');
   const [amountPaid, setAmountPaid] = useState<number>(total);
 
@@ -99,11 +97,6 @@ export function CheckoutModal({ isOpen, onClose, onConfirm, subtotal, taxAmount,
               <span className="text-sm font-bold text-gray-900">{formatCurrency(subtotal)}</span>
             </div>
             
-            {/* TVA - Always shown */}
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-semibold text-gray-600">Taxe ({taxRate.toFixed(2)}%)</span>
-              <span className="text-sm font-bold text-gray-900">{formatCurrency(taxAmount)}</span>
-            </div>
             
             {/* Remise - Always shown */}
             <div className="flex justify-between items-center">
@@ -115,7 +108,6 @@ export function CheckoutModal({ isOpen, onClose, onConfirm, subtotal, taxAmount,
             
             {/* Total TTC */}
             <div className="flex justify-between items-center">
-              <span className="text-sm font-bold text-gray-900">Total TTC</span>
               <span className="text-lg font-black text-emerald-600">{formatCurrency(total)}</span>
             </div>
           </div>

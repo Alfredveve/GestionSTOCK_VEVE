@@ -115,9 +115,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Product.objects.all()
-        point_of_sale = self.request.query_params.get('point_of_sale')
-        if point_of_sale:
-            queryset = queryset.filter(inventory__point_of_sale_id=point_of_sale).distinct()
+        # Accept both 'point_of_sale' and 'pos_id' for better frontend compatibility
+        pos_id = self.request.query_params.get('point_of_sale') or self.request.query_params.get('pos_id')
+        if pos_id:
+            queryset = queryset.filter(inventory__point_of_sale_id=pos_id).distinct()
         return queryset
 
     @action(detail=False, methods=['get'])
@@ -265,6 +266,148 @@ class ProductViewSet(viewsets.ModelViewSet):
         inventory = Inventory.objects.filter(product=product)
         serializer = InventorySerializer(inventory, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def global_stock_stats(self, request):
+        """Retourne les statistiques globales des stocks sur tous les points de vente"""
+        from django.db.models import Sum, Count, F, Q, Max, Min
+        
+        # 1. Statistiques générales
+        total_products = Product.objects.count()
+        
+        # Valeur totale du stock (quantité * prix de vente)
+        total_stock_value = Inventory.objects.aggregate(
+            total=Sum(F('quantity') * F('product__selling_price'))
+        )['total'] or Decimal('0.00')
+        
+        # Produits en stock (au moins 1 unité quelque part)
+        products_in_stock = Product.objects.filter(
+            inventory__quantity__gt=0
+        ).distinct().count()
+        
+        # Produits en stock faible (quantité <= seuil de réapprovisionnement)
+        products_low_stock = Inventory.objects.filter(
+            quantity__lte=F('reorder_level'),
+            quantity__gt=0
+        ).values('product').distinct().count()
+        
+        # Produits en rupture totale (0 partout)
+        products_out_of_stock = Product.objects.annotate(
+            total_qty=Sum('inventory__quantity')
+        ).filter(
+            Q(total_qty=0) | Q(total_qty__isnull=True)
+        ).count()
+        
+        # 2. Répartition par point de vente
+        pos_stats = PointOfSale.objects.annotate(
+            product_count=Count('inventory', filter=Q(inventory__quantity__gt=0)),
+            total_quantity=Sum('inventory__quantity'),
+            total_value=Sum(F('inventory__quantity') * F('inventory__product__selling_price'))
+        ).values(
+            'id', 'name', 'code', 'city',
+            'product_count', 'total_quantity', 'total_value'
+        ).order_by('-total_value')
+        
+        by_point_of_sale = []
+        for pos in pos_stats:
+            by_point_of_sale.append({
+                'id': pos['id'],
+                'name': pos['name'],
+                'code': pos['code'],
+                'city': pos['city'] or '',
+                'product_count': pos['product_count'] or 0,
+                'total_quantity': pos['total_quantity'] or 0,
+                'total_value': float(pos['total_value'] or 0)
+            })
+        
+        # 3. Produits avec stock déséquilibré
+        # (grande différence entre le stock max et min entre les POS)
+        imbalanced_threshold = 50  # Configurable
+        
+        products_with_variance = Product.objects.annotate(
+            max_stock=Max('inventory__quantity'),
+            min_stock=Min('inventory__quantity'),
+            total_stock=Sum('inventory__quantity'),
+            stock_variance=F('max_stock') - F('min_stock'),
+            pos_count=Count('inventory')
+        ).filter(
+            stock_variance__gt=imbalanced_threshold,
+            pos_count__gt=1  # Au moins 2 points de vente
+        ).order_by('-stock_variance')[:10]
+        
+        imbalanced_products = []
+        for product in products_with_variance:
+            # Récupérer les détails par POS pour ce produit
+            pos_details = Inventory.objects.filter(
+                product=product
+            ).select_related('point_of_sale').values(
+                'point_of_sale__name',
+                'point_of_sale__code',
+                'quantity'
+            ).order_by('-quantity')
+            
+            imbalanced_products.append({
+                'id': product.id,
+                'name': product.name,
+                'sku': product.sku,
+                'total_stock': product.total_stock or 0,
+                'max_stock': product.max_stock or 0,
+                'min_stock': product.min_stock or 0,
+                'variance': product.stock_variance or 0,
+                'distribution': list(pos_details)
+            })
+        
+        # 4. Alertes de stock faible global
+        low_stock_alerts = []
+        low_stock_inventories = Inventory.objects.filter(
+            quantity__lte=F('reorder_level'),
+            quantity__gt=0
+        ).select_related('product', 'point_of_sale').order_by('quantity')[:20]
+        
+        for inv in low_stock_inventories:
+            low_stock_alerts.append({
+                'product_id': inv.product.id,
+                'product_name': inv.product.name,
+                'sku': inv.product.sku,
+                'pos_name': inv.point_of_sale.name,
+                'pos_code': inv.point_of_sale.code,
+                'quantity': inv.quantity,
+                'reorder_level': inv.reorder_level,
+                'status': inv.get_status()
+            })
+        
+        # 5. Top produits par valeur de stock
+        top_products_by_value = Product.objects.annotate(
+            total_qty=Sum('inventory__quantity'),
+            stock_value=Sum(F('inventory__quantity') * F('selling_price'))
+        ).filter(
+            total_qty__gt=0
+        ).order_by('-stock_value')[:10]
+        
+        top_products = []
+        for product in top_products_by_value:
+            top_products.append({
+                'id': product.id,
+                'name': product.name,
+                'sku': product.sku,
+                'total_quantity': product.total_qty or 0,
+                'stock_value': float(product.stock_value or 0),
+                'selling_price': float(product.selling_price)
+            })
+        
+        return Response({
+            'summary': {
+                'total_products': total_products,
+                'total_stock_value': float(total_stock_value),
+                'products_in_stock': products_in_stock,
+                'products_low_stock': products_low_stock,
+                'products_out_of_stock': products_out_of_stock
+            },
+            'by_point_of_sale': by_point_of_sale,
+            'imbalanced_products': imbalanced_products,
+            'low_stock_alerts': low_stock_alerts,
+            'top_products_by_value': top_products
+        })
 
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all()

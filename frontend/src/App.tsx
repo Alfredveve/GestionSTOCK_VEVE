@@ -6,6 +6,7 @@ import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
 import { ForgotPassword } from '@/pages/ForgotPassword';
 import { ProductList } from '@/pages/inventory/ProductList';
+import { ListglobalProduits } from '@/pages/inventory/ListglobalProduits';
 import { CategoryPage } from '@/pages/inventory/CategoryPage';
 import { POS } from '@/pages/sales/POS';
 import { useAuthStore } from '@/store/authStore';
@@ -14,6 +15,7 @@ import { FinancePage } from '@/pages/finance/FinancePage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { StockMovementsPage } from '@/pages/inventory/StockMovementsPage';
 import { InventoryByPOS } from '@/pages/inventory/InventoryByPOS';
+import { GlobalStockDashboard } from '@/pages/inventory/GlobalStockDashboard';
 import { InvoicesPage } from '@/pages/sales/InvoicesPage';
 import { QuotesPage } from '@/pages/sales/QuotesPage';
 import { QuoteForm } from '@/pages/sales/QuoteForm';
@@ -41,10 +43,12 @@ function App() {
         
         <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/list-global-produits" element={<ListglobalProduits />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/stock-movements" element={<StockMovementsPage />} />
           <Route path="/inventory/by-pos" element={<InventoryByPOS />} />
+          <Route path="/inventory/global-dashboard" element={<GlobalStockDashboard />} />
           <Route path="/pos" element={<POS />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />
