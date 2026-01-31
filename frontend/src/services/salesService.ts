@@ -8,6 +8,7 @@ export interface OrderItem {
   unit_price: string;
   total_price?: string;
   is_wholesale?: boolean;
+  discount?: number;
 }
 
 export interface Order {
@@ -19,6 +20,7 @@ export interface Order {
   items: OrderItem[];
   total_amount?: string;
   point_of_sale?: number;
+  point_of_sale_name?: string;
   date_issued?: string;
   date_due?: string;
   date_created?: string;
@@ -28,8 +30,10 @@ export interface Order {
   discount?: number;
   client_name?: string;
   order_number?: string;
+  order_type?: 'retail' | 'wholesale';
   walk_in_name?: string;
   walk_in_phone?: string;
+  notes?: string;
 }
 
 const salesService = {
@@ -53,8 +57,11 @@ const salesService = {
     return response.data;
   },
 
-  exportOrdersExcel: async () => {
-    const response = await api.get('orders/export_excel/', { responseType: 'blob' });
+  exportOrdersExcel: async (params?: Record<string, string | number | boolean | undefined>) => {
+    const response = await api.get('orders/export_excel/', { 
+      params,
+      responseType: 'blob' 
+    });
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -69,8 +76,11 @@ const salesService = {
     return response.data;
   },
 
-  exportOrdersPdf: async () => {
-    const response = await api.get('orders/export_pdf/', { responseType: 'blob' });
+  exportOrdersPdf: async (params?: Record<string, string | number | boolean | undefined>) => {
+    const response = await api.get('orders/export_pdf/', { 
+      params,
+      responseType: 'blob' 
+    });
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;

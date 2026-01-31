@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import User
 from .models import Category, Supplier, Product, Inventory, StockMovement, Invoice, Receipt, Payment, Expense, MonthlyProfitReport, Quote, Client, PointOfSale, ExpenseCategory, Settings, Notification
 from .excel_utils import export_to_excel
+from .services.import_service import ProductImportService
 from .pdf_utils import export_to_pdf
 from django.db import transaction
 from decimal import Decimal
@@ -173,91 +174,18 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def import_products(self, request):
-        file = request.FILES.get('file')
-        if not file:
-            return Response({"error": "Aucun fichier fourni."}, status=400)
-            
-        try:
-            import sys
-            lxml_backup = sys.modules.get('lxml')
-            sys.modules['lxml'] = None
-            import openpyxl
-            
-            try:
-                wb = openpyxl.load_workbook(file)
-                ws = wb.active
-            finally:
-                if lxml_backup:
-                    sys.modules['lxml'] = lxml_backup
-                elif 'lxml' in sys.modules:
-                    del sys.modules['lxml']
-            
-            # Map headers to indices
-            rows = list(ws.rows)
-            if len(rows) < 2:
-                return Response({"error": "Le fichier est vide."}, status=400)
-                
-            headers = [cell.value for cell in rows[0]]
-            
-            # Simple validation: required columns (Name, Category, Selling Price)
-            required = ['Nom', 'Catégorie', 'Prix Vente']
-            for field in required:
-                if field not in headers:
-                    return Response({"error": f"Colonne '{field}' manquante."}, status=400)
-            
-            imported_count = 0
-            errors = []
-            
-            with transaction.atomic():
-                for row_idx, row in enumerate(rows[1:], 2):
-                    data = {headers[i]: cell.value for i, cell in enumerate(row) if i < len(headers)}
-                    
-                    if not data.get('Nom'):
-                        continue
-                        
-                    try:
-                        # Find or create category
-                        cat_name = data.get('Catégorie', 'Général')
-                        category, _ = Category.objects.get_or_create(name=cat_name)
-                        
-                        # Find supplier if provided
-                        supplier = None
-                        supp_name = data.get('Fournisseur')
-                        if supp_name:
-                            supplier, _ = Supplier.objects.get_or_create(name=supp_name)
-                            
-                        # Create or update product
-                        sku = data.get('SKU')
-                        
-                        product_data = {
-                            'name': data.get('Nom'),
-                            'category': category,
-                            'supplier': supplier,
-                            'purchase_price': Decimal(str(data.get('Prix Achat', 0) or 0)),
-                            'selling_price': Decimal(str(data.get('Prix Vente', 0) or 0)),
-                            'units_per_box': int(data.get('Unités par colis', 1) or 1),
-                            'description': data.get('Description', '')
-                        }
-                        
-                        if sku:
-                            product, created = Product.objects.update_or_create(
-                                sku=sku,
-                                defaults=product_data
-                            )
-                        else:
-                            product = Product.objects.create(**product_data)
-                            
-                        imported_count += 1
-                    except Exception as e:
-                        errors.append(f"Ligne {row_idx}: {str(e)}")
-            
-            return Response({
-                "message": f"{imported_count} produits importés avec succès.",
-                "errors": errors
-            })
-            
-        except Exception as e:
-            return Response({"error": f"Erreur lors de la lecture du fichier: {str(e)}"}, status=500)
+        """Importer des produits depuis un fichier Excel"""
+        if 'file' not in request.FILES:
+             return Response({"error": "Aucun fichier fourni"}, status=400)
+             
+        result = ProductImportService.import_products(request.FILES['file'])
+        
+        if result['success']:
+             return Response(result)
+        else:
+             return Response(result, status=400)
+
+
 
     @action(detail=True, methods=['get'])
     def stock(self, request, pk=None):
@@ -468,6 +396,38 @@ class StockMovementViewSet(viewsets.ModelViewSet):
     filterset_fields = ['product', 'movement_type', 'from_point_of_sale', 'to_point_of_sale']
     search_fields = ['product__name', 'reference', 'notes']
     ordering_fields = ['created_at']
+
+    def get_queryset(self):
+        queryset = StockMovement.objects.all().order_by('-created_at')
+        
+        # Date filtering support
+        date_param = self.request.query_params.get('date')
+        start_date_param = self.request.query_params.get('start_date')
+        end_date_param = self.request.query_params.get('end_date')
+        
+        if date_param:
+            # Single date filter
+            try:
+                from datetime import datetime
+                filter_date = datetime.strptime(date_param, '%Y-%m-%d').date()
+                queryset = queryset.filter(created_at__date=filter_date)
+            except ValueError:
+                pass
+        elif start_date_param or end_date_param:
+            # Date range filter
+            try:
+                from datetime import datetime
+                if start_date_param:
+                    start_date = datetime.strptime(start_date_param, '%Y-%m-%d').date()
+                    queryset = queryset.filter(created_at__date__gte=start_date)
+                if end_date_param:
+                    end_date = datetime.strptime(end_date_param, '%Y-%m-%d').date()
+                    queryset = queryset.filter(created_at__date__lte=end_date)
+            except ValueError:
+                pass
+        
+        return queryset
+
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     queryset = Invoice.objects.all()

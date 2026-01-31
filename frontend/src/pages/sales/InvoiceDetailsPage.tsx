@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
-import inventoryService from '@/services/inventoryService';
-import type { InvoiceItem } from '@/types';
+import salesService from '@/services/salesService';
+import type { OrderItem as InvoiceItem } from '@/services/salesService';
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
@@ -41,7 +41,7 @@ export function InvoiceDetailsPage() {
         queryKey: [
             'invoice', id
         ],
-        queryFn: () => inventoryService.getInvoice(Number(id)),
+        queryFn: () => salesService.getOrder(Number(id)),
         enabled: !!id
     });
 
@@ -64,14 +64,14 @@ export function InvoiceDetailsPage() {
         
         try {
             toast.info(`Téléchargement de la facture ${
-                invoice.invoice_number
+                invoice.order_number
             }...`);
             const originalTitle = document.title;
             document.title = `Facture_${
-                invoice.invoice_number
+                invoice.order_number
             }`;
 
-            await inventoryService.exportInvoicePdf(invoice.id, invoice.invoice_number);
+            await salesService.exportOrderPdf(invoice.id, invoice.order_number);
 
             document.title = originalTitle;
             toast.success("Facture téléchargée avec succès");
@@ -118,7 +118,7 @@ export function InvoiceDetailsPage() {
                         <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                             Gérer la facture
                             <span className="text-primary">#{
-                                invoice.invoice_number
+                                invoice.order_number
                             }</span>
                         </p>
                     </div>
@@ -206,7 +206,7 @@ export function InvoiceDetailsPage() {
                                     <Label className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Date d'émission</Label>
                                     <p className="font-bold text-foreground text-sm">
                                         {
-                                        invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : 'Non définie'
+                                        invoice.date_created ? new Date(invoice.date_created).toLocaleDateString('fr-FR') : 'Non définie'
                                     } </p>
                                 </div>
                             </div>
@@ -220,7 +220,7 @@ export function InvoiceDetailsPage() {
                                     <div>
                                         <Badge className={
                                                 `mt-1 font-bold text-[10px] uppercase ${
-                                                    (Number(invoice.balance) <= 0) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    ((Number(invoice.total_amount) - Number(invoice.amount_paid)) <= 0) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                                                     invoice.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
                                                     invoice.status === 'partial' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
                                                     invoice.status === 'draft' ? 'bg-slate-500/10 text-slate-500 border-slate-500/20' :
@@ -229,9 +229,9 @@ export function InvoiceDetailsPage() {
                                             }
                                             variant="outline">
                                             {
-                                            (Number(invoice.balance) <= 0) ? 'Payée' :
+                                            (Number(invoice.total_amount) - Number(invoice.amount_paid) <= 0) ? 'Payée' :
                                             invoice.status === 'paid' ? 'Payée' : 
-                                            invoice.status === 'partial' ? 'Partiel' : 
+                                            invoice.payment_status === 'partial' ? 'Partiel' : 
                                             invoice.status === 'draft' ? 'Brouillon' :
                                             invoice.status === 'cancelled' ? 'Annulée' : 'Impayée'
                                         } </Badge>
@@ -246,9 +246,7 @@ export function InvoiceDetailsPage() {
                                 <div>
                                     <Label className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Date d'échéance</Label>
                                     <p className="font-bold text-foreground text-sm">
-                                        {
-                                        invoice.date_due && invoice.date_due !== 'Invalid Date' ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : 'Non définie'
-                                    } </p>
+                                        {'À payer à réception'} </p>
                                 </div>
                             </div>
                         </div>
@@ -295,7 +293,7 @@ export function InvoiceDetailsPage() {
                                         }</TableCell>
                                         <TableCell className="pr-6 text-right font-bold">
                                             {
-                                            formatCurrency(item.total)
+                                            formatCurrency(Number(item.total_price))
                                         }</TableCell>
                                     </TableRow>
                                 ))) : (
@@ -380,11 +378,11 @@ export function InvoiceDetailsPage() {
                         }
 
                             {
-                            Number(invoice.discount_amount) > 0 && (
+                            Number(invoice.discount) > 0 && (
                                 <div className="flex justify-between items-center text-sm text-rose-500">
                                     <span>Remise</span>
                                     <span className="font-bold">- {
-                                        formatCurrency(invoice.discount_amount)
+                                        formatCurrency(Number(invoice.discount))
                                     }</span>
                                 </div>
                             )
@@ -404,7 +402,7 @@ export function InvoiceDetailsPage() {
                                 <span className="text-sm font-bold text-emerald-600">Montant payé</span>
                                 <span className="text-lg font-bold text-emerald-600">
                                     {
-                                    formatCurrency(Number(invoice.total_amount) - Number(invoice.balance))
+                                    formatCurrency(Number(invoice.amount_paid))
                                 } </span>
                             </div>
 
@@ -412,7 +410,7 @@ export function InvoiceDetailsPage() {
                                 <span className="text-base font-bold text-rose-600">Reste à payer</span>
                                 <span className="text-2xl font-black text-rose-600">
                                     {
-                                    formatCurrency(invoice.balance)
+                                    formatCurrency(Number(invoice.total_amount) - Number(invoice.amount_paid))
                                 }</span>
                             </div>
                         </div>
@@ -422,7 +420,7 @@ export function InvoiceDetailsPage() {
 
             {/* Printable Invoice Structure (Hidden on Screen) */}
             <div id="print-invoice" className="print-only hidden bg-white">
-                <div className="max-w-[210mm] mx-auto p-8 font-sans text-gray-900">
+                <div className="max-w-[210mm] mx-auto p-8 print:p-0 font-sans text-gray-900">
                     {selectedTemplate === 'premium' && (
                         <div className="premium-template space-y-8">
                             {/* Premium Header */}
@@ -442,7 +440,7 @@ export function InvoiceDetailsPage() {
                                 </div>
                                 <div className="text-right">
                                     <h1 className="text-7xl font-black text-gray-100 uppercase tracking-tighter leading-none select-none">FACTURE</h1>
-                                    <p className="text-lg font-black text-primary -mt-8 relative z-10">#{invoice.invoice_number}</p>
+                                    <p className="text-lg font-black text-primary -mt-8 relative z-10">#{invoice.order_number}</p>
                                 </div>
                             </div>
 
@@ -464,11 +462,11 @@ export function InvoiceDetailsPage() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-[9px] font-bold text-gray-400 uppercase">Date d'émission</p>
-                                            <p className="text-sm font-black text-gray-700">{invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : '-'}</p>
+                                            <p className="text-sm font-black text-gray-700">{invoice.date_created ? new Date(invoice.date_created).toLocaleDateString('fr-FR') : '-'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-bold text-gray-400 uppercase">Date d'échéance</p>
-                                            <p className="text-sm font-black text-gray-700">{invoice.date_due ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : '-'}</p>
+                                            <p className="text-[9px] font-bold text-gray-400 uppercase">Échéance</p>
+                                            <p className="text-sm font-black text-gray-700">À réception</p>
                                         </div>
                                     </div>
                                 </div>
@@ -502,7 +500,7 @@ export function InvoiceDetailsPage() {
                                                         {Number(item.discount || 0) > 0 ? `-${item.discount}%` : '-'}
                                                     </td>
                                                 )}
-                                                <td className="py-4 px-6 text-right font-black text-gray-900">{formatCurrency(item.total)}</td>
+                                                <td className="py-4 px-6 text-right font-black text-gray-900">{formatCurrency(Number(item.total_price))}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -522,6 +520,12 @@ export function InvoiceDetailsPage() {
                                             <span className="text-gray-900">{formatCurrency(invoice.tax_amount)}</span>
                                         </div>
                                     )}
+                                    {Number(invoice.discount) > 0 && (
+                                        <div className="flex justify-between text-xs font-bold text-rose-500 uppercase tracking-widest px-2">
+                                            <span>Remise</span>
+                                            <span>-{formatCurrency(Number(invoice.discount))}</span>
+                                        </div>
+                                    )}
                                     <div className="h-px bg-gray-100 my-4" />
                                     <div className="bg-primary rounded-3xl p-6 text-white shadow-xl shadow-primary/30">
                                         <div className="flex justify-between items-end">
@@ -529,10 +533,16 @@ export function InvoiceDetailsPage() {
                                             <span className="text-3xl font-black tracking-tighter leading-none">{formatCurrency(invoice.total_amount)}</span>
                                         </div>
                                     </div>
-                                    {Number(invoice.balance) > 0 && (
-                                        <div className="flex justify-between items-center p-4 bg-rose-50 border border-rose-100 rounded-3xl mt-4">
+                                    
+                                    <div className="flex justify-between items-center px-2 mt-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                                        <span>Montant Payé</span>
+                                        <span className="text-gray-900">{formatCurrency(Number(invoice.amount_paid))}</span>
+                                    </div>
+
+                                    {Number(invoice.total_amount) - Number(invoice.amount_paid) > 0 && (
+                                        <div className="flex justify-between items-center p-4 bg-rose-50 border border-rose-100 rounded-3xl mt-2">
                                             <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">Reste à payer</span>
-                                            <span className="text-lg font-black text-rose-600">{formatCurrency(invoice.balance)}</span>
+                                            <span className="text-lg font-black text-rose-600">{formatCurrency(Number(invoice.total_amount) - Number(invoice.amount_paid))}</span>
                                         </div>
                                     )}
                                 </div>
@@ -541,11 +551,11 @@ export function InvoiceDetailsPage() {
                     )}
 
                     {selectedTemplate === 'classic' && (
-                        <div className="classic-template border-4 border-double border-gray-200 p-8 min-h-screen relative">
+                        <div className="classic-template border-4 border-double border-gray-200 p-8 h-auto relative">
                             {/* Classic Header */}
                             <div className="text-center mb-12 space-y-2">
                                 <h1 className="text-4xl font-extrabold uppercase tracking-[0.2em] text-gray-900 underline underline-offset-8 decoration-4 decoration-gray-900">Facture</h1>
-                                <p className="text-lg font-bold text-gray-600">N° {invoice.invoice_number}</p>
+                                <p className="text-lg font-bold text-gray-600">N° {invoice.order_number}</p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-12 mb-12">
@@ -574,8 +584,8 @@ export function InvoiceDetailsPage() {
                             <div className="mb-12">
                                 <div className="bg-gray-100 p-3 mb-4 rounded-md">
                                     <div className="grid grid-cols-2 text-xs font-black uppercase tracking-wider">
-                                        <p>Date d'émission: {invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : '-'}</p>
-                                        <p className="text-right">Échéance: {invoice.date_due ? new Date(invoice.date_due).toLocaleDateString('fr-FR') : '-'}</p>
+                                        <p>Date d'émission: {invoice.date_created ? new Date(invoice.date_created).toLocaleDateString('fr-FR') : '-'}</p>
+                                        <p className="text-right">Échéance: À réception</p>
                                     </div>
                                 </div>
 
@@ -594,7 +604,7 @@ export function InvoiceDetailsPage() {
                                                 <td className="py-2 px-3 border border-gray-300">{item.product_name}</td>
                                                 <td className="py-2 px-3 border border-gray-300 text-center">{item.quantity}</td>
                                                 <td className="py-2 px-3 border border-gray-300 text-right">{formatCurrency(item.unit_price)}</td>
-                                                <td className="py-2 px-3 border border-gray-300 text-right">{formatCurrency(item.total)}</td>
+                                                <td className="py-2 px-3 border border-gray-300 text-right">{formatCurrency(Number(item.total_price))}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -611,10 +621,26 @@ export function InvoiceDetailsPage() {
                                         <span>Total Taxes</span>
                                         <span className="font-bold">{formatCurrency(invoice.tax_amount)}</span>
                                     </div>
+                                    {Number(invoice.discount) > 0 && (
+                                        <div className="p-3 border-b border-gray-200 flex justify-between text-sm text-rose-600">
+                                            <span>Remise</span>
+                                            <span className="font-bold">-{formatCurrency(Number(invoice.discount))}</span>
+                                        </div>
+                                    )}
                                     <div className="p-4 bg-gray-900 text-white flex justify-between items-center">
                                         <span className="font-black uppercase tracking-tighter">Total Net</span>
                                         <span className="text-xl font-black">{formatCurrency(invoice.total_amount)}</span>
                                     </div>
+                                    <div className="p-3 border-b border-gray-200 flex justify-between text-sm">
+                                        <span>Montant Payé</span>
+                                        <span className="font-bold">{formatCurrency(Number(invoice.amount_paid))}</span>
+                                    </div>
+                                    {Number(invoice.total_amount) - Number(invoice.amount_paid) > 0 && (
+                                        <div className="p-3 flex justify-between text-sm bg-rose-50 text-rose-600 font-bold">
+                                            <span>Reste à payer</span>
+                                            <span>{formatCurrency(Number(invoice.total_amount) - Number(invoice.amount_paid))}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -634,7 +660,7 @@ export function InvoiceDetailsPage() {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-8xl font-black text-gray-900 opacity-[0.03] absolute top-0 right-0 pointer-events-none">INVOICE</p>
-                                    <p className="text-sm font-black text-gray-900">FACT-{invoice.invoice_number}</p>
+                                    <p className="text-sm font-black text-gray-900">FACT-{invoice.order_number}</p>
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : '-'}</p>
                                 </div>
                             </div>
@@ -649,7 +675,7 @@ export function InvoiceDetailsPage() {
                                 <div className="text-right flex flex-col justify-end">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-300 mb-4 italic">Statut</p>
                                     <p className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">
-                                        {(Number(invoice.balance) <= 0) ? 'Payé' : invoice.status === 'paid' ? 'Payé' : invoice.status === 'partial' ? 'Partiel' : 'Impayé'}
+                                        {((Number(invoice.total_amount) - Number(invoice.amount_paid)) <= 0) ? 'Payé' : invoice.status === 'paid' ? 'Payé' : invoice.status === 'partial' ? 'Partiel' : 'Impayé'}
                                     </p>
                                 </div>
                             </div>
@@ -670,7 +696,7 @@ export function InvoiceDetailsPage() {
                                         </div>
                                         <div className="col-span-2 text-center font-black text-sm">{item.quantity}</div>
                                         <div className="col-span-2 text-right font-black text-sm opacity-60 tracking-tighter">{formatCurrency(item.unit_price)}</div>
-                                        <div className="col-span-2 text-right font-black text-sm tracking-tighter">{formatCurrency(item.total)}</div>
+                                        <div className="col-span-2 text-right font-black text-sm tracking-tighter">{formatCurrency(Number(item.total_price))}</div>
                                     </div>
                                 ))}
                             </div>
@@ -686,10 +712,26 @@ export function InvoiceDetailsPage() {
                                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300 italic">Taxation</span>
                                         <span className="text-xl font-black text-gray-400 tracking-tighter">{formatCurrency(invoice.tax_amount)}</span>
                                     </div>
+                                    {Number(invoice.discount) > 0 && (
+                                        <div className="flex justify-between items-end">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-300 italic">Remise</span>
+                                            <span className="text-xl font-black text-rose-400 tracking-tighter">-{formatCurrency(Number(invoice.discount))}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between items-end pt-4">
                                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-900 italic">Total Final</span>
                                         <span className="text-5xl font-black text-gray-900 tracking-tighter leading-none">{formatCurrency(invoice.total_amount)}</span>
                                     </div>
+                                    <div className="flex justify-between items-end pt-2">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 italic">Payé</span>
+                                        <span className="text-lg font-black text-gray-600 tracking-tighter">{formatCurrency(Number(invoice.amount_paid))}</span>
+                                    </div>
+                                    {Number(invoice.total_amount) - Number(invoice.amount_paid) > 0 && (
+                                        <div className="flex justify-between items-end pt-2">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-rose-500 italic">Reste</span>
+                                            <span className="text-xl font-black text-rose-600 tracking-tighter">{formatCurrency(Number(invoice.total_amount) - Number(invoice.amount_paid))}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -713,7 +755,7 @@ export function InvoiceDetailsPage() {
                         <p>Tél: +224 620 00 00 00</p>
                         <div className="pt-2">--------------------------------</div>
                         <h3 className="font-black">TICKET DE VENTE</h3>
-                        <p>N°: {invoice.invoice_number}</p>
+                        <p>N°: {invoice.order_number}</p>
                         <p>Date: {invoice.date_issued ? new Date(invoice.date_issued).toLocaleDateString('fr-FR') : '-'}</p>
                         <div>--------------------------------</div>
                     </div>
@@ -738,7 +780,7 @@ export function InvoiceDetailsPage() {
                                 <div className="grid grid-cols-[1fr,40px,80px]">
                                     <span className="italic pl-2">{formatCurrency(item.unit_price)}</span>
                                     <span className="text-center">{item.quantity}</span>
-                                    <span className="text-right font-bold">{formatCurrency(item.total)}</span>
+                                    <span className="text-right font-bold">{formatCurrency(Number(item.total_price))}</span>
                                 </div>
                             </div>
                         ))}
@@ -758,10 +800,10 @@ export function InvoiceDetailsPage() {
                                 <span>{formatCurrency(invoice.tax_amount)}</span>
                             </div>
                         )}
-                        {Number(invoice.discount_amount) > 0 && (
+                        {Number(invoice.discount) > 0 && (
                             <div className="flex justify-between">
                                 <span>REMISE:</span>
-                                <span>-{formatCurrency(invoice.discount_amount)}</span>
+                                <span>-{formatCurrency(Number(invoice.discount))}</span>
                             </div>
                         )}
                         <div className="pt-1">--------------------------------</div>
@@ -770,10 +812,15 @@ export function InvoiceDetailsPage() {
                             <span>{formatCurrency(invoice.total_amount)}</span>
                         </div>
                         
-                        {Number(invoice.balance) > 0 && (
+                        <div className="flex justify-between font-bold pt-1">
+                            <span>PAYÉ:</span>
+                            <span>{formatCurrency(Number(invoice.amount_paid))}</span>
+                        </div>
+                        
+                        {Number(invoice.total_amount) - Number(invoice.amount_paid) > 0 && (
                             <div className="flex justify-between font-bold pt-1">
                                 <span>RESTE À PAYER:</span>
-                                <span>{formatCurrency(invoice.balance)}</span>
+                                <span>{formatCurrency(Number(invoice.total_amount) - Number(invoice.amount_paid))}</span>
                             </div>
                         )}
                     </div>

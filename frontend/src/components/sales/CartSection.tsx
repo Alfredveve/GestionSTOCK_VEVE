@@ -34,6 +34,10 @@ interface CartSectionProps {
   walkInDetails?: { name: string; phone: string };
   onWalkInChange?: (details: { name: string; phone: string }) => void;
   isInvoiceMode?: boolean;
+  notes?: string;
+  onNotesChange?: (notes: string) => void;
+  isWalkIn?: boolean;
+  onToggleWalkIn?: (val: boolean) => void;
 }
 
 export function CartSection({
@@ -49,9 +53,14 @@ export function CartSection({
   isProcessing,
   walkInDetails,
   onWalkInChange,
-  isInvoiceMode = false
+  isInvoiceMode = false,
+  notes = '',
+  onNotesChange,
+  isWalkIn = false,
+  onToggleWalkIn
 }: CartSectionProps) {
   const [discount, setDiscount] = useState<number>(0);
+  const [showNotes, setShowNotes] = useState<boolean>(false);
 
 
 
@@ -98,12 +107,15 @@ export function CartSection({
         <div className="space-y-1">
            <div className="flex items-center justify-between">
               <label className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 pl-1">Client</label>
-              {selectedClientId === 1 && (
+              {isWalkIn && (
                  <motion.button
                    initial={{ opacity: 0 }}
                    animate={{ opacity: 1 }}
                    className="text-[9px] font-bold text-primary hover:underline flex items-center gap-1"
-                   onClick={() => onSelectClient(0)} // Reset or some action
+                   onClick={() => {
+                     onToggleWalkIn?.(false);
+                     onSelectClient(null);
+                   }}
                  >
                     <User className="h-3 w-3" />
                     Client enregistré ?
@@ -111,7 +123,7 @@ export function CartSection({
               )}
            </div>
 
-           {selectedClientId === 1 ? (
+           {isWalkIn ? (
              <div className="bg-muted/30 p-2 rounded-xl border border-primary/10 space-y-1">
                  <div className="flex items-center gap-2 mb-0.5">
                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[8px] font-black uppercase">Passage</Badge>
@@ -164,7 +176,10 @@ export function CartSection({
                 </select>
                 <div className="h-4 w-px bg-primary/10 mx-1" />
                 <button 
-                  onClick={() => onSelectClient(1)}
+                  onClick={() => {
+                    onToggleWalkIn?.(true);
+                    onSelectClient(1);
+                  }}
                   className="px-1.5 py-0.5 h-6 rounded-md bg-primary/10 text-primary text-[8px] font-black uppercase hover:bg-primary hover:text-white transition-colors flex items-center gap-1"
                 >
                   <User className="h-2.5 w-2.5" />
@@ -281,7 +296,7 @@ export function CartSection({
                 </div>
              </div>
 
-             {/* Discount Input */}
+              {/* Discount Input */}
              <div className="flex items-center gap-2 bg-muted/20 p-1.5 rounded-lg border border-transparent focus-within:border-primary/20 transition-all shadow-inner relative">
                 <div className="p-0.5 bg-background rounded-md shadow-sm pointer-events-none">
                   <Zap className="h-2.5 w-2.5 text-amber-500" />
@@ -297,6 +312,33 @@ export function CartSection({
                     onChange={(e) => setDiscount(Math.max(0, parseInt(e.target.value || '0')))}
                   />
                 </div>
+             </div>
+
+             {/* Notes Section */}
+             <div className="space-y-1">
+               <button
+                 type="button"
+                 onClick={() => setShowNotes(!showNotes)}
+                 className="text-[9px] font-black text-muted-foreground/60 hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-1"
+               >
+                 {showNotes ? '−' : '+'} Ajouter des notes
+               </button>
+               {showNotes && (
+                 <motion.div
+                   initial={{ opacity: 0, height: 0 }}
+                   animate={{ opacity: 1, height: 'auto' }}
+                   exit={{ opacity: 0, height: 0 }}
+                   className="overflow-hidden"
+                 >
+                   <textarea
+                     className="w-full bg-muted/20 p-2 rounded-lg border border-primary/10 text-[10px] font-medium outline-none focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                     placeholder="Notes pour cette vente (optionnel)..."
+                     rows={2}
+                     value={notes}
+                     onChange={(e) => onNotesChange?.(e.target.value)}
+                   />
+                 </motion.div>
+               )}
              </div>
           </div>
 

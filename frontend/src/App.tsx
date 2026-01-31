@@ -29,6 +29,7 @@ import { ReportsPage } from '@/pages/reports/ReportsPage';
 import { FinanceReports } from '@/pages/reports/FinanceReports';
 import { AdvancedAnalytics } from '@/pages/reports/AdvancedAnalytics';
 import { NotificationPage } from '@/pages/notifications/NotificationPage';
+import { SalesDashboard } from '@/pages/sales/SalesDashboard';
 
 function App() {
   const { isAuthenticated } = useAuthStore();
@@ -59,6 +60,7 @@ function App() {
           <Route path="/quotes/:id" element={<QuoteDetailsPage />} />
           <Route path="/quotes/:id/edit" element={<QuoteForm />} />
           <Route path="/orders/:id" element={<OrderDetailsPage />} />
+          <Route path="/sales/dashboard" element={<SalesDashboard />} />
           <Route path="/points-of-sale" element={<PointsOfSalePage />} />
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/purchases" element={<PurchasesPage />} />

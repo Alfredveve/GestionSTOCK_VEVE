@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -33,6 +34,7 @@ import { formatCurrency } from '@/lib/utils';
 interface CategoryData {
   name: string;
   value: number;
+  [key: string]: unknown;
 }
 
 interface ProductData {
@@ -58,6 +60,7 @@ interface LowStockProduct {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'];
 
 export function AdvancedAnalytics() {
+  const navigate = useNavigate();
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => dashboardService.getStats(),
@@ -188,7 +191,7 @@ export function AdvancedAnalytics() {
                   <Tooltip 
                     cursor={{fill: 'transparent'}}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value?: unknown) => formatCurrency(Number(value || 0))}
                   />
                   <Bar dataKey="value" fill="#8b5cf6" radius={[0, 8, 8, 0]} barSize={28}>
                     {topProducts.map((_, index) => (
@@ -254,7 +257,7 @@ export function AdvancedAnalytics() {
                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                            ))}
                          </Pie>
-                         <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                         <Tooltip formatter={(value?: unknown) => formatCurrency(Number(value || 0))} />
                       </PieChart>
                    </ResponsiveContainer>
                 </div>
@@ -262,7 +265,10 @@ export function AdvancedAnalytics() {
                    {categoryData.slice(0, 5).map((category: CategoryData, index: number) => (
                       <div key={index} className="flex items-center justify-between">
                          <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                            <div 
+                              className="h-3 w-3 rounded-full bg-(--dot-color)" 
+                              style={{ '--dot-color': COLORS[index % COLORS.length] } as React.CSSProperties}
+                             />
                             <span className="text-sm font-medium">{category.name}</span>
                          </div>
                          <span className="text-sm font-black">{formatCurrency(category.value)}</span>
@@ -291,7 +297,7 @@ export function AdvancedAnalytics() {
                 {lowStockProducts.slice(0, 5).map((product: LowStockProduct) => (
                    <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 transition-all cursor-pointer group">
                       <div className="flex items-center gap-4">
-                         <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-white overflow-hidden border border-slate-200 shadow-sm transition-transform group-hover:scale-105">
+                         <div className="h-10 w-10 shrink-0 rounded-lg bg-white overflow-hidden border border-slate-200 shadow-sm transition-transform group-hover:scale-105">
                             {product.image ? (
                               <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                             ) : (
@@ -323,7 +329,11 @@ export function AdvancedAnalytics() {
              </div>
           </CardContent>
           <div className="p-4 border-t border-slate-100 dark:border-slate-800">
-             <Button variant="ghost" className="w-full text-primary font-bold group">
+             <Button 
+               variant="ghost" 
+               className="w-full text-primary font-bold group"
+               onClick={() => navigate('/products')}
+             >
                 Consulter tout le stock <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
              </Button>
           </div>

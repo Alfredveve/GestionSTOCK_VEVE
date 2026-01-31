@@ -79,7 +79,7 @@ export function GlobalStockDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
+        <Card className="bg-linear-to-br from-indigo-500 to-indigo-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Produits</CardTitle>
             <Package className="h-5 w-5 opacity-80" />
@@ -90,7 +90,7 @@ export function GlobalStockDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+        <Card className="bg-linear-to-br from-green-500 to-green-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Valeur Totale</CardTitle>
             <TrendingUp className="h-5 w-5 opacity-80" />
@@ -101,7 +101,7 @@ export function GlobalStockDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+        <Card className="bg-linear-to-br from-blue-500 to-blue-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">En Stock</CardTitle>
             <Package className="h-5 w-5 opacity-80" />
@@ -112,7 +112,7 @@ export function GlobalStockDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+        <Card className="bg-linear-to-br from-orange-500 to-orange-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Stock Faible</CardTitle>
             <AlertTriangle className="h-5 w-5 opacity-80" />
@@ -123,7 +123,7 @@ export function GlobalStockDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
+        <Card className="bg-linear-to-br from-red-500 to-red-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Rupture</CardTitle>
             <AlertTriangle className="h-5 w-5 opacity-80" />

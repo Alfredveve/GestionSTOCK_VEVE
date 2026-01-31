@@ -436,92 +436,192 @@ def export_quote_to_pdf(quote):
 def export_order_to_pdf(order):
     """
     Generate a professional single order PDF using ReportLab.
+    Matches the 'Premium' template from the screenshot.
     """
     # Prepare Response
     response = HttpResponse(content_type='application/pdf')
     filename = f"Commande_{order.order_number}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
+    # Create PDF Document
     doc = SimpleDocTemplate(response, pagesize=A4, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
-    doc.title = f"Commande {order.order_number}"
+    doc.title = f"Facture {order.order_number}"
     elements = []
+
+    # Styles
     styles = getSampleStyleSheet()
-    col_blue_bg = colors.HexColor("#f0f9ff")
-    col_dark_header = colors.HexColor("#1e293b")
-    col_blue_text = colors.HexColor("#2563eb")
-    col_gray_border = colors.HexColor("#e2e8f0")
-
-    # Reuse styles from above
-    style_label = ParagraphStyle('DocLabel', parent=styles['Normal'], fontSize=32, fontName='Helvetica-Bold', textColor=colors.HexColor("#cbd5e1"), alignment=2)
-    style_box_val = ParagraphStyle('BoxVal', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold', alignment=2)
-
-    # Header
-    info_box_data = [
-        [Paragraph("Numéro", styles['Normal']), Paragraph(f"#{order.order_number}", style_box_val)],
-        [Paragraph("Date", styles['Normal']), Paragraph(order.date_created.strftime('%d/%m/%Y'), style_box_val)],
-        [Paragraph("Statut", styles['Normal']), Paragraph(order.get_status_display(), style_box_val)],
-        [Paragraph("Paiement", styles['Normal']), Paragraph(order.get_payment_status_display(), style_box_val)],
-    ]
-    info_table = Table(info_box_data, colWidths=[2.5*cm, 3.5*cm])
-    info_container = Table([[info_table]], colWidths=[6.5*cm])
-    info_container.setStyle(TableStyle([('BOX', (0,0), (-1,-1), 1, col_blue_text), ('LEFTPADDING', (0,0), (-1,-1), 10), ('RIGHTPADDING', (0,0), (-1,-1), 10), ('TOPPADDING', (0,0), (-1,-1), 10), ('BOTTOMPADDING', (0,0), (-1,-1), 10)]))
     
-    company_info = [Paragraph("<b>PGStock</b>", ParagraphStyle('CN', fontSize=14, spaceAfter=6)), Paragraph("Adresse: Conakry, Guinée", styles['Normal'])]
-    header_table = Table([[company_info, [Paragraph("COMMANDE", style_label), Spacer(1, 0.2*cm), info_container]]], colWidths=[10*cm, 8*cm])
-    elements.append(header_table)
-    elements.append(Spacer(1, 1*cm))
+    # Custom Colors from Screenshot
+    col_primary = colors.HexColor("#2563eb") # Vibrant Blue
+    col_blue_bg = colors.HexColor("#f0f9ff") # Light Blue BG
+    col_dark_header = colors.HexColor("#1e293b") # Dark Slate
+    col_light_gray = colors.HexColor("#cbd5e1") # Gray for background labels
+    col_gray_text = colors.HexColor("#475569") # Slate 600
+    col_rose = colors.HexColor("#f43f5e") # Rose 500 for Remise
 
-    # Client
-    # Client logic: Use walk-in details if available
-    client_name = order.walk_in_name if order.walk_in_name else order.client.name
-    client_phone = order.walk_in_phone if order.walk_in_phone else (order.client.phone or '')
+    # Refined Styles
+    style_company_name = ParagraphStyle('CompName', parent=styles['Normal'], fontSize=20, fontName='Helvetica-Bold', spaceAfter=4)
+    style_company_info = ParagraphStyle('CompInfo', parent=styles['Normal'], fontSize=8, fontName='Helvetica-Bold', textColor=col_gray_text, leading=10, textTransform='uppercase', tracking=1)
     
-    client_rows = [
-        [Paragraph("CLIENT", ParagraphStyle('CL', fontSize=8, fontName='Helvetica-Bold', textColor=col_blue_text))],
-        [Paragraph(client_name, ParagraphStyle('CN', fontSize=14, fontName='Helvetica-Bold'))]
-    ]
-    if client_phone:
-        client_rows.append([Paragraph(f"Tel: {client_phone}", styles['Normal'])])
+    style_facture_bg = ParagraphStyle('FactureBG', parent=styles['Normal'], fontSize=54, fontName='Helvetica-Bold', textColor=colors.HexColor("#f1f5f9"), alignment=2)
+    style_order_num = ParagraphStyle('OrderNum', parent=styles['Normal'], fontSize=16, fontName='Helvetica-Bold', textColor=col_primary, alignment=2)
+    
+    style_box_label = ParagraphStyle('BoxLabel', parent=styles['Normal'], fontSize=8, fontName='Helvetica-Bold', textColor=colors.HexColor("#94a3b8"), spaceAfter=10)
+    style_box_val = ParagraphStyle('BoxVal', parent=styles['Normal'], fontSize=16, fontName='Helvetica-Bold', textColor=colors.black)
+    
+    style_payment_label = ParagraphStyle('PayLabel', parent=styles['Normal'], fontSize=7, fontName='Helvetica-Bold', textColor=colors.HexColor("#94a3b8"), spaceAfter=4)
+    style_payment_val = ParagraphStyle('PayVal', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold', textColor=colors.black)
 
-    client_table = Table(client_rows, colWidths=[18*cm])
-    client_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), col_blue_bg), 
-        ('LEFTPADDING', (0,0), (-1,-1), 15),
-        ('RIGHTPADDING', (0,0), (-1,-1), 15),
-        ('TOPPADDING', (0,0), (-1,-1), 10),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 10),
-        ('ROUNDEDCORNERS', [8, 8, 8, 8])
+    # 1. HEADER SECTION (Identity + Large Watermark-style Label)
+    # Icon/Logo Placeholder
+    logo_table = Table([[Paragraph("📄", ParagraphStyle('Logo', fontSize=32, textColor=colors.white, alignment=1))]], colWidths=[2.2*cm], rowHeights=[2.2*cm])
+    logo_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), col_primary),
+        ('ROUNDEDCORNERS', [15, 15, 15, 15]),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
     ]))
-    elements.append(client_table)
+
+    company_info = [
+        Paragraph("ETS BEA & FILS", style_company_name),
+        Paragraph("📍 MARCHÉ MADINA, CONAKRY, GUINÉE", style_company_info),
+        Paragraph("📞 +224 620 00 00 00", style_company_info),
+        Paragraph("✉️ CONTACT@BEAFILS.COM", style_company_info)
+    ]
+
+    header_left = Table([[logo_table, company_info]], colWidths=[3*cm, 7*cm])
+    header_left.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'TOP'), ('LEFTPADDING', (0,0), (-1,-1), 0)]))
+
+    header_right = [
+        Paragraph("FACTURE", style_facture_bg),
+        Spacer(1, -1.2*cm),
+        Paragraph(f"#{order.order_number}", style_order_num)
+    ]
+
+    header_main = Table([[header_left, header_right]], colWidths=[10*cm, 9*cm])
+    header_main.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM'), ('ALIGN', (1,0), (1,-0), 'RIGHT')]))
+    elements.append(header_main)
     elements.append(Spacer(1, 1*cm))
 
-    # Items
+    # 2. INFO BOXES (Client vs Payment Details)
+    # Box A: Client
+    client_name = order.walk_in_name if order.walk_in_name else order.client.name
+    client_box_content = [
+        Paragraph("FACTURÉ À", style_box_label),
+        Paragraph(client_name, style_box_val),
+    ]
+    client_box = Table([client_box_content], colWidths=[8.5*cm], rowHeights=[2.8*cm])
+    client_box.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), col_blue_bg),
+        ('ROUNDEDCORNERS', [20, 20, 20, 20]),
+        ('LEFTPADDING', (0,0), (-1,-1), 20),
+        ('TOPPADDING', (0,0), (-1,-1), 20),
+    ]))
+
+    # Box B: Payment info
+    payment_info_data = [
+        [Paragraph("DÉTAILS DE PAIEMENT", style_box_label), ''],
+        [Paragraph("DATE D'ÉMISSION", style_payment_label), Paragraph("ÉCHÉANCE", style_payment_label)],
+        [Paragraph(order.date_created.strftime('%d/%m/%Y'), style_payment_val), Paragraph("À réception", style_payment_val)],
+    ]
+    payment_info_table = Table(payment_info_data, colWidths=[4*cm, 4*cm])
+    payment_info_table.setStyle(TableStyle([('BOTTOMPADDING', (0,0), (-1,-1), 4), ('TOPPADDING', (0,0), (-1,-1), 4)]))
+    
+    payment_box = Table([[payment_info_table]], colWidths=[8.5*cm], rowHeights=[2.8*cm])
+    payment_box.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#f8fafc")),
+        ('ROUNDEDCORNERS', [20, 20, 20, 20]),
+        ('LEFTPADDING', (0,0), (-1,-1), 15),
+        ('TOPPADDING', (0,0), (-1,-1), 15),
+    ]))
+
+    info_row = Table([[client_box, Spacer(0.5*cm, 0), payment_box]], colWidths=[8.5*cm, 1*cm, 8.5*cm])
+    elements.append(info_row)
+    elements.append(Spacer(1, 1*cm))
+
+    # 3. ITEMS TABLE (Rounded Header)
     headers = ['DESCRIPTION', 'QTÉ', 'P.U.', 'TOTAL']
     data = [headers]
     for item in order.items.all():
         data.append([
-            Paragraph(f"<b>{item.product.name}</b>", styles['Normal']),
+            Paragraph(f"<b>{item.product.name}</b><br/><font size=8 color='#94a3b8'>{item.product.sku or 'N/A'}</font>", styles['Normal']),
             str(item.quantity),
             f"{float(item.unit_price):,.0f} GNF",
             f"{float(item.total_price):,.0f} GNF"
         ])
     
-    t = Table(data, colWidths=[10*cm, 2*cm, 3*cm, 3*cm])
-    t.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), col_dark_header), ('TEXTCOLOR', (0, 0), (-1, 0), colors.white), ('ALIGN', (2, 0), (-1, -1), 'RIGHT'), ('LINEBELOW', (0, 0), (-1, -1), 0.5, col_gray_border)]))
+    col_widths = [11*cm, 2*cm, 3*cm, 3*cm]
+    t = Table(data, colWidths=col_widths)
+    t.setStyle(TableStyle([
+        # Header Styling
+        ('BACKGROUND', (0, 0), (-1, 0), col_dark_header),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
+        ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('TOPPADDING', (0, 0), (-1, 0), 12),
+        ('LEFTPADDING', (0, 0), (-1, 0), 15),
+        
+        # Row Styling
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+        ('ALIGN', (2, 1), (-1, -1), 'RIGHT'),
+        ('TOPPADDING', (0, 1), (-1, -1), 15),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 15),
+        ('LEFTPADDING', (0, 1), (0, -1), 15),
+        ('RIGHTPADDING', (-1, 1), (-1, -1), 15),
+        ('LINEBELOW', (0, 0), (-1, -1), 0.5, colors.HexColor("#f1f5f9")),
+    ]))
+    
     elements.append(t)
-    elements.append(Spacer(1, 1*cm))
+    elements.append(Spacer(1, 1.5*cm))
 
-    # Totals
-    totals_data = []
-    totals_data.append([Paragraph("Sous-Total", styles['Normal']), Paragraph(f"{float(order.subtotal):,.0f} GNF", style_box_val)])
+    # 4. TOTALS SECTION
+    subtotal_row = [Paragraph("SOUS-TOTAL", ParagraphStyle('Sub', fontSize=8, fontName='Helvetica-Bold', textColor=col_light_gray, alignment=2)), Paragraph(f"{float(order.subtotal):,.0f} GNF", ParagraphStyle('SubV', fontSize=10, fontName='Helvetica-Bold', alignment=2))]
+    
+    total_net_box_inner = [
+        Paragraph("TOTAL NET", ParagraphStyle('TLabel', fontSize=8, fontName='Helvetica-Bold', textColor=colors.white, alignment=0)),
+        Paragraph(f"{float(order.total_amount):,.0f} GNF", ParagraphStyle('TVal', fontSize=24, fontName='Helvetica-Bold', textColor=colors.white, alignment=2))
+    ]
+    total_net_box = Table([total_net_box_inner], colWidths=[8*cm], rowHeights=[2.2*cm])
+    total_net_box.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), col_primary),
+        ('ROUNDEDCORNERS', [20, 20, 20, 20]),
+        ('LEFTPADDING', (0,0), (-1,-1), 25),
+        ('RIGHTPADDING', (0,0), (-1,-1), 25),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+
+    totals_final_data = [
+        subtotal_row,
+    ]
     
     if order.discount and order.discount > 0:
-        totals_data.append([Paragraph("Remise", styles['Normal']), Paragraph(f"- {float(order.discount):,.0f} GNF", style_box_val)])
-        
-    totals_data.append([Paragraph("Total TTC", styles['Normal']), Paragraph(f"{float(order.total_amount):,.0f} GNF", style_box_val)])
-    totals_data.append([Paragraph("Payé", styles['Normal']), Paragraph(f"{float(order.amount_paid):,.0f} GNF", style_box_val)])
-    totals_data.append([Paragraph("Solde", ParagraphStyle('TL', fontName='Helvetica-Bold')), Paragraph(f"{float(order.total_amount - order.amount_paid):,.0f} GNF", ParagraphStyle('TV', fontName='Helvetica-Bold', textColor=colors.red))])
-    elements.append(Table(totals_data, colWidths=[4*cm, 4*cm], hAlign='RIGHT'))
+        totals_final_data.append([
+            Paragraph("REMISE", ParagraphStyle('Rem', fontSize=8, fontName='Helvetica-Bold', textColor=col_rose, alignment=2)), 
+            Paragraph(f"- {float(order.discount):,.0f} GNF", ParagraphStyle('RemV', fontSize=10, fontName='Helvetica-Bold', textColor=col_rose, alignment=2))
+        ])
+
+    totals_final_data.append([Spacer(1, 0.4*cm), ''])
+    totals_final_data.append(['', total_net_box])
+    totals_final_data.append([Spacer(1, 0.5*cm), ''])
     
+    paid_row = [Paragraph("MONTANT PAYÉ", ParagraphStyle('Paid', fontSize=8, fontName='Helvetica-Bold', textColor=col_light_gray, alignment=2)), Paragraph(f"{float(order.amount_paid):,.0f} GNF", ParagraphStyle('PaidV', fontSize=10, fontName='Helvetica-Bold', alignment=2))]
+    totals_final_data.append(paid_row)
+
+    totals_table = Table(totals_final_data, colWidths=[9*cm, 9*cm])
+    totals_table.setStyle(TableStyle([
+        ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+    
+    elements.append(totals_table)
+
+    # PAGE FOOTER
+    elements.append(Spacer(1, 3*cm))
+    footer_text = Paragraph("PGStock - Gestion de Stock • ETS BEA & FILS • DOCUMENT GÉNÉRÉ LE " + datetime.now().strftime('%d/%m/%Y'), ParagraphStyle('Footer', fontSize=7, alignment=1, textColor=col_light_gray))
+    elements.append(footer_text)
+
     doc.build(elements)
     return response

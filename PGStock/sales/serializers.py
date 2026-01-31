@@ -53,11 +53,12 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'point_of_sale': {'required': False, 'allow_null': True},
+            'client': {'required': False, 'allow_null': True},
         }
 
     def validate(self, attrs):
-        # On ne bloque plus la vente si le stock est faible (<=2)
-        # On laisse le modèle gérer les alertes de stock bas
+        if not attrs.get('client') and not attrs.get('walk_in_name'):
+            raise serializers.ValidationError("Veuillez sélectionner un client ou saisir un nom pour le client de passage.")
         return attrs
 
     def create(self, validated_data):
@@ -74,6 +75,36 @@ class OrderSerializer(serializers.ModelSerializer):
         
         if self.context.get('request') and self.context.get('request').user:
             validated_data['created_by'] = self.context.get('request').user
+
+        # [AUTO-CREATE CLIENT for Walk-ins]
+        # If walk_in_name is present, we treat this as a persistent client
+        # We try to find an existing client by Name (and phone if possible) or create a new one.
+        walk_in_name = validated_data.get('walk_in_name')
+        if walk_in_name:
+            from inventory.models import Client
+            walk_in_phone = validated_data.get('walk_in_phone', '')
+            
+            # Simple deduplication strategy:
+            # 1. Try to find by Phone (uniqueness is high)
+            client = None
+            if walk_in_phone:
+                client = Client.objects.filter(phone=walk_in_phone).first()
+            
+            # 2. If not found by phone, try by Name
+            if not client:
+                client = Client.objects.filter(name__iexact=walk_in_name).first()
+                
+            # 3. If still not found, create new Client
+            if not client:
+                client = Client.objects.create(
+                    name=walk_in_name,
+                    phone=walk_in_phone if walk_in_phone else '',
+                    client_type='individual',
+                    notes="Client créé automatiquement (Passage)"
+                )
+            
+            # Update the order to point to this specific client
+            validated_data['client'] = client
 
         order = Order.objects.create(**validated_data)
         

@@ -19,14 +19,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from 'sonner';
-import inventoryService from '@/services/inventoryService';
+import salesService from '@/services/salesService';
+import type { Order } from '@/services/salesService';
 import { formatCurrency } from '@/lib/utils';
-import type { Invoice } from '@/types';
 
 interface PaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  invoice: Invoice | null;
+  invoice: Order | null;
   onSuccess: () => void;
 }
 
@@ -37,13 +37,11 @@ export function PaymentDialog({ open, onOpenChange, invoice, onSuccess }: Paymen
   
   const queryClient = useQueryClient();
 
+  const balance = invoice ? (Number(invoice.total_amount) - (invoice.amount_paid || 0)) : 0;
+
   const paymentMutation = useMutation({
-    mutationFn: async (data: { invoiceId: number; amount: number; method: string; reference?: string }) => {
-      return inventoryService.recordPayment(data.invoiceId, {
-        amount: data.amount,
-        payment_method: data.payment_method, // Note: backend likely expects 'payment_method' snake_case
-        transaction_id: data.reference
-      });
+    mutationFn: async (data: { orderId: number; amount: number; method: string; reference?: string }) => {
+      return salesService.addPayment(data.orderId, data.amount, data.method);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
@@ -61,9 +59,10 @@ export function PaymentDialog({ open, onOpenChange, invoice, onSuccess }: Paymen
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!invoice || !amount) return;
+    if (!invoice.id) return;
 
     paymentMutation.mutate({
-      invoiceId: invoice.id,
+      orderId: invoice.id,
       amount: Number(amount),
       method: paymentMethod,
       reference
@@ -78,7 +77,7 @@ export function PaymentDialog({ open, onOpenChange, invoice, onSuccess }: Paymen
         <DialogHeader>
           <DialogTitle>Enregistrer un paiement</DialogTitle>
           <DialogDescription>
-            Facture {invoice.invoice_number} - Reste à payer: <span className="font-bold text-rose-500">{formatCurrency(invoice.balance)}</span>
+            Commande {invoice.order_number} - Reste à payer: <span className="font-bold text-rose-500">{formatCurrency(balance)}</span>
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -92,7 +91,7 @@ export function PaymentDialog({ open, onOpenChange, invoice, onSuccess }: Paymen
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="col-span-3"
-              max={Number(invoice.balance)}
+              max={balance}
               required
             />
           </div>

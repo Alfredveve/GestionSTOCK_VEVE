@@ -35,7 +35,9 @@ export function POS() {
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [selectedPosId, setSelectedPosId] = useState<number | null>(1); // Default to 1, but should be dynamic
   const [walkInDetails, setWalkInDetails] = useState({ name: '', phone: '' });
+  const [isWalkIn, setIsWalkIn] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [notes, setNotes] = useState<string>('');
   const [checkoutBreakdown, setCheckoutBreakdown] = useState({
     subtotal: 0,
     discount: 0,
@@ -160,9 +162,11 @@ export function POS() {
         date_due: new Date().toISOString().split('T')[0],
         // Send global discount from checkout breakdown
         discount: checkoutBreakdown.discount,
-        // Send walk-in details only if Walk-in Client (ID 1) is selected
-        walk_in_name: selectedClientId === 1 ? walkInDetails.name : undefined,
-        walk_in_phone: selectedClientId === 1 ? walkInDetails.phone : undefined
+        // Send walk-in details only if Walk-in Mode is active
+        walk_in_name: isWalkIn ? walkInDetails.name : undefined,
+        walk_in_phone: isWalkIn ? walkInDetails.phone : undefined,
+        // Send notes if provided
+        notes: notes || undefined
       });
 
       // Invalidate queries to refresh the lists and stock
@@ -174,8 +178,13 @@ export function POS() {
       setIsCheckoutOpen(false);
       toast.success(isInvoiceMode ? 'Facture générée avec succès !' : 'Vente validée avec succès !');
       
-    } catch (err: any) {
-      toast.error(err.response?.data?.detail || 'Une erreur est survenue lors de la validation.');
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+          const apiError = err as { response: { data: { detail: string } } };
+          toast.error(apiError.response?.data?.detail || 'Une erreur est survenue lors de la validation.');
+      } else {
+          toast.error('Une erreur est survenue lors de la validation.');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -262,7 +271,7 @@ export function POS() {
            {isLoading ? (
              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                {[...Array(10)].map((_, i) => (
-                 <div key={i} className="aspect-[4/5] bg-muted/50 animate-pulse rounded-3xl border-2 border-dashed border-muted" />
+                 <div key={i} className="aspect-4/5 bg-muted/50 animate-pulse rounded-3xl border-2 border-dashed border-muted" />
                ))}
              </div>
            ) : isError ? (
@@ -285,7 +294,7 @@ export function POS() {
              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                <AnimatePresence mode="popLayout">
                  {productsData?.results?.map((product) => {
-                   const stock = getStockDisplay(product);
+                   // const stock = getStockDisplay(product);
                    return (
 
                       <motion.div
@@ -314,7 +323,7 @@ export function POS() {
                                onClick={() => addToCart(product, 'retail')}
                                className="w-full mb-2 relative group/retail overflow-hidden"
                             >
-                               <div className="absolute inset-0 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] opacity-90 group-hover/retail:opacity-100 transition-opacity rounded-xl" />
+                               <div className="absolute inset-0 bg-linear-to-r from-[#7C3AED] to-[#A855F7] opacity-90 group-hover/retail:opacity-100 transition-opacity rounded-xl" />
                                <div className="relative py-1.5 px-3 flex items-center justify-between text-white">
                                   <ShoppingCart className="h-4 w-4 opacity-90 group-hover/retail:scale-110 transition-transform" />
                                   <div className="flex flex-col items-end">
@@ -377,6 +386,10 @@ export function POS() {
            walkInDetails={walkInDetails}
            onWalkInChange={setWalkInDetails}
            isInvoiceMode={isInvoiceMode}
+           notes={notes}
+           onNotesChange={setNotes}
+           isWalkIn={isWalkIn}
+           onToggleWalkIn={setIsWalkIn}
          />
       </div>
 

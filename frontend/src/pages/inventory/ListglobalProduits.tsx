@@ -14,8 +14,6 @@ import {
   List,
   Box,
   Package,
-  ChevronUp,
-  ChevronDown,
   Loader2,
   MapPin,
   Monitor
@@ -120,11 +118,7 @@ export function ListglobalProduits() {
     queryFn: () => inventoryService.getCategories(),
   });
 
-  const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      maximumFractionDigits: 0
-    }).format(typeof value === 'string' ? parseFloat(value) : value) + ' GNF';
-  };
+
 
   const handleExportExcel = async () => {
     try {
@@ -165,7 +159,7 @@ export function ListglobalProduits() {
       const result = await inventoryService.importProducts(file);
       toast.success(result.importedCount + " produits importés avec succès");
       queryClient.invalidateQueries({ queryKey: ['products'] });
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
       toast.error("Erreur lors de l'importation des produits");
     } finally {
@@ -474,7 +468,7 @@ export function ListglobalProduits() {
                         <span className="text-[10px] font-mono text-slate-600 font-black">#{product.sku}</span>
                       </div>
 
-                      <h3 className="text-white font-black text-lg uppercase leading-tight mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2 min-h-[3rem]">
+                      <h3 className="text-white font-black text-lg uppercase leading-tight mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2 min-h-12">
                         {product.name}
                       </h3>
 
@@ -566,7 +560,7 @@ export function ListglobalProduits() {
                </div>
              ) : (
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {stockBreakdown?.results?.map((item: any) => (
+                  {stockBreakdown?.results?.map((item: { id: number; pos_name: string; quantity: number }) => (
                     <div key={item.id} className="bg-white/5 border border-white/5 p-5 rounded-3xl group hover:border-indigo-500/30 transition-all">
                        <div className="flex items-center gap-3 mb-3">
                           <MapPin className="h-4 w-4 text-indigo-400" />
@@ -580,8 +574,8 @@ export function ListglobalProduits() {
                        </div>
                        <div className="mt-4 h-1.5 bg-white/5 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-indigo-500 rounded-full" 
-                            style={{ width: `${Math.min((item.quantity / (productForDetails?.current_stock || 1)) * 100, 100)}%` }}
+                            className="h-full bg-indigo-500 rounded-full w-(--progress-width)" 
+                            style={{ '--progress-width': `${Math.min((item.quantity / (productForDetails?.current_stock || 1)) * 100, 100)}%` } as React.CSSProperties}
                           />
                        </div>
                     </div>

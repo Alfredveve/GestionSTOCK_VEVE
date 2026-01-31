@@ -23,9 +23,10 @@ import type { Product, Category } from '@/types';
 import { cn } from '@/lib/utils';
 import { ProductDetailsDrawer } from '@/components/inventory/ProductDetailsDrawer';
 import { ProductForm } from '@/components/inventory/ProductForm';
+import { ImportModal } from '@/components/common/ImportModal';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useRef } from 'react';
+
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -53,8 +54,8 @@ export function ProductList() {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isExporting, setIsExporting] = useState<'excel' | 'pdf' | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  // const fileInputRef = useRef<HTMLInputElement>(null); // No longer needed with Modal
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -137,29 +138,14 @@ export function ProductList() {
     }
   };
 
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
+  // const handleImportClick = () => {
+  //   fileInputRef.current?.click();
+  // };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setIsImporting(true);
-      const result = await inventoryService.importProducts(file);
-      toast.success(result.message || "Produits importés avec succès");
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      if (result.errors && result.errors.length > 0) {
-        toast.warning(`${result.errors.length} erreurs lors de l'importation`);
-      }
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data?.error || "Erreur lors de l'importation des produits");
-    } finally {
-      setIsImporting(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+  const handleUpload = async (file: File) => {
+    const result = await inventoryService.importProducts(file);
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    return result;
   };
 
   return (
@@ -176,14 +162,7 @@ export function ProductList() {
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            className="hidden" 
-            accept=".xlsx, .xls"
-            aria-label="Importer des produits"
-          />
+          {/* File Input removed */}
           <Button 
             variant="outline" 
             onClick={handleExportExcel}
@@ -204,11 +183,10 @@ export function ProductList() {
           </Button>
           <Button 
             variant="outline" 
-            onClick={handleImportClick}
-            disabled={isImporting}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
+            onClick={() => setIsImportModalOpen(true)}
+            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all"
           >
-            {isImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4 rotate-180" />}
+            <Download className="mr-2 h-4 w-4 rotate-180" />
             Importer
           </Button>
           <Button onClick={() => setIsFormOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6">
@@ -594,6 +572,12 @@ export function ProductList() {
           setSelectedProduct(null);
         }} 
         product={selectedProduct || undefined}
+      />
+
+      <ImportModal 
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onUpload={handleUpload}
       />
 
       <ProductDetailsDrawer 

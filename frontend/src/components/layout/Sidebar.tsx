@@ -21,17 +21,18 @@ import {
     Bell,
     BarChart3
 } from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
 import {cn} from '@/lib/utils';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 
 type NavigationItem = {
     name: string;
     href?: string;
-    icon: React.ComponentType<any>;
+    icon: React.ComponentType<LucideProps>;
     children?: {
         name: string;
         href: string;
-        icon?: React.ComponentType<any>
+        icon?: React.ComponentType<LucideProps>
     }[];
 };
 
@@ -97,23 +98,27 @@ const navigation: NavigationItem[] = [
         ]
     },
 
-    // 4 - Devis & Commandes, Factures, Vente Rapide(POST)
+    // 4 - Ventes (Caisse Rapide, Facturation Pro, Devis)
     {
-        name: 'Ventes & Fact.',
+        name: 'Ventes',
         icon: ShoppingCart,
         children: [
             {
-                name: 'Devis & Commandes',
-                href: '/quotes',
-                icon: ClipboardList
+                name: '📊 Tableau de Bord',
+                href: '/sales/dashboard',
+                icon: BarChart3
             }, {
-                name: 'Factures',
+                name: '🛒 Caisse Rapide',
+                href: '/pos',
+                icon: Monitor
+            }, {
+                name: '📄 Facturation Pro',
                 href: '/invoices',
                 icon: Receipt
             }, {
-                name: 'Vente Rapide (POS)',
-                href: '/pos',
-                icon: Monitor
+                name: '📋 Devis',
+                href: '/quotes',
+                icon: ClipboardList
             },
         ]
     },
@@ -209,34 +214,43 @@ interface SidebarProps {
 
 export function Sidebar({isOpen, onClose} : SidebarProps) {
     const location = useLocation();
-    const [expandedGroups, setExpandedGroups] = useState < string[] > ([]);
-
-    // Automatically expand groups based on current path
-    useEffect(() => {
+    // Automatically expand groups based on current path using memoization to avoid cascading renders
+    const autoExpandedGroups = useMemo(() => {
         const currentPath = location.pathname;
-        const groupsToExpand = navigation.filter(item => item.children && item.children.some(child => {
+        return navigation.filter(item => item.children && item.children.some(child => {
             const childPath = child.href.split('?')[0];
             return currentPath === childPath || (childPath !== '/' && currentPath.startsWith(childPath));
         })).map(item => item.name);
-
-        if (groupsToExpand.length > 0) {
-            setExpandedGroups(prev => Array.from(new Set([
-                ...prev,
-                ... groupsToExpand
-            ])));
-        }
-
-        // Auto-close sidebar on mobile when route changes
-        if (window.innerWidth < 768) {
-            onClose();
-        }
     }, [location.pathname]);
 
-    const toggleGroup = (name : string) => {
-        setExpandedGroups(prev => prev.includes(name) ? prev.filter(item => item !== name) : [
-            ...prev,
-            name
-        ]);
+    const [manuallyExpandedGroups, setManuallyExpandedGroups] = useState<string[]>([]);
+    const [manuallyCollapsedGroups, setManuallyCollapsedGroups] = useState<string[]>([]);
+    
+    // Combined expanded groups: auto + manual, but exclude manually collapsed
+    const expandedGroups = useMemo(() => {
+        const combined = Array.from(new Set([...autoExpandedGroups, ...manuallyExpandedGroups]));
+        return combined.filter(name => !manuallyCollapsedGroups.includes(name));
+    }, [autoExpandedGroups, manuallyExpandedGroups, manuallyCollapsedGroups]);
+
+    // Effect for closing sidebar on mobile
+    useEffect(() => {
+        if (window.innerWidth < 768 && isOpen) {
+            onClose();
+        }
+    }, [location.pathname, onClose, isOpen]);
+
+    const toggleGroup = (name: string) => {
+        const isCurrentlyExpanded = expandedGroups.includes(name);
+        
+        if (isCurrentlyExpanded) {
+            // Closing: add to manually collapsed, remove from manually expanded
+            setManuallyCollapsedGroups(prev => [...prev.filter(item => item !== name), name]);
+            setManuallyExpandedGroups(prev => prev.filter(item => item !== name));
+        } else {
+            // Opening: add to manually expanded, remove from manually collapsed
+            setManuallyExpandedGroups(prev => [...prev.filter(item => item !== name), name]);
+            setManuallyCollapsedGroups(prev => prev.filter(item => item !== name));
+        }
     };
 
     const isActive = (path : string) => {
@@ -304,8 +318,8 @@ export function Sidebar({isOpen, onClose} : SidebarProps) {
                                             () => toggleGroup(item.name)
                                         }
                                         aria-label={`${isExpanded ? 'Réduire' : 'Développer'} ${item.name}`}
-                                        aria-expanded={isExpanded ? "true" : "false"}
-                                        aria-controls={`submenu-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
+                                        aria-expanded={isExpanded}
+                                        aria-controls={`submenu-${item.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`}
                                         className={
                                             cn("flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group relative overflow-hidden", groupActive ? "text-white bg-white/10" : "text-gray-400 hover:text-white hover:bg-white/5")
                                     }>
@@ -327,7 +341,7 @@ export function Sidebar({isOpen, onClose} : SidebarProps) {
                                         }/>
                                     </button>
 
-                                    <div id={`submenu-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
+                                    <div id={`submenu-${item.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}`}
                                          className={
                                         cn("grid transition-[grid-template-rows] duration-300 ease-out pl-4", isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")
                                     }>

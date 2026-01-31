@@ -435,11 +435,7 @@ const inventoryService = {
   async importProducts(file: File): Promise<{ message: string; importedCount: number }> {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await api.post('products/import_products/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.post('products/import_products/', formData);
     return response.data;
   },
 
