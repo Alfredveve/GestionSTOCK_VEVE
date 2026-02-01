@@ -1,192 +1,124 @@
 # 📦 GestionSTOCK
 
-Système de gestion de stock professionnel développé avec Django.
+Système de gestion de stock professionnel avec architecture moderne **SPA (React)** & **API (Django)**.
 
 ## 📋 Description
 
-GestionSTOCK est une application web complète pour la gestion de stock, incluant :
+GestionSTOCK est une solution complète pour la gestion commerciale et logistique :
 
-- 📊 Gestion des produits et inventaire
-- 🏪 Gestion multi-points de vente (POS)
-- 📝 Facturation et gestion des clients
-- 👥 Gestion des fournisseurs
-- 📈 Rapports et statistiques
-- 🔐 Système de permissions utilisateurs (Admin, Superuser, Staff)
+- 📊 **Inventaire & Produits** : Gestion avancée, suivi des stocks, seuils d'alerte.
+- 🏪 **Multi-POS** : Points de vente multiples avec interfaces dédiées.
+- 💰 **Ventes & Achats** : Gestion des factures, devis (quotes), et commandes fournisseurs.
+- 💹 **Gestion Financière** : Suivi des dépenses, rapports de profits, et flux de trésorerie.
+- 📈 **Rapports Dynamiques** : Graphiques interactifs et exports PDF/Excel.
+- 🔐 **Permissions** : Système de rôles granulaires (Admin, Superuser, Staff).
 
-## 🚀 Installation
+## 🏗️ Architecture & Technologies
 
-### Prérequis
+L'application utilise une architecture découplée (Decoupled API/SPA) pour une performance et une maintenabilité optimales.
 
-- Python 3.8 ou supérieur
-- pip (gestionnaire de paquets Python)
-- Git
+### 💻 Frontend (SPA)
+
+- **Framework** : [React 19](https://react.dev/)
+- **Build Tool** : [Vite 7](https://vitejs.dev/)
+- **Langage** : TypeScript
+- **Styling** : [Tailwind CSS 4](https://tailwindcss.com/) & Radix UI
+- **State Management** : Zustand
+- **Data Fetching** : TanStack React Query v5
+- **Charts** : Recharts
+- **Icons** : Lucide React
+
+### ⚙️ Backend (API)
+
+- **Framework** : [Django 5.2](https://www.djangoproject.com/)
+- **API** : Django REST Framework (DRF)
+- **Auth** : JWT (SimpleJWT)
+- **Base de données** : PostgreSQL (Production), SQLite (Dev)
+- **Génération PDF** : WeasyPrint
+- **Exports Excel** : Openpyxl
+
+---
+
+## 🚀 Installation & Configuration
 
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/VOTRE-USERNAME/GestionSTOCK.git
+git clone https://github.com/Alfredveve/GestionSTOCK_VEVE.git
 cd GestionSTOCK
 ```
 
-### 2. Créer un environnement virtuel
-
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Installer les dépendances
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configuration des variables d'environnement
-
-```bash
-# Copier le fichier exemple
-copy .env.example .env
-
-# Éditer .env avec vos vraies valeurs
-notepad .env
-```
-
-**Variables importantes à configurer dans `.env` :**
-
-```env
-SECRET_KEY=votre-cle-secrete-django
-DEBUG=True
-EMAIL_HOST_USER=votre-email@gmail.com
-EMAIL_HOST_PASSWORD=votre-mot-de-passe-application
-```
-
-> ⚠️ **IMPORTANT** : Ne jamais commiter le fichier `.env` sur GitHub !
-
-### 5. Appliquer les migrations
+### 2. Backend (Django)
 
 ```bash
 cd PGStock
+
+# Créer et activer l'environnement virtuel
+python -m venv venv
+# Windows: venv\Scripts\activate | Linux: source venv/bin/activate
+
+# Installer les dépendances
+pip install -r requirements.txt
+
+# Configurer les variables d'environnement
+cp .env.example .env  # Éditer .env avec vos clés
+
+# Migrations et Superutilisateur
 python manage.py migrate
-```
-
-### 6. Créer un superutilisateur
-
-```bash
 python manage.py createsuperuser
-```
 
-### 7. Lancer le serveur de développement
-
-```bash
+# Lancer le serveur API (Port 8000 par défaut)
 python manage.py runserver
 ```
 
-L'application sera accessible sur : `http://127.0.0.1:8000/`
+### 3. Frontend (React)
 
-## 📚 Documentation
+```bash
+cd ../frontend
 
-- **[Guide Git](GIT_GUIDE.md)** - Guide complet pour utiliser Git avec ce projet
-- **[Documentation Django](https://docs.djangoproject.com/)** - Documentation officielle de Django
+# Installer les dépendances
+npm install
 
-## 🏗️ Structure du projet
-
+# Lancer le mode développement (Port 5173 par défaut)
+npm run dev
 ```
+
+---
+
+## 📂 Structure du Projet
+
+```text
 GestionSTOCK/
-├── PGStock/              # Projet Django principal
-│   ├── PGStock/          # Configuration du projet
-│   ├── inventory/        # Application principale
-│   ├── manage.py         # Script de gestion Django
-│   └── db.sqlite3        # Base de données (non commité)
-├── .env                  # Variables d'environnement (non commité)
-├── .env.example          # Exemple de configuration
-├── .gitignore            # Fichiers ignorés par Git
-├── GIT_GUIDE.md          # Guide Git
-└── README.md             # Ce fichier
+├── PGStock/                # Backend Django API
+│   ├── core/               # Logique d'authentification
+│   ├── inventory/          # Gestion des produits & stock
+│   ├── sales/              # Ventes & Facturation
+│   ├── purchasing/         # Achats fournisseurs
+│   └── stock/              # Mouvements de stock
+├── frontend/               # SPA React
+│   ├── src/
+│   │   ├── components/     # Composants UI réutilisables
+│   │   ├── pages/          # Vues principales de l'application
+│   │   ├── services/       # Appels API (Axios/React Query)
+│   │   ├── store/          # Gestion d'état (Zustand)
+│   │   └── types/          # Définitions TypeScript
+└── .gitignore              # Configuration Git
 ```
 
 ## 🔐 Sécurité
 
-Ce projet utilise des variables d'environnement pour protéger les données sensibles :
+- ✅ Authentification sécurisée via **JWT**.
+- ✅ Gestion stricte des variables d'environnement via `.env` (non commité).
+- ✅ Validation des entrées côté API et Frontend.
+- ✅ Système de permissions Django pour restreindre l'accès aux données sensibles.
 
-- ✅ Fichier `.env` pour les secrets (non commité)
-- ✅ Fichier `.gitignore` configuré
-- ✅ Utilisation de `python-decouple` pour la configuration
+## 📚 Documentation Additionnelle
 
-**Ne jamais commiter :**
-- Fichiers `.env`
-- Base de données avec données réelles
-- Mots de passe ou tokens
-
-### Configuration e-mail (Sécurisée)
-
- - **Toujours** stocker les identifiants SMTP dans des variables d'environnement (fichier `.env` local non commité). Ce projet utilise `python-decouple`.
- - **Gmail** : préférez un mot de passe d'application (App Password) plutôt que le mot de passe principal. Activez l'authentification à deux facteurs puis générez un mot de passe d'application.
- - **TLS/SSL** : utilisez `EMAIL_USE_TLS=True` et `EMAIL_PORT=587` pour TLS, ou `EMAIL_USE_SSL=True` et `EMAIL_PORT=465` si vous préférez SSL en prod.
- - **DEBUG** : laissez `DEBUG=True` en développement. En production, mettez `DEBUG=False` et vérifiez `ALLOWED_HOSTS` et `DEFAULT_FROM_EMAIL`.
- - **Transactional Email Provider** : pour la production, utilisez des services spécialisés (SendGrid, Mailgun, Amazon SES) plutôt que SMTP direct si vous envoyez un grand volume.
- - **Logs & Monitoring** : surveillez les erreurs d'envoi via vos logs (Sentry, Papertrail) et activez l'envoi d'alerte si nécessaire.
-
-Tests locaux sûrs
- - Pour tester sans envoyer d'e-mails réels, activez dans `.env` : `EMAIL_FILE_BASED=True`. Les e-mails seront écrits dans `sent_emails/` (ignoré par Git).
- - Vous pouvez aussi utiliser le backend console (défaut en dev) : les e-mails s'affichent dans le terminal où tourne `manage.py runserver`.
-
-Commande de test
- - Une commande de gestion est fournie pour tester l'envoi en respectant la configuration actuelle :
-
-```powershell
-# Exemple : envoyer un e-mail de test à votre adresse
-cd PGStock
-python manage.py send_test_mail --to vous@exemple.com --subject "Test e-mail" --body "Corps du message"
-```
-
- - La commande affiche quel `EMAIL_BACKEND` est utilisé et, si le backend fichier est activé, le chemin où le fichier a été créé.
-
-Bonnes pratiques de sécurité
- - Ne mettez jamais de credentials SMTP dans le dépôt.
- - Utilisez un compte dédié aux envois (adresse `no-reply@votredomaine` ou compte transactionnel).
- - Protégez l'accès à la console de production et limitez qui peut déclencher des envois massifs.
-
-## 🌿 Workflow Git
-
-Nous utilisons une stratégie de branches simple :
-
-```
-main (production)
-  ↑
-develop (développement)
-  ↑
-feature/xxx (fonctionnalités)
-```
-
-Consultez le [Guide Git](GIT_GUIDE.md) pour plus de détails.
-
-## 🛠️ Technologies utilisées
-
-- **Backend** : Django 4.x
-- **Frontend** : HTML, CSS, JavaScript, Tailwind CSS, DaisyUI
-- **Base de données** : SQLite (développement), PostgreSQL (production recommandée)
-- **Authentification** : Django Auth avec permissions personnalisées
-
-## 👥 Rôles et permissions
-
-- **ADMIN** : Accès complet au système
-- **SUPERUSER** : Gestion multi-POS, rapports globaux
-- **STAFF** : Gestion d'un seul point de vente
-
-## 📧 Contact
-
-- **Email** : vevebea2022@outlook.fr
-- **GitHub** : [Créer un ticket](https://github.com/VOTRE-USERNAME/GestionSTOCK/issues)
-
-## 📄 Licence
-
-Ce projet est privé et propriétaire.
+- **[Manuel Utilisateur](MANUEL_UTILISATEUR.md)** - Guide d'utilisation des fonctionnalités.
+- **[Guide Git](GIT_GUIDE.md)** - Guide pour les contributeurs.
 
 ---
 
-**Dernière mise à jour** : 6 décembre 2025
+**Propriétaire** : Alfred VEVE  
+**Contact** : <vevebea2022@outlook.fr>  
+**Dernière mise à jour** : Février 2026
