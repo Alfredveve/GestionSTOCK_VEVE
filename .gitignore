@@ -52,6 +52,10 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+frontend/*.json
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/tsconfig.json
 
 # Cursor/IDE
 .cursorrules
@@ -60,3 +64,10 @@ dist-ssr/
 .DS_Store
 .env
 .env.*
+
+# Backups & Temporary scripts
+*_backup.*
+PGStock/scripts/*.py
+!PGStock/scripts/__init__.py
+PGStock/verify_*.py
+PGStock/inventory/management/commands/test_*.py
