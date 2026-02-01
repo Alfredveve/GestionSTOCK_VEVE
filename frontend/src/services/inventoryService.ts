@@ -16,7 +16,8 @@ import type {
   Payment,
   DashboardStats,
   ReceiptCreatePayload,
-  Inventory
+  Inventory,
+  GlobalStockStats
 } from '@/types';
 
 export interface UserAccount {
@@ -66,6 +67,7 @@ export interface ClientCreatePayload {
 export interface ExpenseCreatePayload {
   category: number;
   amount: number;
+  point_of_sale?: number;
   date: string;
   description: string;
   reference?: string;
@@ -247,7 +249,7 @@ const inventoryService = {
     return Array.isArray(response.data) ? response.data : (response.data.results || []);
   },
 
-  async getMe(): Promise<any> {
+  async getMe(): Promise<UserAccount> {
     const response = await api.get('users/me/');
     return response.data;
   },
@@ -499,7 +501,7 @@ const inventoryService = {
     link.remove();
   },
 
-  async getGlobalStockStats(): Promise<any> {
+  async getGlobalStockStats(): Promise<GlobalStockStats> {
     const response = await api.get('products/global_stock_stats/');
     return response.data;
   },

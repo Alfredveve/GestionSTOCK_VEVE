@@ -7,8 +7,7 @@ import {
   LayoutDashboard,
   Receipt,
   Tags,
-  BarChart3,
-  Search
+  BarChart3
 } from 'lucide-react';
 import inventoryService from '@/services/inventoryService';
 import dashboardService from '@/services/dashboardService';

@@ -99,13 +99,13 @@ export function CategoryPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-4xl font-extrabold tracking-tight text-white flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 shadow-2xl shadow-indigo-500/20">
-              <Tags className="h-8 w-8 text-indigo-400" />
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3 sm:gap-4">
+            <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-linear-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 shadow-2xl shadow-indigo-500/20">
+              <Tags className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-400" />
             </div>
             Catégories
           </h2>
-          <p className="mt-2 text-slate-400 text-lg">Gérez et organisez votre inventaire avec style et efficacité.</p>
+          <p className="mt-1 sm:mt-2 text-slate-400 text-sm sm:text-lg">Gérez et organisez votre inventaire avec style et efficacité.</p>
         </div>
         
         <Button 
@@ -130,9 +130,9 @@ export function CategoryPage() {
               </div>
               <p className="text-slate-400 font-medium uppercase tracking-wider text-sm">Total Catégories</p>
             </div>
-            <div className="text-5xl font-black text-white tracking-tight">
+            <div className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               {totalCategories}
-              <span className="text-lg font-medium text-slate-500 ml-2">actives</span>
+              <span className="text-base sm:text-lg font-medium text-slate-500 ml-2">actives</span>
             </div>
           </CardContent>
         </Card>
@@ -148,9 +148,9 @@ export function CategoryPage() {
               </div>
               <p className="text-slate-400 font-medium uppercase tracking-wider text-sm">Produits Associés</p>
             </div>
-            <div className="text-5xl font-black text-white tracking-tight">
+            <div className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               {totalProducts}
-              <span className="text-lg font-medium text-slate-500 ml-2">en stock</span>
+              <span className="text-base sm:text-lg font-medium text-slate-500 ml-2">en stock</span>
             </div>
           </CardContent>
         </Card>
@@ -192,24 +192,24 @@ export function CategoryPage() {
             >
               {/* Left Side: Info */}
               <div className="flex items-center gap-6 mb-4 md:mb-0">
-                <div className="p-4 rounded-xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/10 group-hover:from-indigo-500/20 group-hover:to-purple-500/20 group-hover:border-indigo-500/30 transition-all duration-300">
-                  <Tags className="h-6 w-6 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+                <div className="p-3 sm:p-4 rounded-xl bg-linear-to-br from-slate-800 to-slate-900 border border-white/10 group-hover:from-indigo-500/20 group-hover:to-purple-500/20 group-hover:border-indigo-500/30 transition-all duration-300">
+                  <Tags className="h-5 w-5 sm:h-6 sm:w-6 text-slate-400 group-hover:text-indigo-400 transition-colors" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-slate-400 line-clamp-1 max-w-md">
+                  <p className="text-xs sm:text-sm text-slate-400 line-clamp-1 max-w-[200px] sm:max-w-md">
                     {category.description || <span className="opacity-50 italic">Aucune description</span>}
                   </p>
                 </div>
               </div>
 
               {/* Right Side: Stats & Actions */}
-              <div className="flex items-center gap-6 md:gap-12 pl-16 md:pl-0">
+              <div className="flex items-center gap-4 sm:gap-12 pl-12 sm:pl-0">
                 <div className="flex flex-col items-end">
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-1">Produits</span>
-                    <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-3 py-1 text-sm">
+                    <span className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-0.5 sm:mb-1">Produits</span>
+                    <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm">
                         {category.product_count || 0}
                     </Badge>
                 </div>

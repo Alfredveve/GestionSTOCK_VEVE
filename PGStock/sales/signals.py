@@ -25,8 +25,15 @@ order_service = OrderService()
 def notify_order_created(sender, instance, created, **kwargs):
     """
     Create notification when a new order is created.
+    Only send notification after order items are added and total is calculated.
     """
-    if created:
+    # Send notification only when:
+    # 1. Order is being updated (not just created)
+    # 2. Order has a non-zero total amount (items have been added)
+    # 3. Order doesn't have a _notification_sent flag (to avoid duplicate notifications)
+    if not created and instance.total_amount > 0 and not hasattr(instance, '_notification_sent'):
+        # Mark as notified to prevent duplicate notifications
+        instance._notification_sent = True
         notification_service.notify_order_created(instance)
 
 

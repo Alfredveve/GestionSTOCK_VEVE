@@ -134,7 +134,17 @@ const dashboardService = {
       responseType: 'blob'
     });
     return response.data;
+  },
+
+  getDiscountAnalytics: async (params?: { 
+    month?: number; 
+    year?: number; 
+    point_of_sale?: number 
+  }) => {
+    const response = await api.get('discount-analytics/', { params });
+    return response.data;
   }
 };
 
 export default dashboardService;
+

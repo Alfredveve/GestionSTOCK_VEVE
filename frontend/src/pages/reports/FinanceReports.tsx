@@ -43,6 +43,98 @@ interface ActivityItem {
   reference: string;
 }
 
+// Discount Analytics Components
+function DiscountAnalyticsSection() {
+  const { data: discountData, isLoading } = useQuery({
+    queryKey: ['discount-analytics'],
+    queryFn: () => dashboardService.getDiscountAnalytics(),
+  });
+
+  if (isLoading || !discountData) {
+    return <div className="text-center text-muted-foreground">Chargement...</div>;
+  }
+
+  const grossRevenue = Number(discountData.gross_revenue) || 0;
+  const netRevenue = Number(discountData.net_revenue) || 0;
+  const totalDiscounts = Number(discountData.total_discounts) || 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-muted-foreground">CA Brut</div>
+          <div className="text-2xl font-black text-blue-600">{formatCurrency(grossRevenue)}</div>
+          <div className="text-xs text-muted-foreground">Avant remises</div>
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-muted-foreground">Remises</div>
+          <div className="text-2xl font-black text-rose-600">-{formatCurrency(totalDiscounts)}</div>
+          <div className="text-xs text-muted-foreground">Total accordé</div>
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-muted-foreground">CA Net</div>
+          <div className="text-2xl font-black text-emerald-600">{formatCurrency(netRevenue)}</div>
+          <div className="text-xs text-muted-foreground">Après remises</div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Impact des remises</span>
+          <span className="font-bold text-rose-600">
+            {grossRevenue > 0 ? ((totalDiscounts / grossRevenue) * 100).toFixed(2) : 0}%
+          </span>
+        </div>
+        <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-linear-to-r from-blue-500 to-emerald-500 rounded-full transition-all duration-500" 
+            style={{ width: `${grossRevenue > 0 ? (netRevenue / grossRevenue) * 100 : 0}%` } as React.CSSProperties}
+          ></div>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>0%</span>
+          <span>100%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DiscountRateCard() {
+  const { data: discountData, isLoading } = useQuery({
+    queryKey: ['discount-analytics'],
+    queryFn: () => dashboardService.getDiscountAnalytics(),
+  });
+
+  if (isLoading || !discountData) {
+    return <div className="text-center text-muted-foreground">Chargement...</div>;
+  }
+
+  const discountRate = Number(discountData.discount_rate) || 0;
+  const invoiceCount = Number(discountData.invoice_count) || 0;
+  const orderCount = Number(discountData.order_count) || 0;
+
+  return (
+    <div className="space-y-4">
+      <div className="text-4xl font-black">{discountRate.toFixed(2)}%</div>
+      <p className="text-xs opacity-80 mt-1">Du chiffre d'affaires brut</p>
+      
+      <div className="pt-4 border-t border-white/20">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-2xl font-bold">{invoiceCount}</div>
+            <div className="text-xs opacity-80">Factures</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{orderCount}</div>
+            <div className="text-xs opacity-80">Commandes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function FinanceReports() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -146,6 +238,31 @@ export function FinanceReports() {
         </Card>
       </div>
 
+      {/* Discount Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2 border-none shadow-xl bg-card/40 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">Analyse des Remises</CardTitle>
+            <CardDescription>CA Brut vs CA Net - Impact des remises commerciales</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DiscountAnalyticsSection />
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-xl bg-linear-to-br from-amber-500 to-amber-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium opacity-90 text-white">Taux de Remise Moyen</CardTitle>
+            <div className="p-2 bg-white/20 rounded-lg">
+              <TrendingDown className="h-4 w-4 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <DiscountRateCard />
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Revenue vs Expenses Area Chart */}
         <Card className="lg:col-span-2 border-none shadow-2xl bg-card/40 backdrop-blur-sm">
@@ -182,7 +299,7 @@ export function FinanceReports() {
                     tickFormatter={(value) => `${value / 1000}k`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) => formatCurrency(value || 0)}
                     contentStyle={{ 
                       borderRadius: '16px', 
                       border: 'none', 
@@ -232,7 +349,7 @@ export function FinanceReports() {
               <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-primary rounded-full" 
-                  style={{ width: `${stats?.monthly_revenue ? (stats.net_profit / stats.monthly_revenue) * 100 : 0}%` }}
+                  style={{ width: `${stats?.monthly_revenue ? (stats.net_profit / stats.monthly_revenue) * 100 : 0}%` } as React.CSSProperties}
                 ></div>
               </div>
             </div>

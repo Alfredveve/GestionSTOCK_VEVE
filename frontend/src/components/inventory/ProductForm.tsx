@@ -119,6 +119,7 @@ export function ProductForm({isOpen, onClose, product} : ProductFormProps) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['products']});
+            queryClient.invalidateQueries({queryKey: ['dashboard-stats']});
             toast.success(isEditing ? "Produit mis à jour avec succès" : "Produit créé avec succès");
             onClose();
         },

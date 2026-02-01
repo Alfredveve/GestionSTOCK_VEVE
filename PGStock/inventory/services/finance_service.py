@@ -104,3 +104,103 @@ class FinanceService:
                 point_of_sale
             )
         return None
+
+    @staticmethod
+    def get_discount_analytics(month, year, point_of_sale=None):
+        """
+        Calcule les statistiques de remises pour un mois donné
+        
+        Args:
+            month: Mois (1-12)
+            year: Année
+            point_of_sale: Point de vente optionnel (None = tous les POS)
+            
+        Returns:
+            Dict avec les métriques:
+            - gross_revenue: CA brut (avant remises)
+            - net_revenue: CA net (après remises)
+            - total_discounts: Total des remises accordées
+            - discount_rate: Taux de remise moyen (%)
+            - invoice_count: Nombre de factures
+            - order_count: Nombre de commandes
+            - by_point_of_sale: Liste des métriques par POS
+        """
+        from sales.models import Order
+        
+        # Filtrer les factures pour le mois/année
+        invoice_filter = {
+            'date_issued__month': month,
+            'date_issued__year': year,
+            'status__in': ['paid', 'sent']
+        }
+        if point_of_sale:
+            invoice_filter['point_of_sale'] = point_of_sale
+            
+        invoices = Invoice.objects.filter(**invoice_filter)
+        
+        # Filtrer les commandes pour le mois/année
+        order_filter = {
+            'date_created__month': month,
+            'date_created__year': year,
+            'status__in': ['paid', 'validated', 'delivered']
+        }
+        if point_of_sale:
+            order_filter['point_of_sale'] = point_of_sale
+            
+        orders = Order.objects.filter(**order_filter)
+        
+        # Calculer les métriques pour les factures
+        invoice_gross = Decimal('0.00')
+        invoice_discounts = Decimal('0.00')
+        invoice_net = Decimal('0.00')
+        
+        for inv in invoices:
+            invoice_gross += inv.subtotal  # Subtotal = CA brut avant remise globale
+            invoice_discounts += inv.discount_amount
+            invoice_net += inv.total_amount  # Total après remise
+        
+        # Calculer les métriques pour les commandes
+        order_gross = Decimal('0.00')
+        order_discounts = Decimal('0.00')
+        order_net = Decimal('0.00')
+        
+        for order in orders:
+            order_gross += order.subtotal
+            order_discounts += order.discount
+            order_net += order.total_amount
+        
+        # Totaux combinés
+        total_gross = invoice_gross + order_gross
+        total_discounts = invoice_discounts + order_discounts
+        total_net = invoice_net + order_net
+        
+        # Calculer le taux de remise moyen
+        discount_rate = Decimal('0.00')
+        if total_gross > 0:
+            discount_rate = (total_discounts / total_gross * 100).quantize(Decimal('0.01'))
+        
+        result = {
+            'month': month,
+            'year': year,
+            'gross_revenue': float(total_gross),
+            'net_revenue': float(total_net),
+            'total_discounts': float(total_discounts),
+            'discount_rate': float(discount_rate),
+            'invoice_count': invoices.count(),
+            'order_count': orders.count(),
+        }
+        
+        # Si aucun POS spécifique, ajouter les détails par POS
+        if not point_of_sale:
+            by_pos = []
+            for pos in PointOfSale.objects.filter(is_active=True):
+                pos_data = FinanceService.get_discount_analytics(month, year, pos)
+                if pos_data['gross_revenue'] > 0:  # Inclure seulement les POS avec des ventes
+                    by_pos.append({
+                        'point_of_sale_id': pos.id,
+                        'point_of_sale_name': pos.name,
+                        **pos_data
+                    })
+            result['by_point_of_sale'] = by_pos
+        
+        return result

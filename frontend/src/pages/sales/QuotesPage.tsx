@@ -338,12 +338,8 @@ export function QuotesPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="quotes" className="w-full">
+      <Tabs defaultValue="orders" className="w-full">
         <TabsList className="grid w-full max-w-[400px] grid-cols-2 mb-8 p-1 bg-muted/30 rounded-2xl">
-          <TabsTrigger value="quotes" className="rounded-xl font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-            <FileText className="mr-2 h-4 w-4" />
-            Devis
-          </TabsTrigger>
           <TabsTrigger value="orders" className="rounded-xl font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
             <ShoppingBag className="mr-2 h-4 w-4" />
             Commandes
@@ -357,6 +353,10 @@ export function QuotesPage() {
                 {orders.count}
               </Badge>
             )}
+          </TabsTrigger>
+          <TabsTrigger value="quotes" className="rounded-xl font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
+            <FileText className="mr-2 h-4 w-4" />
+            Devis
           </TabsTrigger>
         </TabsList>
 
@@ -757,7 +757,7 @@ export function QuotesPage() {
                         {order.date_created ? new Date(order.date_created).toLocaleDateString() : 'N/A'}
                       </TableCell>
                       <TableCell className="text-right font-black">
-                        {formatCurrency(order.total_amount)}
+                        {formatCurrency(order.total_amount || 0)}
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <DropdownMenu>

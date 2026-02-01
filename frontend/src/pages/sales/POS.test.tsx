@@ -15,6 +15,8 @@ vi.mock('@/services/inventoryService', () => ({
   }
 }));
 
+import salesService from '@/services/salesService';
+
 vi.mock('@/services/salesService', () => ({
   default: {
     createInvoice: vi.fn(),

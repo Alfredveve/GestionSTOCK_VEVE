@@ -183,8 +183,8 @@ export function SalesDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Tableau de Bord des Ventes</h1>
-          <p className="text-slate-500 mt-1 font-medium">Vue consolidée de toutes vos transactions</p>
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">Tableau de Bord des Ventes</h1>
+          <p className="text-sm sm:text-base text-slate-500 mt-1 font-medium">Vue consolidée de toutes vos transactions</p>
         </div>
         <div className="flex items-center gap-2">
            <Button 
@@ -353,8 +353,8 @@ export function SalesDashboard() {
       </Card>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-2">
           <Card className="border-l-4 border-l-purple-500 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -372,7 +372,7 @@ export function SalesDashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-6">
            <Card className="border-l-4 border-l-emerald-500 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -390,7 +390,7 @@ export function SalesDashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2">
            <Card className="border-l-4 border-l-blue-500 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -408,7 +408,7 @@ export function SalesDashboard() {
           </Card>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="lg:col-span-2">
             <Card className="border-l-4 border-l-orange-500 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -447,13 +447,13 @@ export function SalesDashboard() {
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">N° Facture</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Date</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Client</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Type</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Source</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Montant</th>
-                      <th className="px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest sticky right-0 bg-slate-50 shadow-l">Statut</th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">N° Facture</th>
+                      <th className="hidden sm:table-cell px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Date</th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Client</th>
+                      <th className="hidden lg:table-cell px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Type</th>
+                      <th className="hidden md:table-cell px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Source</th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Montant</th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest sticky right-0 bg-slate-50 shadow-l">Statut</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -465,22 +465,22 @@ export function SalesDashboard() {
                         transition={{ delay: index * 0.05 }}
                         className="hover:bg-slate-50/80 transition-colors group"
                       >
-                        <td className="px-6 py-4 font-mono text-sm font-bold text-indigo-600">{invoice.order_number}</td>
-                        <td className="px-6 py-4 text-sm text-slate-600 font-medium">
+                         <td className="px-4 sm:px-6 py-4 font-mono text-sm font-bold text-indigo-600">{invoice.order_number}</td>
+                        <td className="hidden sm:table-cell px-6 py-4 text-sm text-slate-600 font-medium">
                           <div className="flex items-center gap-2">
                              <Calendar className="h-3.5 w-3.5 text-slate-400" />
                              {new Date(invoice.date_created!).toLocaleDateString('fr-FR')}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm font-bold text-slate-700">{invoice.client_name || 'N/A'}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-4 text-sm font-bold text-slate-700">{invoice.client_name || 'N/A'}</td>
+                        <td className="hidden lg:table-cell px-6 py-4">
                           <Badge variant="outline" className={invoice.order_type === 'retail' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'bg-purple-50 text-purple-600 border-purple-200'}>
                             {invoice.order_type === 'retail' ? 'Détail' : 'Gros'}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4">{getSourceIcon(invoice.status!)}</td>
-                        <td className="px-6 py-4 text-sm font-black text-slate-900">{formatCurrency(parseFloat(invoice.total_amount!))}</td>
-                        <td className="px-6 py-4 sticky right-0 bg-white group-hover:bg-slate-50/80 transition-colors">{getStatusBadge(invoice.status!)}</td>
+                        <td className="hidden md:table-cell px-6 py-4">{getSourceIcon(invoice.status!)}</td>
+                        <td className="px-4 sm:px-6 py-4 text-sm font-black text-slate-900">{formatCurrency(parseFloat(invoice.total_amount!))}</td>
+                        <td className="px-4 sm:px-6 py-4 sticky right-0 bg-white group-hover:bg-slate-50/80 transition-colors">{getStatusBadge(invoice.status!)}</td>
                       </motion.tr>
                     ))}
                   </tbody>

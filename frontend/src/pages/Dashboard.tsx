@@ -49,8 +49,6 @@ export function Dashboard() {
     refetchInterval: 30000,
   });
 
-
-
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'];
 
   const kpis = [
@@ -60,7 +58,7 @@ export function Dashboard() {
       icon: Boxes, 
       color: 'text-blue-600',
       bg: 'bg-blue-100',
-      borderColor: 'border-l-4 border-blue-500' // Visual style from screenshot
+      borderColor: 'border-l-4 border-blue-500'
     },
     { 
       title: 'Valeur Stock', 
@@ -91,16 +89,17 @@ export function Dashboard() {
   return (
     <div className="space-y-8 p-1">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Tableau de bord</h2>
-          <p className="text-muted-foreground">Vue d'ensemble de votre activité et du stock.</p>
+          <h2 className="text-xl sm:text-3xl font-black tracking-tight">Tableau de bord</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">Vue d'ensemble de votre activité et du stock.</p>
         </div>
         <Button 
           variant="outline" 
           size="sm" 
           onClick={() => refetch()}
           disabled={isFetching || isLoading}
+          className="w-full sm:w-auto font-bold"
         >
           <RefreshCw className={cn("mr-2 h-4 w-4", (isFetching || isLoading) && "animate-spin")} />
           Actualiser
@@ -108,17 +107,17 @@ export function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {kpis.map((stat, index) => (
           <Card key={index} className={cn("overflow-hidden shadow-sm hover:shadow-md transition-all", stat.borderColor)}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                   <p className="text-sm font-medium text-muted-foreground mb-1">{stat.title}</p>
-                   <h3 className="text-2xl font-bold">{stat.value}</h3>
+                    <p className="text-[10px] sm:text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">{stat.title}</p>
+                    <h3 className="text-lg sm:text-2xl font-black">{stat.value}</h3>
                 </div>
-                <div className={cn("p-3 rounded-full", stat.bg)}>
-                  <stat.icon className={cn("h-6 w-6", stat.color)} />
+                <div className={cn("p-2 sm:p-3 rounded-xl sm:rounded-full", stat.bg)}>
+                  <stat.icon className={cn("h-5 w-5 sm:h-6 sm:w-6", stat.color)} />
                 </div>
               </div>
             </CardContent>
@@ -138,35 +137,35 @@ export function Dashboard() {
            </CardHeader>
            <CardContent className="p-0">
               <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Produit</TableHead>
-                          <TableHead>Magasin</TableHead>
-                          <TableHead className="text-right">Qté</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {stats?.returned_products?.results?.map((item) => (
-                          <TableRow key={item.id}>
-                              <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                              </TableCell>
-                              <TableCell className="font-medium">{item.product}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-none text-[10px]">
-                                  {item.pos_name}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right font-bold">{item.quantity}</TableCell>
-                          </TableRow>
-                      ))}
-                      {!stats?.returned_products?.results?.length && (
-                          <TableRow>
-                              <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun retour récent</TableCell>
-                          </TableRow>
-                      )}
-                  </TableBody>
+                   <TableHeader className="bg-slate-50/50">
+                       <TableRow className="border-slate-100 hover:bg-transparent">
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Date</TableHead>
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Produit</TableHead>
+                           <TableHead className="hidden sm:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Magasin</TableHead>
+                           <TableHead className="text-right text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Qté</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {stats?.returned_products?.results?.map((item) => (
+                           <TableRow key={item.id} className="border-slate-100 italic transition-colors hover:bg-teal-50/30">
+                               <TableCell className="text-[10px] sm:text-xs text-muted-foreground font-medium py-4">
+                                 {new Date(item.date).toLocaleDateString()}
+                               </TableCell>
+                               <TableCell className="font-bold text-slate-700 text-sm sm:text-base uppercase">{item.product}</TableCell>
+                               <TableCell className="hidden sm:table-cell">
+                                 <Badge variant="outline" className="bg-blue-50 text-blue-600 border-none text-[10px] font-bold px-2.5 py-1">
+                                   {item.pos_name}
+                                 </Badge>
+                               </TableCell>
+                               <TableCell className="text-right font-black text-teal-600">{item.quantity}</TableCell>
+                           </TableRow>
+                       ))}
+                       {!stats?.returned_products?.results?.length && (
+                           <TableRow>
+                               <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun retour récent</TableCell>
+                           </TableRow>
+                       )}
+                   </TableBody>
               </Table>
            </CardContent>
            {stats?.returned_products && stats.returned_products.total_pages > 1 && (
@@ -204,35 +203,35 @@ export function Dashboard() {
            </CardHeader>
            <CardContent className="p-0">
               <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Produit</TableHead>
-                          <TableHead>Magasin</TableHead>
-                          <TableHead className="text-right">Qté</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {stats?.defective_products?.results?.map((item) => (
-                          <TableRow key={item.id}>
-                              <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                              </TableCell>
-                              <TableCell className="font-medium">{item.product}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="bg-amber-50 text-amber-600 border-none text-[10px]">
-                                  {item.pos_name}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right font-bold">{item.quantity}</TableCell>
-                          </TableRow>
-                      ))}
-                       {!stats?.defective_products?.results?.length && (
-                          <TableRow>
-                              <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun défectueux récent</TableCell>
-                          </TableRow>
-                      )}
-                  </TableBody>
+                   <TableHeader className="bg-slate-50/50">
+                       <TableRow className="border-slate-100 hover:bg-transparent">
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Date</TableHead>
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Produit</TableHead>
+                           <TableHead className="hidden sm:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Magasin</TableHead>
+                           <TableHead className="text-right text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Qté</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {stats?.defective_products?.results?.map((item) => (
+                           <TableRow key={item.id} className="border-slate-100 italic transition-colors hover:bg-amber-50/30">
+                               <TableCell className="text-[10px] sm:text-xs text-muted-foreground font-medium py-4">
+                                 {new Date(item.date).toLocaleDateString()}
+                               </TableCell>
+                               <TableCell className="font-bold text-slate-700 text-sm sm:text-base uppercase">{item.product}</TableCell>
+                               <TableCell className="hidden sm:table-cell">
+                                 <Badge variant="outline" className="bg-amber-50 text-amber-600 border-none text-[10px] font-bold px-2.5 py-1">
+                                   {item.pos_name}
+                                 </Badge>
+                               </TableCell>
+                               <TableCell className="text-right font-black text-amber-600">{item.quantity}</TableCell>
+                           </TableRow>
+                       ))}
+                        {!stats?.defective_products?.results?.length && (
+                           <TableRow>
+                               <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun défectueux récent</TableCell>
+                           </TableRow>
+                       )}
+                   </TableBody>
               </Table>
            </CardContent>
            {stats?.defective_products && stats.defective_products.total_pages > 1 && (
@@ -274,38 +273,38 @@ export function Dashboard() {
            </CardHeader>
            <CardContent className="p-0">
               <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Produit</TableHead>
-                          <TableHead>Magasin</TableHead>
-                          <TableHead className="text-center">Qté</TableHead>
-                          <TableHead className="text-center">Seuil</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {stats?.low_stock_products?.results?.map((item) => (
-                          <TableRow key={item.id} className="hover:bg-rose-50/50">
-                              <TableCell className="font-medium">
-                                <div className="flex items-center gap-2">
-                                    <div className="h-2 w-2 rounded-full bg-rose-500" />
-                                    {item.name}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="bg-rose-50 text-rose-600 border-none text-[10px]">
-                                  {item.pos_name}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center font-bold text-rose-600">{item.quantity}</TableCell>
-                              <TableCell className="text-center text-muted-foreground">{item.threshold}</TableCell>
-                          </TableRow>
-                      ))}
-                      {!stats?.low_stock_products?.results?.length && (
-                          <TableRow>
-                              <TableCell colSpan={4} className="text-center text-emerald-600 py-8 font-medium">Tout est en ordre ! Aucun stock faible.</TableCell>
-                          </TableRow>
-                      )}
-                  </TableBody>
+                   <TableHeader className="bg-rose-50/50">
+                       <TableRow className="border-rose-100 hover:bg-transparent">
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Produit</TableHead>
+                           <TableHead className="hidden sm:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Magasin</TableHead>
+                           <TableHead className="text-center text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Qté</TableHead>
+                           <TableHead className="text-center text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Seuil</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {stats?.low_stock_products?.results?.map((item) => (
+                           <TableRow key={item.id} className="hover:bg-rose-50/50 border-rose-50 transition-colors">
+                               <TableCell className="font-bold text-slate-700 text-sm sm:text-base uppercase">
+                                 <div className="flex items-center gap-2">
+                                     <div className="h-2 w-2 rounded-full bg-rose-500" />
+                                     {item.name}
+                                 </div>
+                               </TableCell>
+                               <TableCell className="hidden sm:table-cell">
+                                 <Badge variant="outline" className="bg-rose-50 text-rose-600 border-none text-[10px] font-bold px-2.5 py-1">
+                                   {item.pos_name}
+                                 </Badge>
+                               </TableCell>
+                               <TableCell className="text-center font-black text-rose-600">{item.quantity}</TableCell>
+                               <TableCell className="text-center text-muted-foreground font-medium">{item.threshold}</TableCell>
+                           </TableRow>
+                       ))}
+                       {!stats?.low_stock_products?.results?.length && (
+                           <TableRow>
+                               <TableCell colSpan={4} className="text-center text-emerald-600 py-8 font-medium">Tout est en ordre ! Aucun stock faible.</TableCell>
+                           </TableRow>
+                       )}
+                   </TableBody>
               </Table>
            </CardContent>
            {stats?.low_stock_products && stats.low_stock_products.total_pages > 1 && (
@@ -344,56 +343,56 @@ export function Dashboard() {
            </CardHeader>
            <CardContent className="p-0">
               <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Produit</TableHead>
-                          <TableHead>Magasin</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead className="text-right">Qté</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {stats?.latest_stock_movements?.results?.map((move) => (
-                          <TableRow key={move.id}>
-                              <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(move.date).toLocaleDateString()} {new Date(move.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                              </TableCell>
-                              <TableCell className="font-medium">{move.product}</TableCell>
-                              <TableCell>
-                                <div className="flex flex-col gap-1">
-                                  <Badge variant="outline" className="bg-slate-50 text-slate-600 border-none text-[10px] w-fit">
-                                    {move.pos_name}
-                                  </Badge>
-                                  {move.target_pos_name && (
-                                    <span className="text-[9px] text-muted-foreground italic">
-                                      → {move.target_pos_name}
-                                    </span>
-                                  )}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className={cn(
-                                    "text-[10px] font-normal border-0",
-                                    move.type === 'Entrée' && "bg-emerald-100 text-emerald-700",
-                                    move.type === 'Sortie' && "bg-orange-100 text-orange-700",
-                                    move.type === 'Retour' && "bg-blue-100 text-blue-700",
-                                    move.type === 'Défectueux' && "bg-red-100 text-red-700",
-                                    move.type === 'Transfert' && "bg-indigo-100 text-indigo-700",
-                                    move.type === 'Ajustement' && "bg-slate-100 text-slate-700",
-                                )}>
-                                    {move.type}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right font-mono font-bold">{move.quantity}</TableCell>
-                          </TableRow>
-                      ))}
-                      {!stats?.latest_stock_movements?.results?.length && (
-                          <TableRow>
-                              <TableCell colSpan={5} className="text-center text-muted-foreground py-6">Aucun mouvement récent</TableCell>
-                          </TableRow>
-                      )}
-                  </TableBody>
+                   <TableHeader className="bg-slate-50/50">
+                       <TableRow className="border-slate-100 hover:bg-transparent">
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Date</TableHead>
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Produit</TableHead>
+                           <TableHead className="hidden sm:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Magasin</TableHead>
+                           <TableHead className="hidden lg:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Type</TableHead>
+                           <TableHead className="text-right text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Qté</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {stats?.latest_stock_movements?.results?.map((move) => (
+                           <TableRow key={move.id} className="border-slate-50 transition-colors hover:bg-slate-50/50">
+                               <TableCell className="text-[10px] sm:text-xs text-muted-foreground font-medium py-4">
+                                 {new Date(move.date).toLocaleDateString()}
+                               </TableCell>
+                               <TableCell className="font-bold text-slate-700 text-sm sm:text-base uppercase">{move.product}</TableCell>
+                               <TableCell className="hidden sm:table-cell">
+                                 <div className="flex flex-col gap-1">
+                                   <Badge variant="outline" className="bg-slate-50 text-slate-600 border-none text-[10px] font-bold px-2.5 py-1 w-fit">
+                                     {move.pos_name}
+                                   </Badge>
+                                   {move.target_pos_name && (
+                                     <span className="text-[9px] text-muted-foreground italic">
+                                       → {move.target_pos_name}
+                                     </span>
+                                   )}
+                                 </div>
+                               </TableCell>
+                               <TableCell className="hidden lg:table-cell">
+                                 <Badge variant="outline" className={cn(
+                                     "text-[10px] font-bold border-0 px-2 py-0.5",
+                                     move.type === 'Entrée' && "bg-emerald-100 text-emerald-700",
+                                     move.type === 'Sortie' && "bg-orange-100 text-orange-700",
+                                     move.type === 'Retour' && "bg-blue-100 text-blue-700",
+                                     move.type === 'Défectueux' && "bg-red-100 text-red-700",
+                                     move.type === 'Transfert' && "bg-indigo-100 text-indigo-700",
+                                     move.type === 'Ajustement' && "bg-slate-100 text-slate-700",
+                                 )}>
+                                     {move.type}
+                                 </Badge>
+                               </TableCell>
+                               <TableCell className="text-right font-black text-slate-900">{move.quantity}</TableCell>
+                           </TableRow>
+                       ))}
+                       {!stats?.latest_stock_movements?.results?.length && (
+                           <TableRow>
+                               <TableCell colSpan={5} className="text-center text-muted-foreground py-6">Aucun mouvement récent</TableCell>
+                           </TableRow>
+                       )}
+                   </TableBody>
               </Table>
            </CardContent>
            {stats?.latest_stock_movements && stats.latest_stock_movements.total_pages > 1 && (
@@ -434,33 +433,33 @@ export function Dashboard() {
            </CardHeader>
            <CardContent className="p-0">
               <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Magasin</TableHead>
-                          <TableHead>Produit</TableHead>
-                          <TableHead className="text-right">Qté</TableHead>
-                          <TableHead className="text-right">Montant (Prix Achat)</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {stats?.remaining_products?.results?.map((item) => (
-                          <TableRow key={item.id}>
-                              <TableCell>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-600 border-none">
-                                  {item.pos_name}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-medium">{item.product}</TableCell>
-                              <TableCell className="text-right font-bold">{item.quantity}</TableCell>
-                              <TableCell className="text-right font-mono text-emerald-600">{formatCurrency(item.amount)}</TableCell>
-                          </TableRow>
-                      ))}
-                      {!stats?.remaining_products?.results?.length && (
-                          <TableRow>
-                              <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun produit en stock</TableCell>
-                          </TableRow>
-                      )}
-                  </TableBody>
+                   <TableHeader className="bg-blue-50/50">
+                       <TableRow className="border-blue-100 hover:bg-transparent">
+                           <TableHead className="hidden sm:table-cell text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Magasin</TableHead>
+                           <TableHead className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Produit</TableHead>
+                           <TableHead className="text-right text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Qté</TableHead>
+                           <TableHead className="text-right text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Montant</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {stats?.remaining_products?.results?.map((item) => (
+                           <TableRow key={item.id} className="border-blue-50 transition-colors hover:bg-blue-50/30">
+                               <TableCell className="hidden sm:table-cell">
+                                 <Badge variant="outline" className="bg-blue-50 text-blue-600 border-none text-[10px] font-bold px-2.5 py-1">
+                                   {item.pos_name}
+                                 </Badge>
+                               </TableCell>
+                               <TableCell className="font-bold text-slate-700 text-sm sm:text-base uppercase">{item.product}</TableCell>
+                               <TableCell className="text-right font-black text-blue-600">{item.quantity}</TableCell>
+                               <TableCell className="text-right font-mono text-emerald-600 font-bold">{formatCurrency(item.amount)}</TableCell>
+                           </TableRow>
+                       ))}
+                       {!stats?.remaining_products?.results?.length && (
+                           <TableRow>
+                               <TableCell colSpan={4} className="text-center text-muted-foreground py-6">Aucun produit en stock</TableCell>
+                           </TableRow>
+                       )}
+                   </TableBody>
               </Table>
            </CardContent>
            {stats?.remaining_products && stats.remaining_products.total_pages > 1 && (
@@ -503,8 +502,8 @@ export function Dashboard() {
                     <ResponsiveContainer width="99%" height="100%">
                       <BarChart data={stats.stock_movement_evolution} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} />
                         <Tooltip 
                           contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                           cursor={{ fill: 'transparent' }}
@@ -551,7 +550,7 @@ export function Dashboard() {
                                 formatter={(value: number | undefined) => (value ? formatCurrency(value) : '')}
                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                             />
-                            <Legend iconType="circle" />
+                            <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                         </PieChart>
                     </ResponsiveContainer>
                   </div>

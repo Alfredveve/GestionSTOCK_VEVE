@@ -14,7 +14,7 @@ from .serializers import (
     InventorySerializer, StockMovementSerializer, InvoiceSerializer,
     ReceiptSerializer, PaymentSerializer, ExpenseSerializer, MonthlyProfitReportSerializer,
     QuoteSerializer, ClientSerializer, PointOfSaleSerializer, ExpenseCategorySerializer,
-    SettingsSerializer, NotificationSerializer, UserSerializer
+    SettingsSerializer, NotificationSerializer, UserSerializer, DiscountAnalyticsSerializer
 )
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -72,6 +72,49 @@ class SettingsViewSet(viewsets.ModelViewSet):
             
         serializer = self.get_serializer(settings)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def reset_application(self, request):
+        """Réinitialise l'application en supprimant les produits et les transactions"""
+        from .models import (
+            Product, Category, Inventory, StockMovement, Invoice, 
+            Receipt, Payment, Expense, MonthlyProfitReport, Quote,
+            Notification
+        )
+        from sales.models import Order, OrderItem
+        
+        try:
+            with transaction.atomic():
+                # On suit l'ordre inverse des dépendances pour éviter les erreurs de contrainte
+                # 1. Transactions et rapports
+                MonthlyProfitReport.objects.all().delete()
+                Payment.objects.all().delete()
+                
+                # 2. Commandes et Factures
+                OrderItem.objects.all().delete()
+                Order.objects.all().delete()
+                Invoice.objects.all().delete()
+                Quote.objects.all().delete()
+                
+                # 3. Achats et Dépenses
+                Receipt.objects.all().delete()
+                Expense.objects.all().delete()
+                
+                # 4. Mouvements de stock et notifications
+                StockMovement.objects.all().delete()
+                Notification.objects.all().delete()
+                
+                # 5. Inventaire et Produits
+                Inventory.objects.all().delete()
+                Product.objects.all().delete()
+                
+                # 6. Catégories (Optionnel, mais logique pour un "reset")
+                Category.objects.all().delete()
+                
+                return Response({"success": True, "message": "Application réinitialisée avec succès"})
+        except Exception as e:
+            return Response({"success": False, "message": str(e)}, status=500)
+
 from django.db.models import F, Sum, Count
 from django.db.models.functions import TruncDate
 from django.db import models
@@ -1049,3 +1092,47 @@ class NotificationViewSet(viewsets.ModelViewSet):
         """Compter les notifications non lues"""
         count = self.get_queryset().filter(is_read=False).count()
         return Response({'count': count})
+
+
+class DiscountAnalyticsViewSet(viewsets.ViewSet):
+    """ViewSet pour les analytics de remises"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def list(self, request):
+        """
+        Retourne les analytics de remises pour un mois donné
+        
+        Query params:
+        - month: Mois (1-12), défaut = mois actuel
+        - year: Année, défaut = année actuelle
+        - point_of_sale: ID du point de vente (optionnel)
+        """
+        from .services.finance_service import FinanceService
+        from .serializers import DiscountAnalyticsSerializer
+        from datetime import date
+        
+        # Récupérer les paramètres
+        today = date.today()
+        month = int(request.query_params.get('month', today.month))
+        year = int(request.query_params.get('year', today.year))
+        pos_id = request.query_params.get('point_of_sale')
+        
+        # Valider les paramètres
+        if not (1 <= month <= 12):
+            return Response({'error': 'Le mois doit être entre 1 et 12'}, status=400)
+        
+        # Récupérer le point de vente si spécifié
+        point_of_sale = None
+        if pos_id:
+            try:
+                point_of_sale = PointOfSale.objects.get(pk=pos_id)
+            except PointOfSale.DoesNotExist:
+                return Response({'error': 'Point de vente introuvable'}, status=404)
+        
+        # Calculer les analytics
+        analytics_data = FinanceService.get_discount_analytics(month, year, point_of_sale)
+        
+        # Sérialiser et retourner
+        serializer = DiscountAnalyticsSerializer(analytics_data)
+        return Response(serializer.data)
+

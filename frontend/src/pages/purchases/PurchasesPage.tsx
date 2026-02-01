@@ -619,6 +619,7 @@ export function PurchasesPage() {
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                   <input
                     type="date"
+                    id="receiptDate"
                     value={receiptDate}
                     aria-label="Date de réception"
                     onChange={(e) => setReceiptDate(e.target.value)}

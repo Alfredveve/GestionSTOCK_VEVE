@@ -28,9 +28,7 @@ import {
   Trash2, 
   Save, 
   ArrowLeft,
-  Search,
-  Loader2,
-  Calendar as CalendarIcon
+  Search
 } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
 
@@ -63,13 +61,13 @@ export function QuoteForm() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { data: clientsData } = useQuery({ queryKey: ['clients'], queryFn: () => inventoryService.getClients() });
-  const { data: productsData, isLoading: isLoadingProducts } = useQuery({
+  const { data: productsData } = useQuery({
     queryKey: ['products', productSearch],
     queryFn: () => inventoryService.getProducts({ search: productSearch, page_size: 20 }),
     enabled: isSearchFocused || productSearch.length > 0
   });
 
-  const { data: existingQuote, isLoading: isLoadingQuote } = useQuery({
+  const { data: existingQuote } = useQuery({
     queryKey: ['quotes', id],
     queryFn: () => inventoryService.getQuote(id!),
     enabled: isEdit

@@ -93,7 +93,7 @@ export function InvoicesPage() {
     queryFn: () => salesService.getOrders({ 
       page, 
       search: searchQuery || undefined,
-      status: statusFilter === 'all' ? undefined : statusFilter,
+      payment_status: statusFilter === 'all' ? undefined : statusFilter,
       ordering: '-date_created'
     }),
   });

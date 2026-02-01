@@ -7,7 +7,7 @@ from inventory.api import (
     InventoryViewSet, StockMovementViewSet, InvoiceViewSet,
     ReceiptViewSet, PaymentViewSet, ExpenseViewSet, MonthlyProfitReportViewSet,
     DashboardView, QuoteViewSet, ClientViewSet, PointOfSaleViewSet, ExpenseCategoryViewSet,
-    SettingsViewSet, NotificationViewSet, UserViewSet
+    SettingsViewSet, NotificationViewSet, UserViewSet, DiscountAnalyticsViewSet
 )
 from sales.api import OrderViewSet
 
@@ -34,6 +34,7 @@ router.register(r'profit-reports', MonthlyProfitReportViewSet, basename='monthly
 router.register(r'dashboard', DashboardView, basename='dashboard')
 router.register(r'quotes', QuoteViewSet)
 router.register(r'notifications', NotificationViewSet)
+router.register(r'discount-analytics', DiscountAnalyticsViewSet, basename='discount-analytics')
 
 # Sales
 router.register(r'orders', OrderViewSet)

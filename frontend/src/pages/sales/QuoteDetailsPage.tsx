@@ -68,7 +68,7 @@ export function QuoteDetailsPage() {
             queryClient.invalidateQueries({ queryKey: ['quotes'] });
             queryClient.invalidateQueries({ queryKey: ['invoices'] });
             toast.success("Devis converti en facture avec succès");
-            navigate(`/invoices/${data.invoice_id}`);
+            navigate(`/sales/invoices/${data.invoice_id}`);
         },
         onError: () => {
             toast.error("Erreur lors de la conversion du devis");
@@ -304,12 +304,7 @@ export function QuoteDetailsPage() {
                                 <span>Total HT</span>
                                 <span>{formatCurrency(quote.subtotal)}</span>
                             </div>
-                            {Number(quote.tax_amount) > 0 && (
-                                <div className="flex justify-between items-center text-sm font-medium text-white/80">
-                                    <span>TVA ({quote.tax_rate || 18}%)</span>
-                                    <span>{formatCurrency(quote.tax_amount)}</span>
-                                </div>
-                            )}
+
                             
                             <div className="pt-4 border-t border-white/10 mt-6 md:mt-8">
                                 <div className="flex justify-between items-center mb-1">
@@ -467,10 +462,7 @@ export function QuoteDetailsPage() {
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Partiel HT</span>
                             <span className="font-bold text-slate-900">{formatCurrency(quote.subtotal)}</span>
                         </div>
-                        <div className="flex justify-between items-center px-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TVA (18%)</span>
-                            <span className="font-bold text-slate-900">{formatCurrency(quote.tax_amount)}</span>
-                        </div>
+
                         
                         <div className="h-px bg-slate-200 my-2" />
 

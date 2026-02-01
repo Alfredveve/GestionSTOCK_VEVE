@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { PaymentDialog } from '../PaymentDialog';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import userEvent from '@testing-library/user-event';
+
 
 // Mock dependencies
 vi.mock('@/services/inventoryService', () => ({
@@ -15,12 +15,14 @@ const invoiceMock = {
     id: 1,
     invoice_number: 'INV-001',
     client_name: 'John Doe',
+    client: 1,
+    invoice_type: 'retail' as const,
     date_issued: '2023-01-01',
     due_date: '2023-01-15',
     total_amount: '100000',
     paid_amount: '0',
     balance: '100000',
-    status: 'unpaid',
+    status: 'unpaid' as const,
     items: []
 };
 

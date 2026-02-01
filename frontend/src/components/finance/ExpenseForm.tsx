@@ -36,7 +36,11 @@ export function ExpenseForm({ isOpen, onClose }: ExpenseFormProps) {
 
   const mutation = useMutation({
     mutationFn: (data: { amount: string, category: string, description: string, date: string, reference: string }) => inventoryService.createExpense({
-        ...data,
+        amount: Number(data.amount),
+        category: Number(data.category),
+        description: data.description,
+        date: data.date,
+        reference: data.reference,
         point_of_sale: 1 // Default POS for now
     }),
     onSuccess: () => {

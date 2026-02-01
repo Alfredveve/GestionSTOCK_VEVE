@@ -1,27 +1,38 @@
 from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
 from .models import Order
 from .serializers import OrderSerializer
 from inventory.renderers import PDFRenderer
 
 from inventory.permissions import POSFilterMixin, get_user_pos, is_admin
 
+class OrderFilter(django_filters.FilterSet):
+    payment_status = django_filters.ChoiceFilter(choices=Order.PAYMENT_STATUS_CHOICES)
+    status = django_filters.ChoiceFilter(choices=Order.STATUS_CHOICES)
+    date_created = django_filters.DateFromToRangeFilter()
+    
+    class Meta:
+        model = Order
+        fields = ['status', 'payment_status', 'client', 'order_type', 'point_of_sale']
+
 class OrderViewSet(POSFilterMixin, viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = {
-        'status': ['exact'],
-        'payment_status': ['exact'],
-        'client': ['exact'],
-        'order_type': ['exact'],
-        'date_created': ['gte', 'lte'],
-    }
+    filterset_class = OrderFilter
     search_fields = ['order_number', 'client__name']
     ordering_fields = ['date_created', 'total_amount']
     pos_field = 'point_of_sale'
+    
+    def get_queryset(self):
+        """
+        Optimisation des requêtes: prefetch des relations courantes
+        """
+        queryset = super().get_queryset()
+        return queryset.select_related('client', 'point_of_sale', 'created_by')
 
     def create(self, request, *args, **kwargs):
         # Restriction POS pour les vendeurs

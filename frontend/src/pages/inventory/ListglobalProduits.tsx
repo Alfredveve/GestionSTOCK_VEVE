@@ -11,7 +11,6 @@ import {
   FileText, 
   Download, 
   LayoutGrid, 
-  List,
   Box,
   Package,
   Loader2,
@@ -169,19 +168,19 @@ export function ListglobalProduits() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111319] p-8">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-8">
+      <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-6 mb-8">
         <div>
           <div className="flex items-center gap-3">
-             <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/20">
-               <Box className="h-6 w-6 text-white" />
+             <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/20 shrink-0">
+               <Box className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
              </div>
-             <h2 className="text-4xl font-black tracking-tight text-white uppercase">Liste Globale Produits</h2>
+             <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase leading-tight">Liste Globale Produits</h2>
           </div>
-          <p className="text-slate-400 mt-2 font-medium">Consultez la disponibilité mondiale de vos produits</p>
+          <p className="text-slate-400 mt-2 text-xs sm:text-sm font-medium">Consultez la disponibilité mondiale de vos produits</p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -191,37 +190,41 @@ export function ListglobalProduits() {
             title="Importer des produits"
             aria-label="Importer des produits"
           />
-          <Button 
-            variant="outline" 
-            onClick={handleExportExcel}
-            disabled={isExporting !== null}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
-          >
-            {isExporting === 'excel' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
-            Excel
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleExportPdf}
-            disabled={isExporting !== null}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
-          >
-            {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
-            PDF
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleImportClick}
-            disabled={isImporting}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
-          >
-            {isImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4 rotate-180" />}
-            Importer
-          </Button>
-          <Button onClick={() => setIsFormOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-500/20 font-bold px-6">
-            <Plus className="mr-2 h-5 w-5" />
-            Nouveau Produit
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleExportExcel}
+              disabled={isExporting !== null}
+              className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50 h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+            >
+              {isExporting === 'excel' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
+              Excel
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleExportPdf}
+              disabled={isExporting !== null}
+              className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50 h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+            >
+              {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
+              PDF
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleImportClick}
+              disabled={isImporting}
+              className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50 h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+            >
+              {isImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4 rotate-180" />}
+              Importer
+            </Button>
+            <Button onClick={() => setIsFormOpen(true)} className="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-500/20 font-bold px-4 sm:px-6 h-11 sm:h-12 rounded-xl text-xs sm:text-sm">
+              <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Nouveau
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -232,16 +235,16 @@ export function ListglobalProduits() {
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center gap-3 uppercase">
-                <div className="bg-white/5 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
-                   <Package className="h-6 w-6 text-indigo-400" />
+              <h2 className="text-xl sm:text-3xl font-black tracking-tight mb-2 flex items-center gap-3 uppercase">
+                <div className="bg-white/5 p-2.5 rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
+                   <Package className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-400" />
                 </div>
                 Stock Global
               </h2>
-              <div className="flex items-center gap-4">
-                <p className="text-slate-400 font-medium pl-14 uppercase tracking-wider text-xs">Visibilité complète sur le réseau de magasins</p>
-                <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest backdrop-blur-sm uppercase">
-                  {products?.count || 0} ITEMS GLOBAUX
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <p className="text-slate-400 font-medium sm:pl-14 uppercase tracking-wider text-[10px] sm:text-xs">Visibilité complète sur le réseau</p>
+                <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest backdrop-blur-sm uppercase w-fit">
+                   {products?.count || 0} ITEMS GLOBAUX
                 </Badge>
               </div>
             </div>
@@ -259,7 +262,7 @@ export function ListglobalProduits() {
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <List className="h-4 w-4" />
+                  <LayoutGrid className="h-4 w-4" />
                   <span>Liste</span>
                 </div>
               </Button>
@@ -336,13 +339,13 @@ export function ListglobalProduits() {
               <Table>
                 <TableHeader className="bg-[#111319]/50">
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="w-[60px] pl-8 py-5 text-slate-500 font-bold text-[10px] uppercase tracking-wider">#</TableHead>
-                    <TableHead className="min-w-[250px] text-slate-500 font-bold text-[10px] uppercase tracking-wider">PRODUIT</TableHead>
-                    <TableHead className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">TOTAL STOCK</TableHead>
-                    <TableHead className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">CATÉGORIE</TableHead>
-                    <TableHead className="text-slate-500 font-bold text-[10px] uppercase tracking-wider text-center">DÉTAILS</TableHead>
-                    <TableHead className="text-slate-500 font-bold text-[10px] uppercase tracking-wider text-center">STATUT</TableHead>
-                    <TableHead className="text-slate-500 pr-8 font-bold text-[10px] uppercase tracking-wider text-center">ACTES</TableHead>
+                    <TableHead className="w-[60px] pl-4 sm:pl-8 py-5 text-slate-500 font-bold text-[10px] uppercase tracking-wider">#</TableHead>
+                    <TableHead className="min-w-[150px] sm:min-w-[250px] text-slate-500 font-bold text-[10px] uppercase tracking-wider">PRODUIT</TableHead>
+                    <TableHead className="text-slate-500 font-bold text-[10px] uppercase tracking-wider">STOCK</TableHead>
+                    <TableHead className="hidden lg:table-cell text-slate-500 font-bold text-[10px] uppercase tracking-wider">CATÉGORIE</TableHead>
+                    <TableHead className="hidden md:table-cell text-slate-500 font-bold text-[10px] uppercase tracking-wider text-center">DÉTAILS</TableHead>
+                    <TableHead className="hidden sm:table-cell text-slate-500 font-bold text-[10px] uppercase tracking-wider text-center">STATUT</TableHead>
+                    <TableHead className="text-slate-500 pr-4 sm:pr-8 font-bold text-[10px] uppercase tracking-wider text-center">ACTES</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -370,7 +373,7 @@ export function ListglobalProduits() {
                   ) : (
                     products?.results?.map((product: Product, index: number) => (
                       <TableRow key={product.id} className="group hover:bg-white/5 transition-all border-white/5">
-                        <TableCell className="pl-8 font-bold text-slate-600">{(page - 1) * 12 + index + 1}</TableCell>
+                        <TableCell className="pl-4 sm:pl-8 font-bold text-slate-600">{(page - 1) * 12 + index + 1}</TableCell>
                         <TableCell>
                           <div className="flex flex-col">
                             <div className="font-bold text-white text-base uppercase group-hover:text-indigo-400 transition-colors">{product.name}</div>
@@ -378,16 +381,16 @@ export function ListglobalProduits() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-none font-black text-[11px] px-3 py-1 rounded-lg">
-                            {product.current_stock} UNITÉS
+                          <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-none font-black text-[10px] sm:text-[11px] px-3 py-1 rounded-lg">
+                            {product.current_stock}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell">
                           <Badge variant="secondary" className="bg-slate-800 text-slate-400 font-bold uppercase text-[9px] px-2.5 py-1">
                             {product.category_name}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="hidden md:table-cell text-center">
                            <Button 
                              variant="ghost" 
                              size="sm"
@@ -398,7 +401,7 @@ export function ListglobalProduits() {
                               DÉTAILS MAGASINS
                            </Button>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="hidden sm:table-cell text-center">
                           {product.current_stock > product.reorder_level ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-none font-bold px-3 py-1 rounded-xl text-[10px] uppercase">
                               En Stock
@@ -413,7 +416,7 @@ export function ListglobalProduits() {
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell className="pr-8">
+                        <TableCell className="pr-4 sm:pr-8">
                           <div className="flex items-center justify-center gap-2">
                             <Button 
                               variant="ghost" 
@@ -448,8 +451,8 @@ export function ListglobalProduits() {
               </Table>
             </div>
           ) : (
-            <div className="p-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="p-4 sm:p-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {isLoading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="h-[220px] rounded-3xl bg-white/5 animate-pulse border border-white/5" />
@@ -574,8 +577,8 @@ export function ListglobalProduits() {
                        </div>
                        <div className="mt-4 h-1.5 bg-white/5 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-indigo-500 rounded-full w-(--progress-width)" 
-                            style={{ '--progress-width': `${Math.min((item.quantity / (productForDetails?.current_stock || 1)) * 100, 100)}%` } as React.CSSProperties}
+                            className="h-full bg-indigo-500 rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min((item.quantity / (productForDetails?.current_stock || 1)) * 100, 100)}%` } as React.CSSProperties}
                           />
                        </div>
                     </div>

@@ -85,6 +85,7 @@ export function ProductList() {
     mutationFn: (id: number) => inventoryService.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       setIsDeleting(false);
       setProductToDelete(null);
     }
@@ -149,50 +150,54 @@ export function ProductList() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111319] p-8">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-8">
+      <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-6 mb-8">
         <div>
           <div className="flex items-center gap-3">
-             <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
-               <Box className="h-6 w-6 text-white" />
+             <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-500/20 shrink-0">
+               <Box className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
              </div>
-             <h2 className="text-4xl font-black tracking-tight text-white">Produits</h2>
+             <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white uppercase leading-tight">Produits</h2>
           </div>
-          <p className="text-slate-400 mt-2 font-medium">Gérez votre catalogue de produits</p>
+          <p className="text-slate-400 mt-2 text-xs sm:text-sm font-medium">Gérez votre catalogue de produits</p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3">
-          {/* File Input removed */}
-          <Button 
-            variant="outline" 
-            onClick={handleExportExcel}
-            disabled={isExporting !== null}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
-          >
-            {isExporting === 'excel' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
-            Excel
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleExportPdf}
-            disabled={isExporting !== null}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50"
-          >
-            {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
-            PDF
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => setIsImportModalOpen(true)}
-            className="bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all"
-          >
-            <Download className="mr-2 h-4 w-4 rotate-180" />
-            Importer
-          </Button>
-          <Button onClick={() => setIsFormOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6">
-            <Plus className="mr-2 h-5 w-5" />
-            Nouveau Produit
-          </Button>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={handleExportExcel}
+                disabled={isExporting !== null}
+                className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50 h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+              >
+                {isExporting === 'excel' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSpreadsheet className="mr-2 h-4 w-4" />}
+                Excel
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleExportPdf}
+                disabled={isExporting !== null}
+                className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all disabled:opacity-50 h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+              >
+                {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
+                PDF
+              </Button>
+            </div>
+          
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsImportModalOpen(true)}
+                className="flex-1 sm:flex-none bg-[#23262f] border-none text-slate-300 hover:bg-[#2d3039] hover:text-white transition-all h-11 sm:h-12 rounded-xl text-xs sm:text-sm"
+              >
+                <Download className="mr-2 h-4 w-4 rotate-180" />
+                Importer
+              </Button>
+              <Button onClick={() => setIsFormOpen(true)} className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-4 sm:px-6 h-11 sm:h-12 rounded-xl text-xs sm:text-sm">
+                <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                Nouveau
+              </Button>
+            </div>
         </div>
       </div>
 
@@ -204,15 +209,15 @@ export function ProductList() {
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center gap-3">
-                <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
-                   <Package className="h-6 w-6 text-blue-400" />
+              <h2 className="text-xl sm:text-3xl font-black tracking-tight mb-2 flex items-center gap-3">
+                <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
+                   <Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                 </div>
                 Détails des produits
               </h2>
-              <div className="flex items-center gap-4">
-                <p className="text-slate-400 font-medium pl-14">Gérez votre catalogue, vos prix et vos stocks</p>
-                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest backdrop-blur-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <p className="text-slate-400 text-xs sm:text-sm font-medium sm:pl-14">Gérez votre catalogue, vos prix et vos stocks</p>
+                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-1.5 rounded-full font-black text-[10px] tracking-widest backdrop-blur-sm w-fit uppercase">
                   {products?.count || 0} PRODUITS AU TOTAL
                 </Badge>
               </div>
@@ -309,17 +314,17 @@ export function ProductList() {
                 {/* ... existing table header ... */}
                 <TableHeader className="bg-slate-50/50">
                   <TableRow className="border-slate-100 hover:bg-transparent">
-                    <TableHead className="w-[60px] pl-8 py-5 text-[#94a3b8] font-bold text-xs uppercase tracking-wider">#</TableHead>
-                    <TableHead className="min-w-[250px] text-[#94a3b8] font-bold text-xs uppercase tracking-wider">
+                    <TableHead className="w-[60px] pl-4 sm:pl-8 py-5 text-[#94a3b8] font-bold text-xs uppercase tracking-wider">#</TableHead>
+                    <TableHead className="min-w-[150px] sm:min-w-[250px] text-[#94a3b8] font-bold text-xs uppercase tracking-wider">
                       <div className="flex items-center gap-1 cursor-pointer">
                         PRODUIT <div className="flex flex-col -space-y-1"><ChevronUp className="h-3 w-3" /><ChevronDown className="h-3 w-3" /></div>
                       </div>
                     </TableHead>
                     <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">STOCK</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">CATÉGORIE</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider">VALEUR STOCK</TableHead>
-                    <TableHead className="text-[#94a3b8] font-bold text-xs uppercase tracking-wider text-center">STATUT</TableHead>
-                    <TableHead className="text-[#94a3b8] pr-8 font-bold text-xs uppercase tracking-wider text-center">ACTES</TableHead>
+                    <TableHead className="hidden lg:table-cell text-[#94a3b8] font-bold text-xs uppercase tracking-wider">CATÉGORIE</TableHead>
+                    <TableHead className="hidden md:table-cell text-[#94a3b8] font-bold text-xs uppercase tracking-wider">VALEUR</TableHead>
+                    <TableHead className="hidden sm:table-cell text-[#94a3b8] font-bold text-xs uppercase tracking-wider text-center">STATUT</TableHead>
+                    <TableHead className="text-[#94a3b8] pr-4 sm:pr-8 font-bold text-xs uppercase tracking-wider text-center">ACTES</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -359,36 +364,36 @@ export function ProductList() {
 
                       return (
                         <TableRow key={product.id} className="group hover:bg-slate-50/80 transition-all border-slate-100">
-                          <TableCell className="pl-8 font-bold text-slate-500">{(page - 1) * 12 + index + 1}</TableCell>
+                          <TableCell className="pl-4 sm:pl-8 font-bold text-slate-500">{(page - 1) * 12 + index + 1}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-4 py-2">
                               <div>
-                                <div className="font-bold text-[#1a1c23] text-base group-hover:text-blue-600 transition-colors uppercase">{product.name}</div>
-                                {product.sku && <div className="text-[11px] font-mono text-slate-400 tracking-wider mt-0.5">#{product.sku}</div>}
+                                <div className="font-bold text-[#1a1c23] text-sm sm:text-base group-hover:text-blue-600 transition-colors uppercase">{product.name}</div>
+                                {product.sku && <div className="text-[10px] sm:text-[11px] font-mono text-slate-400 tracking-wider mt-0.5">#{product.sku}</div>}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
-                              <Badge variant="outline" className="w-fit bg-blue-50 text-blue-500 border-none font-bold text-[11px] px-2.5 py-0.5 rounded-lg">
+                              <Badge variant="outline" className="w-fit bg-blue-50 text-blue-500 border-none font-bold text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-lg">
                                 {product.current_stock} Total
                               </Badge>
                               {unitsPerBox > 1 && (
-                                <div className="text-[11px] text-slate-400 font-medium">
+                                <div className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
                                 {product.stock_analysis.analysis}
                                 </div>
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden lg:table-cell">
                             <Badge variant="secondary" className="bg-slate-100 text-slate-500 font-bold uppercase text-[10px] px-2.5 py-1">
                               {product.category_name}
                             </Badge>
                           </TableCell>
-                          <TableCell className="font-bold text-slate-600">
-                            {formatCurrency(product.current_stock * parseFloat(product.purchase_price))}
+                          <TableCell className="hidden md:table-cell font-bold text-slate-600">
+                             {formatCurrency(product.current_stock * parseFloat(product.purchase_price))}
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="hidden sm:table-cell text-center">
                             {product.current_stock > product.reorder_level ? (
                               <Badge className="bg-cyan-50 text-cyan-500 hover:bg-cyan-100 border-none font-bold px-3 py-1.5 rounded-xl transition-all">
                                 En Stock
@@ -403,34 +408,34 @@ export function ProductList() {
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell className="pr-8">
-                            <div className="flex items-center justify-center gap-2">
+                          <TableCell className="pr-4 sm:pr-8">
+                            <div className="flex items-center justify-center gap-1 sm:gap-2">
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
                                 title="Détails" 
                                 onClick={() => handleOpenDetails(product)}
-                                className="h-10 w-10 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl"
+                                className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg sm:rounded-xl"
                               >
-                                <Eye className="h-5 w-5" />
+                                <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
                               </Button>
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
                                 title="Modifier" 
                                 onClick={() => handleEdit(product)}
-                                className="h-10 w-10 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-xl"
+                                className="h-8 w-8 sm:h-10 sm:w-10 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg sm:rounded-xl"
                               >
-                                <Edit className="h-4 w-4" />
+                                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               </Button>
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
                                 title="Supprimer" 
                                 onClick={() => handleDelete(product)}
-                                className="h-10 w-10 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl"
+                                className="h-8 w-8 sm:h-10 sm:w-10 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg sm:rounded-xl"
                               >
-                                <Trash2 className="h-5 w-5" />
+                                <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               </Button>
                             </div>
                           </TableCell>

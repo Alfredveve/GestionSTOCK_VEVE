@@ -811,12 +811,12 @@ export function StockMovementsPage() {
               <Table>
                 <TableHeader className="bg-white/5 border-b border-white/5">
                   <TableRow className="hover:bg-transparent border-none">
-                    <TableHead className="py-4 pl-4 sm:pl-6 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white text-center sm:text-left">Date</TableHead>
-                    <TableHead className="py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Produit</TableHead>
-                    <TableHead className="hidden sm:table-cell py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Type</TableHead>
-                    <TableHead className="hidden lg:table-cell py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Magasin (S → D)</TableHead>
-                    <TableHead className="py-4 text-right text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Qté</TableHead>
-                    <TableHead className="hidden md:table-cell py-4 pr-4 sm:pr-6 text-right text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white">Référence</TableHead>
+                    <TableHead className="py-4 pl-6 text-[11px] font-bold uppercase tracking-widest text-white">Date</TableHead>
+                    <TableHead className="py-4 text-[11px] font-bold uppercase tracking-widest text-white">Produit</TableHead>
+                    <TableHead className="py-4 text-[11px] font-bold uppercase tracking-widest text-white">Type</TableHead>
+                    <TableHead className="py-4 text-[11px] font-bold uppercase tracking-widest text-white">Magasin (S → D)</TableHead>
+                    <TableHead className="py-4 text-right text-[11px] font-bold uppercase tracking-widest text-white">Quantité</TableHead>
+                    <TableHead className="py-4 pr-6 text-right text-[11px] font-bold uppercase tracking-widest text-white">Référence</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -970,11 +970,11 @@ export function StockMovementsPage() {
                </div>
 
                <div className="space-y-6">
-                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1 bg-black/40 rounded-xl border border-white/10 h-auto sm:h-14">
+                 <div className="grid grid-cols-3 gap-2 p-1 bg-black/40 rounded-xl border border-white/10 h-14">
                     <button 
                     onClick={() => setMovementFormType('entry')}
                     className={cn(
-                        "rounded-lg py-2 sm:py-0 text-[10px] font-bold uppercase tracking-wider transition-all",
+                        "rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
                         movementFormType === 'entry' ? "bg-emerald-600 text-white shadow-lg" : "text-white/40 hover:text-white"
                     )}
                     >
@@ -983,7 +983,7 @@ export function StockMovementsPage() {
                     <button 
                     onClick={() => setMovementFormType('exit')}
                     className={cn(
-                        "rounded-lg py-2 sm:py-0 text-[10px] font-bold uppercase tracking-wider transition-all",
+                        "rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
                         movementFormType === 'exit' ? "bg-rose-600 text-white shadow-lg" : "text-white/40 hover:text-white"
                     )}
                     >
@@ -992,7 +992,7 @@ export function StockMovementsPage() {
                     <button 
                     onClick={() => setMovementFormType('transfer')}
                     className={cn(
-                        "rounded-lg py-2 sm:py-0 text-[10px] font-bold uppercase tracking-wider transition-all",
+                        "rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
                         movementFormType === 'transfer' ? "bg-indigo-600 text-white shadow-lg" : "text-white/40 hover:text-white"
                     )}
                     >
@@ -1153,3 +1153,4 @@ export function StockMovementsPage() {
     </>
   );
 }
+

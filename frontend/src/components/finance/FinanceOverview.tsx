@@ -138,7 +138,7 @@ export function FinanceOverview({ stats }: FinanceOverviewProps) {
                     tickFormatter={(value) => `${value / 1000}k`}
                   />
                   <Tooltip 
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) => formatCurrency(value || 0)}
                     contentStyle={{ 
                       borderRadius: '12px', 
                       border: 'none', 
@@ -193,12 +193,12 @@ export function FinanceOverview({ stats }: FinanceOverviewProps) {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {categoryData.map((entry, index) => (
+                    {categoryData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip 
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) => formatCurrency(value || 0)}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -207,7 +207,10 @@ export function FinanceOverview({ stats }: FinanceOverviewProps) {
               {categoryData.map((item, index) => (
                 <div key={item.name} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                    <div 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: COLORS[index % COLORS.length] } as React.CSSProperties}
+                    ></div>
                     <span className="text-muted-foreground">{item.name}</span>
                   </div>
                   <span className="font-bold">{((item.value / totalExpenses) * 100).toFixed(1)}%</span>

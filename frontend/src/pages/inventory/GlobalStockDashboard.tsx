@@ -62,23 +62,23 @@ export function GlobalStockDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord Global des Stocks</h1>
-          <p className="text-gray-500 mt-1">Vue d'ensemble consolidée de tous les points de vente</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 uppercase leading-tight">Tableau de Bord Global</h1>
+          <p className="text-[10px] sm:text-xs text-gray-500 mt-1 font-medium">Vue d'ensemble consolidée de tous les points de vente</p>
         </div>
         <button
           onClick={loadStats}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 font-bold text-sm"
         >
           Actualiser
         </button>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <Card className="bg-linear-to-br from-indigo-500 to-indigo-600 text-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Produits</CardTitle>
@@ -90,7 +90,7 @@ export function GlobalStockDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-green-500 to-green-600 text-white">
+        <Card className="bg-linear-to-br from-green-500 to-green-600 text-white lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Valeur Totale</CardTitle>
             <TrendingUp className="h-5 w-5 opacity-80" />
@@ -152,9 +152,9 @@ export function GlobalStockDashboard() {
                 <XAxis dataKey="code" />
                 <YAxis />
                 <Tooltip 
-                  formatter={(value: number, name: string) => {
-                    if (name === 'total_value') return formatCurrency(value);
-                    return value;
+                  formatter={(value: number | undefined, name: string | undefined) => {
+                    if (name === 'total_value') return formatCurrency(value || 0);
+                    return value || 0;
                   }}
                   labelFormatter={(label) => `Point de vente: ${label}`}
                 />
@@ -211,9 +211,9 @@ export function GlobalStockDashboard() {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-semibold text-gray-700">Point de Vente</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Code</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Ville</th>
-                  <th className="text-right py-3 px-4 font-semibold text-gray-700">Nb. Produits</th>
+                  <th className="hidden sm:table-cell text-left py-3 px-4 font-semibold text-gray-700">Code</th>
+                  <th className="hidden lg:table-cell text-left py-3 px-4 font-semibold text-gray-700">Ville</th>
+                  <th className="hidden md:table-cell text-right py-3 px-4 font-semibold text-gray-700">Nb. Produits</th>
                   <th className="text-right py-3 px-4 font-semibold text-gray-700">Quantité Totale</th>
                   <th className="text-right py-3 px-4 font-semibold text-gray-700">Valeur Totale</th>
                 </tr>
@@ -222,9 +222,9 @@ export function GlobalStockDashboard() {
                 {stats.by_point_of_sale.map((pos) => (
                   <tr key={pos.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 font-medium text-gray-900">{pos.name}</td>
-                    <td className="py-3 px-4 text-gray-600">{pos.code}</td>
-                    <td className="py-3 px-4 text-gray-600">{pos.city}</td>
-                    <td className="py-3 px-4 text-right text-gray-900">{pos.product_count}</td>
+                    <td className="hidden sm:table-cell py-3 px-4 text-gray-600">{pos.code}</td>
+                    <td className="hidden lg:table-cell py-3 px-4 text-gray-600">{pos.city}</td>
+                    <td className="hidden md:table-cell py-3 px-4 text-right text-gray-900">{pos.product_count}</td>
                     <td className="py-3 px-4 text-right text-gray-900">{pos.total_quantity}</td>
                     <td className="py-3 px-4 text-right font-semibold text-green-600">
                       {formatCurrency(pos.total_value)}
@@ -293,10 +293,10 @@ export function GlobalStockDashboard() {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">Produit</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">SKU</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Point de Vente</th>
+                    <th className="hidden sm:table-cell text-left py-3 px-4 font-semibold text-gray-700">SKU</th>
+                    <th className="hidden md:table-cell text-left py-3 px-4 font-semibold text-gray-700">Point de Vente</th>
                     <th className="text-right py-3 px-4 font-semibold text-gray-700">Quantité</th>
-                    <th className="text-right py-3 px-4 font-semibold text-gray-700">Seuil</th>
+                    <th className="hidden lg:table-cell text-right py-3 px-4 font-semibold text-gray-700">Seuil</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-700">Statut</th>
                   </tr>
                 </thead>
@@ -304,12 +304,12 @@ export function GlobalStockDashboard() {
                   {stats.low_stock_alerts.map((alert, index) => (
                     <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-900">{alert.product_name}</td>
-                      <td className="py-3 px-4 text-gray-600">{alert.sku}</td>
-                      <td className="py-3 px-4 text-gray-600">{alert.pos_name}</td>
+                      <td className="hidden sm:table-cell py-3 px-4 text-gray-600">{alert.sku}</td>
+                      <td className="hidden md:table-cell py-3 px-4 text-gray-600">{alert.pos_name}</td>
                       <td className="py-3 px-4 text-right">
                         <span className="font-semibold text-orange-600">{alert.quantity}</span>
                       </td>
-                      <td className="py-3 px-4 text-right text-gray-600">{alert.reorder_level}</td>
+                      <td className="hidden lg:table-cell py-3 px-4 text-right text-gray-600">{alert.reorder_level}</td>
                       <td className="py-3 px-4 text-center">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           alert.status === 'low_stock' 

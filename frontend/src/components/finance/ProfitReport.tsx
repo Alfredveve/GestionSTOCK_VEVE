@@ -73,7 +73,7 @@ export function ProfitReport() {
                     tickFormatter={(value) => `${value / 1000}k`}
                   />
                   <ReTooltip 
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) => formatCurrency(value || 0)}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   />
                   <Legend verticalAlign="top" align="right" />

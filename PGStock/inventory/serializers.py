@@ -395,3 +395,19 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'recipient', 'title', 'message', 'notification_type', 'link', 'is_read', 'created_at']
         read_only_fields = ['created_at']
+
+
+class DiscountAnalyticsSerializer(serializers.Serializer):
+    """Serializer pour les analytics de remises"""
+    month = serializers.IntegerField()
+    year = serializers.IntegerField()
+    gross_revenue = serializers.DecimalField(max_digits=20, decimal_places=2)
+    net_revenue = serializers.DecimalField(max_digits=20, decimal_places=2)
+    total_discounts = serializers.DecimalField(max_digits=20, decimal_places=2)
+    discount_rate = serializers.DecimalField(max_digits=5, decimal_places=2)
+    invoice_count = serializers.IntegerField()
+    order_count = serializers.IntegerField()
+    point_of_sale_id = serializers.IntegerField(required=False, allow_null=True)
+    point_of_sale_name = serializers.CharField(required=False, allow_null=True)
+    by_point_of_sale = serializers.ListField(required=False)
+

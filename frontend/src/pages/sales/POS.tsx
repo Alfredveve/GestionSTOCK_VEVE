@@ -13,12 +13,19 @@ import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import settingsService from '@/services/settingsService';
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 interface CartItem extends Product {
   cartQuantity: number;
@@ -43,6 +50,7 @@ export function POS() {
     discount: 0,
     total: 0
   });
+  const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
 
   const [searchParams] = useSearchParams();
   const isInvoiceMode = searchParams.get('mode') === 'invoice';
@@ -153,7 +161,7 @@ export function POS() {
       await salesService.createOrder({
         client: selectedClientId!,
         invoice_type: orderType,
-        status: 'validated',
+        status: 'delivered',
         payment_method: paymentMethod,
         amount_paid: amountPaid,
         items: orderItems,
@@ -173,6 +181,9 @@ export function POS() {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-list'] });
 
       setCart([]);
       setIsCheckoutOpen(false);
@@ -190,15 +201,9 @@ export function POS() {
     }
   };
 
-  const getStockDisplay = (product: Product) => {
-    const qty = product.current_stock;
-    if (qty <= 0) return { label: 'Rupture', color: 'text-rose-600 bg-rose-50 border-rose-100' };
-    if (qty <= (product.reorder_level || 5)) return { label: 'Faible', color: 'text-amber-600 bg-amber-50 border-amber-100' };
-    return { label: 'En stock', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' };
-  };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] gap-4 overflow-hidden bg-muted/20 p-2 sm:p-4">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-4rem)] gap-4 overflow-hidden bg-muted/20 p-2 sm:p-4">
       {/* Search and Products Section */}
       <div className="flex flex-1 flex-col gap-4 overflow-hidden">
         {/* Navigation & Search */}
@@ -225,7 +230,7 @@ export function POS() {
             </div>
             
             {/* Select POS */}
-            <div className="w-[200px] shrink-0">
+            <div className="w-full sm:w-[200px] shrink-0">
                <Select
                  value={selectedPosId?.toString()}
                  onValueChange={(value) => setSelectedPosId(parseInt(value))}
@@ -371,7 +376,7 @@ export function POS() {
       </div>
 
       {/* Cart Section */}
-      <div className="w-[380px] shrink-0 h-full">
+      <div className="hidden lg:block lg:w-[380px] shrink-0 h-full">
          <CartSection
            cart={cart}
            onUpdateQuantity={updateQuantity}
@@ -392,6 +397,54 @@ export function POS() {
            onToggleWalkIn={setIsWalkIn}
          />
       </div>
+
+      {/* Mobile Cart Button - Floating */}
+      <button
+        onClick={() => setIsMobileCartOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 h-16 w-16 rounded-full bg-primary text-white shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-transform"
+      >
+        <div className="relative">
+          <ShoppingCart className="h-6 w-6" />
+          {cart.length > 0 && (
+            <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold">
+              {cart.reduce((sum, item) => sum + item.cartQuantity, 0)}
+            </Badge>
+          )}
+        </div>
+      </button>
+
+      {/* Mobile Cart Sheet */}
+      <Sheet open={isMobileCartOpen} onOpenChange={setIsMobileCartOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md p-0 border-none">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Panier Mobile</SheetTitle>
+          </SheetHeader>
+          <div className="h-screen">
+            <CartSection
+              cart={cart}
+              onUpdateQuantity={updateQuantity}
+              onRemove={removeFromCart}
+              onClear={clearCart}
+              clients={clientsData?.results || []}
+              selectedClientId={selectedClientId}
+              onSelectClient={setSelectedClientId}
+              onCheckout={(breakdown) => {
+                handleCheckoutInit(breakdown);
+                setIsMobileCartOpen(false);
+              }}
+              orderType={orderType}
+              isProcessing={isProcessing}
+              walkInDetails={walkInDetails}
+              onWalkInChange={setWalkInDetails}
+              isInvoiceMode={isInvoiceMode}
+              notes={notes}
+              onNotesChange={setNotes}
+              isWalkIn={isWalkIn}
+              onToggleWalkIn={setIsWalkIn}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <CheckoutModal
         isOpen={isCheckoutOpen}

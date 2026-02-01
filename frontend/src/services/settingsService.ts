@@ -9,6 +9,7 @@ export interface Settings {
   tax_rate: string | number;
   default_order_type: 'retail' | 'wholesale';
   email_notifications: boolean;
+  enable_low_stock_alerts: boolean;
   daily_reports: boolean;
   new_customer_notifications: boolean;
   smart_rounding: boolean;
@@ -24,6 +25,12 @@ const settingsService = {
     const response = await api.patch('settings/current/', data);
     return response.data;
   },
+
+  resetApplication: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post('settings/reset_application/');
+    return response.data;
+  },
 };
+
 
 export default settingsService;

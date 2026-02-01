@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+vert/
 *.py[cod]
 *$py.class
 *.so
@@ -32,6 +33,7 @@ staticfiles/
 *.log
 *.txt
 PGStock/*.txt
+frontend_results_fixed.txt
 !PGStock/requirements.txt
 PGStock/inventory/tests/
 PGStock/sales/tests_*.py
@@ -56,3 +58,5 @@ dist-ssr/
 .gemini/
 .agent/
 .DS_Store
+.env
+.env.*

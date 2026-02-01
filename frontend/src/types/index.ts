@@ -99,6 +99,8 @@ export interface Quote {
   valid_until: string;
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'converted';
   subtotal: number;
+  tax_rate?: number;
+  tax_amount?: number;
   total_amount: number;
   notes: string;
   created_by: number;
@@ -157,6 +159,8 @@ export interface Inventory {
   pos_name: string;
   quantity: number;
   reorder_level: number;
+  total_value?: number;
+  selling_price?: string;
   location: string;
   last_updated: string;
   status_label: string;
@@ -241,13 +245,16 @@ export interface ReceiptItem {
 
 export interface ReceiptCreatePayload {
   supplier: number;
-  total_amount: number;
-  payment_method: string;
-  payment_status: string;
+  point_of_sale: number;
+  date_received: string;
+  reference?: string;
+  notes?: string;
+  status: 'pending' | 'received';
   items: Array<{
     product: number;
     quantity: number;
-    unit_price: number;
+    unit_cost: number;
+    is_wholesale: boolean;
   }>;
 }
 
@@ -359,6 +366,7 @@ export interface Expense {
   category_name: string;
   description: string;
   amount: number;
+  point_of_sale?: number;
   date: string;
   created_at: string;
 }
