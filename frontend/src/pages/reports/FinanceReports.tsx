@@ -141,12 +141,21 @@ export function FinanceReports() {
     queryFn: () => dashboardService.getStats(),
   });
 
+  const { data: discountData } = useQuery({
+    queryKey: ['discount-analytics'],
+    queryFn: () => dashboardService.getDiscountAnalytics(),
+  });
+
   const chartData = (stats?.monthly_history || []) as HistoryItem[];
   const recentActivities = (stats?.recent_activities || []) as ActivityItem[];
 
   const averageRevenue = chartData.length > 0 
     ? chartData.reduce((acc: number, curr: HistoryItem) => acc + (curr.revenue || 0), 0) / chartData.length 
     : 0;
+
+  // Extract invoice and payment counts from discount analytics
+  const invoiceCount = discountData?.invoice_count || 0;
+  const paymentCount = discountData?.payment_count || 0;
 
   if (isLoading) {
     return (
@@ -357,12 +366,12 @@ export function FinanceReports() {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
                 <Receipt className="h-5 w-5 text-blue-500 mb-2" />
-                <div className="text-lg font-bold">248</div>
+                <div className="text-lg font-bold">{invoiceCount}</div>
                 <div className="text-xs text-muted-foreground">Factures émises</div>
               </div>
               <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
                 <CreditCard className="h-5 w-5 text-emerald-500 mb-2" />
-                <div className="text-lg font-bold">182</div>
+                <div className="text-lg font-bold">{paymentCount}</div>
                 <div className="text-xs text-muted-foreground">Paiements validés</div>
               </div>
             </div>

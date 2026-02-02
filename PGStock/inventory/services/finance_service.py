@@ -1,6 +1,7 @@
 from django.db.models import Sum, F
 from decimal import Decimal
 from ..models import Invoice, InvoiceItem, Expense, MonthlyProfitReport, PointOfSale
+from sales.models import Order, OrderItem
 import datetime
 
 class FinanceService:
@@ -48,6 +49,40 @@ class FinanceService:
                     total_discounts += (brut_line * (item.discount / Decimal('100')))
             
             total_net_profit += inv.total_profit
+
+        # Also include Orders (POS sales)
+        orders = Order.objects.filter(
+            date_created__month=month,
+            date_created__year=year,
+            point_of_sale=point_of_sale,
+            status__in=['paid', 'validated', 'delivered']
+        )
+        
+        for order in orders:
+            # Add order discount to total discounts
+            total_discounts += order.discount
+            
+            # Determine if this is a wholesale order
+            is_wholesale = (order.order_type == 'wholesale')
+            
+            # Process order items
+            order_items = OrderItem.objects.filter(order=order)
+            for item in order_items:
+                # Brut sales (before discount)
+                brut_line = item.quantity * item.unit_price
+                total_sales_brut += brut_line
+                
+                # COGS - use purchase price from product at time of sale
+                purchase_price = item.product.wholesale_purchase_price if is_wholesale else item.product.purchase_price
+                total_cogs += item.quantity * purchase_price
+            
+            # Add order profit (total_amount - cost)
+            order_profit = order.total_amount - sum(
+                (item.quantity * (item.product.wholesale_purchase_price if is_wholesale else item.product.purchase_price))
+                for item in order_items
+            )
+            total_net_profit += order_profit
+
 
         # 2. Calculer le total des dépenses pour ce mois et ce POS
         expenses_total = Expense.objects.filter(
@@ -123,9 +158,11 @@ class FinanceService:
             - discount_rate: Taux de remise moyen (%)
             - invoice_count: Nombre de factures
             - order_count: Nombre de commandes
+            - payment_count: Nombre de paiements validés
             - by_point_of_sale: Liste des métriques par POS
         """
         from sales.models import Order
+        from ..models import Payment
         
         # Filtrer les factures pour le mois/année
         invoice_filter = {
@@ -148,6 +185,16 @@ class FinanceService:
             order_filter['point_of_sale'] = point_of_sale
             
         orders = Order.objects.filter(**order_filter)
+        
+        # Filtrer les paiements pour le mois/année
+        payment_filter = {
+            'payment_date__month': month,
+            'payment_date__year': year,
+        }
+        if point_of_sale:
+            payment_filter['invoice__point_of_sale'] = point_of_sale
+            
+        payments = Payment.objects.filter(**payment_filter)
         
         # Calculer les métriques pour les factures
         invoice_gross = Decimal('0.00')
@@ -188,6 +235,7 @@ class FinanceService:
             'discount_rate': float(discount_rate),
             'invoice_count': invoices.count(),
             'order_count': orders.count(),
+            'payment_count': payments.count(),
         }
         
         # Si aucun POS spécifique, ajouter les détails par POS

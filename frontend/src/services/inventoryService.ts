@@ -434,7 +434,7 @@ const inventoryService = {
     link.remove();
   },
 
-  async importProducts(file: File): Promise<{ message: string; importedCount: number }> {
+  async importProducts(file: File): Promise<{ success: boolean; created: number; updated: number; errors: string[] }> {
     const formData = new FormData();
     formData.append('file', file);
     const response = await api.post('products/import_products/', formData);

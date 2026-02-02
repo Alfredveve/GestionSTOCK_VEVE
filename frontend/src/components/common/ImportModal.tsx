@@ -5,10 +5,18 @@ import { Upload, FileSpreadsheet, Loader2, AlertCircle, CheckCircle } from 'luci
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+interface ImportResult {
+  success: boolean;
+  created: number;
+  updated: number;
+  errors: string[];
+  error?: string;
+}
+
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File) => Promise<any>;
+  onUpload: (file: File) => Promise<ImportResult>;
   title?: string;
   description?: string;
   templateUrl?: string; // Future use
@@ -24,7 +32,7 @@ export function ImportModal({
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,16 +62,20 @@ export function ImportModal({
     try {
       setIsUploading(true);
       const res = await onUpload(file);
-      setResult({ success: true, ...res });
-      // Reset file after success? Or keep it to show success state?
-      // We keep it but show success message.
-    } catch (error: any) {
+      setResult(res);
+      if (res.success) {
+        toast.success(`${res.created + res.updated} produits traités`);
+      }
+    } catch (error: unknown) {
       console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de l'importation";
       setResult({ 
         success: false, 
-        message: error.response?.data?.error || error.message || "Erreur lors de l'importation",
-        errors: error.response?.data?.errors || []
+        created: 0,
+        updated: 0,
+        errors: [errorMessage]
       });
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -149,7 +161,7 @@ export function ImportModal({
                     <AlertCircle className="h-4 w-4" />
                     <span>Échec de l'importation</span>
                   </div>
-                  <p>{result.message}</p>
+                  <p>{result.error}</p>
                   {result.errors && result.errors.length > 0 && (
                     <div className="mt-2 pl-4 border-l-2 border-rose-200 text-xs space-y-1 max-h-32 overflow-y-auto">
                         {result.errors.map((err: string, i: number) => (
@@ -165,8 +177,11 @@ export function ImportModal({
               <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="h-10 w-10" />
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Importation réussie !</h3>
-              <p className="text-slate-500 mb-6">{result.message}</p>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Importation terminée !</h3>
+              <div className="text-slate-500 mb-6 space-y-1">
+                <p><span className="font-bold text-emerald-600">{result.created}</span> nouveaux produits créés</p>
+                <p><span className="font-bold text-blue-600">{result.updated}</span> produits mis à jour</p>
+              </div>
               
               {result.errors && result.errors.length > 0 && (
                 <div className="w-full bg-amber-50 text-amber-700 p-4 rounded-xl text-left text-sm mb-4 border border-amber-100">

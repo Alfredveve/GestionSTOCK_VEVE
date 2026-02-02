@@ -43,14 +43,14 @@ export function ReportsPage() {
 
   const chartData = stats?.sales_history?.map((item: { date: string; revenue: string | number; orders: number }) => ({
     name: new Date(item.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
-    revenue: Number(item.revenue),
-    orders: item.orders,
+    revenue: Number(item.revenue || 0),
+    orders: Number(item.orders || 0),
     date: item.date
   })) || [];
 
-  const categoryData = stats?.category_stats?.map((item: { category_name: string; total_revenue: string | number }) => ({
-    name: item.category_name,
-    value: Number(item.total_revenue)
+  const categoryData = stats?.category_stats?.map((item: { category_name: string; total_revenue: string | number; name?: string; value?: number; total_value?: string | number }) => ({
+    name: item.category_name || item.name || 'Inconnu',
+    value: Number(item.total_revenue || item.value || item.total_value || 0)
   })) || [];
 
   const handleExport = (type: 'pdf' | 'excel') => {
@@ -87,7 +87,7 @@ export function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black">
-              {stats ? formatCurrency(stats.total_revenue) : '...'}
+              {stats ? formatCurrency(stats.total_revenue || stats.total_sales_value || 0) : '...'}
             </div>
             <p className="text-xs text-emerald-500 mt-1 flex items-center">
               <TrendingUp className="mr-1 h-3 w-3" />

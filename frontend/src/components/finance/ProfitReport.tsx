@@ -95,15 +95,36 @@ export function ProfitReport() {
                 </div>
                 <div>
                   <p className="text-xs opacity-70 font-bold uppercase tracking-wider">Cumul Annuel (Net)</p>
-                  <h3 className="text-2xl font-black">12.450.000 GNF</h3>
+                  <h3 className="text-2xl font-black">
+                    {(() => {
+                      const currentYear = new Date().getFullYear();
+                      const yearlyTotal = (reports?.results || [])
+                        .filter(r => r.year === currentYear)
+                        .reduce((sum, r) => sum + parseFloat(r.net_interest), 0);
+                      return formatCurrency(yearlyTotal);
+                    })()}
+                  </h3>
                 </div>
               </div>
               <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 w-[72%]"></div>
+                <div 
+                  className="h-full bg-emerald-500 transition-all duration-500" 
+                  style={{ 
+                    width: `${(() => {
+                      const currentYear = new Date().getFullYear();
+                      const yearlyTotal = (reports?.results || [])
+                        .filter(r => r.year === currentYear)
+                        .reduce((sum, r) => sum + parseFloat(r.net_interest), 0);
+                      const annualTarget = 17500000;
+                      return Math.min(100, (yearlyTotal / annualTarget) * 100);
+                    })()}%` 
+                  }}
+                ></div>
               </div>
               <p className="text-[10px] mt-2 opacity-60">Objectif annuel : 17.500.000 GNF</p>
             </CardContent>
           </Card>
+
 
           <Card className="border-none shadow-xl bg-card">
             <CardHeader className="pb-2">
@@ -116,11 +137,46 @@ export function ProfitReport() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Mois dernier</span>
-                  <span className="font-bold text-emerald-500">+14%</span>
+                  <span className={`font-bold ${(() => {
+                    const sortedReports = (reports?.results || []).sort((a, b) => {
+                      if (a.year !== b.year) return b.year - a.year;
+                      return b.month - a.month;
+                    });
+                    if (sortedReports.length < 2) return 'text-muted-foreground';
+                    const lastMonth = parseFloat(sortedReports[0].net_interest);
+                    const previousMonth = parseFloat(sortedReports[1].net_interest);
+                    if (previousMonth === 0) return 'text-muted-foreground';
+                    const change = ((lastMonth - previousMonth) / previousMonth) * 100;
+                    return change >= 0 ? 'text-emerald-500' : 'text-red-500';
+                  })()}`}>
+                    {(() => {
+                      const sortedReports = (reports?.results || []).sort((a, b) => {
+                        if (a.year !== b.year) return b.year - a.year;
+                        return b.month - a.month;
+                      });
+                      if (sortedReports.length < 2) return 'N/A';
+                      const lastMonth = parseFloat(sortedReports[0].net_interest);
+                      const previousMonth = parseFloat(sortedReports[1].net_interest);
+                      if (previousMonth === 0) return 'N/A';
+                      const change = ((lastMonth - previousMonth) / previousMonth) * 100;
+                      return `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
+                    })()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Marge Moyenne</span>
-                  <span className="font-bold text-blue-500">32.5%</span>
+                  <span className="font-bold text-blue-500">
+                    {(() => {
+                      const reportsWithSales = (reports?.results || []).filter(r => parseFloat(r.total_sales_brut) > 0);
+                      if (reportsWithSales.length === 0) return 'N/A';
+                      const avgMargin = reportsWithSales.reduce((sum, r) => {
+                        const sales = parseFloat(r.total_sales_brut);
+                        const grossProfit = parseFloat(r.gross_profit);
+                        return sum + (sales > 0 ? (grossProfit / sales) * 100 : 0);
+                      }, 0) / reportsWithSales.length;
+                      return `${avgMargin.toFixed(1)}%`;
+                    })()}
+                  </span>
                 </div>
               </div>
             </CardContent>

@@ -156,7 +156,8 @@ export function ListglobalProduits() {
     try {
       setIsImporting(true);
       const result = await inventoryService.importProducts(file);
-      toast.success(result.importedCount + " produits importés avec succès");
+      const total = result.created + result.updated;
+      toast.success(`${total} produits traités (${result.created} créés, ${result.updated} mis à jour)`);
       queryClient.invalidateQueries({ queryKey: ['products'] });
     } catch (error) {
       console.error(error);

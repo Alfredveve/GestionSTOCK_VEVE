@@ -333,7 +333,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         low_stock_inventories = Inventory.objects.filter(
             quantity__lte=F('reorder_level'),
             quantity__gt=0
-        ).select_related('product', 'point_of_sale').order_by('quantity')[:20]
+        ).select_related('product', 'point_of_sale').order_by('quantity')
         
         for inv in low_stock_inventories:
             low_stock_alerts.append({
@@ -605,7 +605,7 @@ class DashboardView(viewsets.ViewSet):
         p_ret = get_page('p_ret')
         p_def = get_page('p_def')
         p_rem = get_page('p_rem')
-        page_size = 5
+        page_size = 20
 
         # Parse Date Params
         start_date_param = request.query_params.get('start_date')
@@ -882,9 +882,10 @@ class DashboardView(viewsets.ViewSet):
             "monthly_expenses": float(monthly_expenses),
             "net_profit": float(estimated_profit),
             "total_sales_value": float(total_sales_value),
-            "total_stock_value": float(total_stock_value),
+            "total_revenue": float(total_sales_value),  # Alias for frontend reports
             "pending_orders_count": pending_orders_count,
             "total_products_count": total_products_count,
+            "total_stock_value": float(total_stock_value),
             
             # Lists
             "low_stock_products": low_stock_products,
@@ -896,8 +897,10 @@ class DashboardView(viewsets.ViewSet):
             
             # Charts / Graphs
             "monthly_history": monthly_history,
+            "sales_history": history_results['sales_history'],  # Explicit sales history for reports
             "stock_movement_evolution": stock_movement_evolution,
             "stock_distribution_by_category": stock_distribution_by_category,
+            "category_stats": stock_distribution_by_category,  # Alias for frontend reports
             
             # Legacy / Misc
             "recent_activities": recent_activities
@@ -929,20 +932,22 @@ class DashboardView(viewsets.ViewSet):
             history_start = default_start_date if default_start_date else (today - timedelta(days=30))
             history_end = default_end_date if default_end_date else today
 
-        # Sales
+        # Sales & Orders Count
         daily_stats = (
             Order.objects
             .filter(date_created__date__range=[history_start, history_end])
             .annotate(day=TruncDate('date_created'))
             .values('day')
-            .annotate(revenue=Sum('total_amount'))
+            .annotate(revenue=Sum('total_amount'), orders=Count('id'))
             .order_by('day')
         )
         stats_dict = {}
+        order_counts_dict = {}
         for stat in daily_stats:
             if stat['day']:
                 day_key = stat['day'].strftime('%Y-%m-%d') if isinstance(stat['day'], (date, datetime)) else str(stat['day'])
                 stats_dict[day_key] = float(stat['revenue'] or 0)
+                order_counts_dict[day_key] = stat['orders'] or 0
 
         # Expenses
         daily_expenses_stats = (
@@ -959,6 +964,7 @@ class DashboardView(viewsets.ViewSet):
                 expenses_dict[day_key] = float(stat['expenses'] or 0)
 
         monthly_list = []
+        sales_history = [] # Detailed history for reports
         tabular_data = [] # For exports
         current_date_loop = history_start
         while current_date_loop <= history_end:
@@ -966,13 +972,21 @@ class DashboardView(viewsets.ViewSet):
             display_date = current_date_loop.strftime('%d %b')
             rev = float(stats_dict.get(date_str, 0))
             exp = float(expenses_dict.get(date_str, 0))
+            order_count = int(order_counts_dict.get(date_str, 0))
             
             monthly_list.append({
                 "name": display_date,
                 "month": display_date,
                 "revenue": rev,
                 "expenses": exp,
-                "profit": rev - exp
+                "profit": rev - exp,
+                "orders": order_count
+            })
+            
+            sales_history.append({
+                "date": date_str,
+                "revenue": rev,
+                "orders": order_count
             })
             
             tabular_data.append([
@@ -985,6 +999,7 @@ class DashboardView(viewsets.ViewSet):
             
         return {
             'monthly_list': monthly_list,
+            'sales_history': sales_history,
             'tabular_data': tabular_data
         }
 
