@@ -420,11 +420,11 @@ export function OrderDetailsPage() {
                 {/* Header with Color Accents */}
                 <div className="flex justify-between items-start mb-12">
                     <div className="flex items-center gap-4">
-                        <div className="h-16 w-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
-                            <Package className="h-10 w-10" />
+                        <div className="h-20 w-20 flex items-center justify-center overflow-hidden">
+                             <img src="/logo-gstock.png" alt="Logo" className="h-full w-full object-contain" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black tracking-tighter uppercase leading-none">Gestion Stock</h2>
+                            <h2 className="text-2xl font-black tracking-tighter uppercase leading-none text-slate-900">Gstock_BEA & Fils</h2>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Intelligence Logistique</p>
                         </div>
                     </div>
@@ -518,10 +518,10 @@ export function OrderDetailsPage() {
                 <div className="mt-24 pt-8 border-t border-slate-100 flex justify-between items-end">
                     <div>
                         <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Authentifié par</p>
-                        <p className="text-sm font-black text-slate-900">SYSTÈME GESTION STOCK</p>
+                        <p className="text-sm font-black text-slate-900">Gstock_BEA & Fils</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em]">Document Numérique PGStock</p>
+                        <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em]">Document Numérique Gstock_BEA & Fils</p>
                     </div>
                 </div>
             </div>

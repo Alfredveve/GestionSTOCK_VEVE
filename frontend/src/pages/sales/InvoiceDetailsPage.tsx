@@ -426,11 +426,11 @@ export function InvoiceDetailsPage() {
                             {/* Premium Header */}
                             <div className="flex justify-between items-start mb-10">
                                 <div className="flex items-start gap-5">
-                                    <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20">
-                                        <FileText className="h-10 w-10" />
+                                    <div className="h-24 w-24 flex items-center justify-center overflow-hidden">
+                                         <img src="/logo-gstock.png" alt="Logo" className="h-full w-full object-contain" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h2 className="text-2xl font-black tracking-tighter text-gray-900">ETS BEA & FILS</h2>
+                                        <h2 className="text-2xl font-black tracking-tighter text-gray-900">Gstock_BEA & FILS</h2>
                                         <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
                                             <p>📍 Marché Madina, Conakry, Guinée</p>
                                             <p>📞 +224 620 00 00 00</p>

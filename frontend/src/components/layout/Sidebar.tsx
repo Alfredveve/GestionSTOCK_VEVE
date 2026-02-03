@@ -282,14 +282,13 @@ export function Sidebar({isOpen, onClose} : SidebarProps) {
             }>
                 <div className="p-6 pb-2 flex items-center justify-between">
                     <div className="flex items-center space-x-3 px-2">
-                        <div className="h-10 w-10 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                            <Package className="h-5 w-5 text-white"/>
+                        <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden">
+                            <img src="/logo-gstock.png" alt="Logo" className="h-full w-full object-contain" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold tracking-tight text-white">
-                                PGStock
+                            <h1 className="text-lg font-bold tracking-tight text-white leading-tight font-serif">
+                                Gstock_BEA <br/> <span className="text-indigo-400">& Fils</span>
                             </h1>
-                            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Gestion Intelligente</p>
                         </div>
                     </div>
                     {/* Close Button for Mobile */}

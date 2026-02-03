@@ -66,9 +66,10 @@ export function Header({ onMenuClick }: HeaderProps) {
             
             <DropdownMenuPrimitive.Portal>
               <DropdownMenuPrimitive.Content 
-                className="w-64 bg-card border border-border rounded-xl shadow-xl p-2 z-50 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
+                className="w-64 border border-border rounded-xl shadow-2xl p-2 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
                 align="end"
                 sideOffset={8}
+                style={{ backgroundColor: 'white', zIndex: 9999, position: 'relative' }} // Force white background and high z-index
               >
                 {/* User Info Header */}
                 <div className="flex items-start gap-3 p-3 mb-2 bg-muted/30 rounded-lg">
