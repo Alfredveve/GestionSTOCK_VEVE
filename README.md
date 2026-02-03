@@ -85,6 +85,33 @@ npm run dev
 
 ---
 
+## 🛠️ Installation sur une nouvelle machine (Clone)
+
+Si vous venez de cloner le dépôt sur un nouvel ordinateur, suivez ces étapes cruciales :
+
+1. **Dépendances Backend** :
+
+   ```bash
+   cd PGStock
+   python -m venv venv
+   # Activer venv...
+   pip install -r requirements.txt
+   ```
+
+2. **Dépendances Frontend** :
+
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+3. **Variables d'Environnement** :
+   Assurez-vous de créer les fichiers `.env` (basés sur les `.env.example` s'ils existent) dans les dossiers `PGStock` et `frontend`.
+4. **Lancer les serveurs** :
+   Ouvrez deux terminaux et lancez `python manage.py runserver` (Backend) et `npm run dev` (Frontend).
+
+---
+
 ## 📂 Structure du Projet
 
 ```text
