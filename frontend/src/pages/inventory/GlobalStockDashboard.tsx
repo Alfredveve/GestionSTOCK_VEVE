@@ -4,6 +4,7 @@ import { Package, TrendingUp, AlertTriangle, Store, BarChart3, ArrowUpDown } fro
 import inventoryService from '@/services/inventoryService';
 import type { GlobalStockStats } from '@/types';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/formatters';
 import {
   BarChart,
   Bar,
@@ -52,14 +53,6 @@ export function GlobalStockDashboard() {
     );
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      style: 'currency',
-      currency: 'GNF',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  };
 
   return (
     <div className="p-4 sm:p-6 space-y-6">

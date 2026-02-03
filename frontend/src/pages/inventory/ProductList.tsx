@@ -26,8 +26,7 @@ import { ProductForm } from '@/components/inventory/ProductForm';
 import { ImportModal } from '@/components/common/ImportModal';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
-
-
+import { formatCurrency } from '@/lib/formatters';
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,11 +106,6 @@ export function ProductList() {
     queryFn: () => inventoryService.getCategories(),
   });
 
-  const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      maximumFractionDigits: 0
-    }).format(typeof value === 'string' ? parseFloat(value) : value) + ' GNF';
-  };
 
   const handleExportExcel = async () => {
     try {

@@ -1,5 +1,6 @@
 import { X, ShoppingCart, Box, Info, Target, TrendingUp, Truck, Package, AlertTriangle, BarChart3, Percent } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatCurrency } from '@/lib/formatters';
 import type { Product } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,14 +17,6 @@ interface ProductDetailsDrawerProps {
 
 export function ProductDetailsDrawer({ product, isOpen, onClose, onStartSale, onEdit }: ProductDetailsDrawerProps) {
   if (!product) return null;
-
-  const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('fr-FR', { 
-      style: 'currency', 
-      currency: 'GNF', 
-      maximumFractionDigits: 0 
-    }).format(typeof value === 'string' ? parseFloat(value) : value);
-  };
 
   const margin = parseFloat(product.margin);
   const wholesaleMargin = parseFloat(product.wholesale_margin);

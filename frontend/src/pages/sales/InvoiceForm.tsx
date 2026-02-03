@@ -7,7 +7,6 @@ import type { Order } from '@/services/salesService';
 import type { Product } from '@/types';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -31,15 +30,12 @@ import {
   Store,
   FileText,
   Percent,
-  ChevronRight,
   Package,
-  X,
-  CreditCard,
-  LayoutGrid,
-  List
+  X
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { cn } from "@/lib/utils";
+import { formatCurrency } from '@/lib/formatters';
 
 interface InvoiceFormItem {
   id?: number;
@@ -231,9 +227,6 @@ export function InvoiceForm() {
     return { subtotal, total };
   }, [items, globalDiscount]);
 
-  const formatCurrency = (val: number) => new Intl.NumberFormat('fr-GN', {
-    maximumFractionDigits: 0
-  }).format(val) + ' GNF';
 
   if (isEdit && isLoadingInvoice) {
     return (

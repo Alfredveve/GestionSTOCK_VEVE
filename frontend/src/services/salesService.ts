@@ -14,7 +14,7 @@ export interface OrderItem {
 
 export interface Order {
   id?: number;
-  client: number;
+  client?: number;
   invoice_type: 'retail' | 'wholesale';
   payment_method?: string;
   amount_paid?: number;

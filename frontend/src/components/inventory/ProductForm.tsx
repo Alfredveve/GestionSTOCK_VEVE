@@ -21,6 +21,7 @@ import {
     DialogDescription
 } from "@/components/ui/dialog";
 import {Separator} from "@/components/ui/separator";
+import { formatCurrency } from '@/lib/formatters';
 import inventoryService from '@/services/inventoryService';
 import type {Product, Category, Supplier}
 from '@/types';
@@ -188,14 +189,6 @@ export function ProductForm({isOpen, onClose, product} : ProductFormProps) {
         }));
     };
 
-    const formatCurrency = (value : string | number) => {
-        const num = typeof value === 'string' ? parseFloat(value) : value;
-        return new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: 'GNF',
-            maximumFractionDigits: 0
-        }).format(num || 0);
-    };
 
     // Derivative values
     const purchasePrice = parseFloat(formData.purchase_price) || 0;

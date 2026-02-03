@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, CreditCard, Banknote, Landmark, Smartphone, Loader2, Wallet, FileText } from "lucide-react";
+import { formatCurrency } from '@/lib/formatters';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -38,11 +39,6 @@ export function CheckoutModal({ isOpen, onClose, onConfirm, subtotal, discount, 
     setPrevIsOpen(false);
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      maximumFractionDigits: 0
-    }).format(amount) + ' GNF';
-  };
 
   const methods = [
     { id: 'cash', name: 'Espèces', icon: Banknote, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },

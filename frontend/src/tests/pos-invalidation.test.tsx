@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '../tests/test-utils';
+import { render, screen, fireEvent, waitFor } from './test-utils';
 import { POS } from '../pages/sales/POS';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import salesService from '../services/salesService';

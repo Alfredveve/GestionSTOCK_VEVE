@@ -239,7 +239,7 @@ const inventoryService = {
   },
 
   async updatePointOfSale(id: number, data: Partial<PointOfSale>): Promise<PointOfSale> {
-    const response = await api.put(`pos/${id}/`, data);
+    const response = await api.patch(`pos/${id}/`, data);
     return response.data;
   },
 

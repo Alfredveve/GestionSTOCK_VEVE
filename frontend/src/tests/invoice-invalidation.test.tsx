@@ -1,7 +1,6 @@
-import { render, waitFor } from '../tests/test-utils';
+import { render } from './test-utils';
 import { InvoiceForm } from '../pages/sales/InvoiceForm';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import salesService from '../services/salesService';
 import inventoryService from '../services/inventoryService';
 import { useQueryClient } from '@tanstack/react-query';
 

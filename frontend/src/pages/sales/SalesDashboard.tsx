@@ -33,6 +33,7 @@ import inventoryService from '@/services/inventoryService';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/formatters';
 
 interface SalesStats {
   total_sales: number;
@@ -118,11 +119,6 @@ export function SalesDashboard() {
     wholesale_amount: statsData?.results?.filter((inv: Order) => inv.order_type === 'wholesale').reduce((sum: number, inv: Order) => sum + parseFloat(inv.total_amount || '0'), 0) || 0,
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      maximumFractionDigits: 0
-    }).format(amount) + ' GNF';
-  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {

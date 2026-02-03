@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Product } from '@/types';
 import { motion } from 'framer-motion';
+import { formatCurrency } from '@/lib/formatters';
 
 
 interface CartItem extends Product {
@@ -74,11 +75,6 @@ export function CartSection({
 
   const total = Math.max(0, subtotal - (isNaN(discount) ? 0 : discount));
 
-  const formatCurrency = (amount: string | number) => {
-    return new Intl.NumberFormat('fr-GN', {
-      maximumFractionDigits: 0
-    }).format(typeof amount === 'string' ? parseFloat(amount) : amount) + ' GNF';
-  };
 
   return (
     <Card className="flex flex-col h-full shadow-2xl border-none bg-card/60 backdrop-blur-3xl rounded-3xl overflow-hidden max-h-[calc(100vh-2rem)]">
@@ -178,7 +174,7 @@ export function CartSection({
                 <button 
                   onClick={() => {
                     onToggleWalkIn?.(true);
-                    onSelectClient(1);
+                    onSelectClient(null);
                   }}
                   className="px-1.5 py-0.5 h-6 rounded-md bg-primary/10 text-primary text-[8px] font-black uppercase hover:bg-primary hover:text-white transition-colors flex items-center gap-1"
                 >

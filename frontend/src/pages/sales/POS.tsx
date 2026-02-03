@@ -9,7 +9,7 @@ import { Search, Boxes, AlertTriangle, ShoppingCart, Package } from 'lucide-reac
 import salesService from '@/services/salesService';
 import { CheckoutModal } from '@/components/sales/CheckoutModal';
 import { CartSection } from '@/components/sales/CartSection';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/formatters';
 import { toast } from 'sonner';
 import settingsService from '@/services/settingsService';
 import {
@@ -140,7 +140,7 @@ export function POS() {
   };
 
   const handleCheckoutInit = (breakdown: { subtotal: number; discount: number; total: number }) => {
-    if (!selectedClientId) {
+    if (!selectedClientId && !isWalkIn) {
        toast.error('Veuillez sélectionner un client avant de valider la vente.');
        return;
     }
@@ -159,7 +159,7 @@ export function POS() {
       }));
 
       await salesService.createOrder({
-        client: selectedClientId!,
+        client: selectedClientId || undefined,
         invoice_type: orderType,
         status: 'delivered',
         payment_method: paymentMethod,

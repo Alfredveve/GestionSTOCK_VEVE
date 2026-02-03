@@ -51,12 +51,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
+import { formatCurrency } from '@/lib/formatters';
 
-const formatCurrency = (amount: string | number) => {
-  return new Intl.NumberFormat('fr-GN', {
-    maximumFractionDigits: 0
-  }).format(Number(amount)) + ' GNF';
-};
 
 export function PurchasesPage() {
   const [searchQuery, setSearchQuery] = useState('');

@@ -41,6 +41,7 @@ import type { Order } from '@/services/salesService';
 import salesService from '@/services/salesService';
 import dashboardService from '@/services/dashboardService';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/formatters';
 import { OrderPaymentDialog } from '@/components/sales/OrderPaymentDialog';
 import {
   Tabs,
@@ -71,11 +72,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const formatCurrency = (amount: string | number) => {
-  return new Intl.NumberFormat('fr-GN', {
-    maximumFractionDigits: 0
-  }).format(Number(amount)) + ' GNF';
-};
 
 type StatusFilter = 'all' | 'draft' | 'sent' | 'converted';
 type DateFilter = 'all' | 'today' | 'week' | 'month';

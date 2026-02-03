@@ -86,8 +86,9 @@ export function PointsOfSalePage() {
       resetForm();
       toast.success('Point de vente créé avec succès');
     },
-    onError: () => {
-      toast.error('Erreur lors de la création du point de vente');
+    onError: (err: any) => {
+      const errorMsg = err.response?.data?.detail || err.message || 'Erreur lors de la création du point de vente';
+      toast.error(errorMsg);
     }
   });
 
@@ -100,8 +101,9 @@ export function PointsOfSalePage() {
       resetForm();
       toast.success('Point de vente mis à jour avec succès');
     },
-    onError: () => {
-      toast.error('Erreur lors de la mise à jour du point de vente');
+    onError: (err: any) => {
+      const errorMsg = err.response?.data?.detail || err.message || 'Erreur lors de la mise à jour du point de vente';
+      toast.error(errorMsg);
     }
   });
 
@@ -161,10 +163,15 @@ export function PointsOfSalePage() {
 
   const handleSubmit = (e: React.FormEvent, isEdit: boolean) => {
     e.preventDefault();
+    const data = {
+      ...formData,
+      manager: formData.manager || null
+    };
+    
     if (isEdit && selectedPOS) {
-      updateMutation.mutate({ id: selectedPOS.id, data: formData });
+      updateMutation.mutate({ id: selectedPOS.id, data });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(data);
     }
   };
 
