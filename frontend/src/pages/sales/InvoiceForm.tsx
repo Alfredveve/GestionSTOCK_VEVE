@@ -68,7 +68,28 @@ export function InvoiceForm() {
   const [items, setItems] = useState<InvoiceFormItem[]>([]);
   const [notes, setNotes] = useState('');
   const [globalDiscount, setGlobalDiscount] = useState<number>(0);
-  const [invoiceType, setOrderType] = useState<'retail' | 'wholesale'>('retail');
+  const [invoiceType, setOrderTypeState] = useState<'retail' | 'wholesale'>('retail');
+  
+  // Wrapper to update items when type changes
+  const setOrderType = (type: 'retail' | 'wholesale') => {
+    setOrderTypeState(type);
+    
+    // Update existing items logic
+    setItems(prevItems => prevItems.map(item => {
+       const isWholesale = (type === 'wholesale');
+       const newPrice = Number(isWholesale ? item.product.wholesale_selling_price : item.product.selling_price);
+       
+       return {
+         ...item,
+         is_wholesale: isWholesale,
+         unit_price: newPrice
+       };
+    }));
+
+    if (items.length > 0) {
+        toast.info(`Prix mis à jour pour la vente en ${type === 'wholesale' ? 'Gros' : 'Détail'}`);
+    }
+  };
 
   const [productSearch, setProductSearch] = useState('');
   const [posIdInitialized, setPosIdInitialized] = useState(false);

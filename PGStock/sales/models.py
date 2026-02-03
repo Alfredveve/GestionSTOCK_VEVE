@@ -169,8 +169,8 @@ class Order(models.Model):
         # Créer un mouvement de stock pour chaque item de la commande
         items = self.items.all()
         for item in items:
-            # Determine if wholesale based on unit price
-            is_wholesale = (item.unit_price == item.product.wholesale_selling_price)
+            # Determine if wholesale based on ORDER TYPE, not price (which can vary due to discounts)
+            is_wholesale = (self.order_type == 'wholesale')
             
             StockMovement.objects.create(
                 product=item.product,
@@ -203,8 +203,8 @@ class Order(models.Model):
         # Créer un mouvement de retour pour chaque item de la commande
         items = self.items.all()
         for item in items:
-            # Determine if wholesale based on unit price
-            is_wholesale = (item.unit_price == item.product.wholesale_selling_price)
+            # Determine if wholesale based on ORDER TYPE
+            is_wholesale = (self.order_type == 'wholesale')
             
             StockMovement.objects.create(
                 product=item.product,
