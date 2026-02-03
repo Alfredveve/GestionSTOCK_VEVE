@@ -225,10 +225,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'inventory.pagination.CustomPageNumberPagination',
     'PAGE_SIZE': 10,
-    'PAGE_SIZE_QUERY_PARAM': 'page_size',
-    'MAX_PAGE_SIZE': 1000,
     'EXCEPTION_HANDLER': 'inventory.utils.custom_exception_handler',
 }
 
