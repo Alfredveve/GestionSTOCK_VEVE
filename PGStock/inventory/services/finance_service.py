@@ -196,15 +196,32 @@ class FinanceService:
             
         payments = Payment.objects.filter(**payment_filter)
         
+        # Optimisation des requêtes
+        invoices = invoices.prefetch_related('invoiceitem_set')
+        orders = orders.prefetch_related('items')
+        
         # Calculer les métriques pour les factures
         invoice_gross = Decimal('0.00')
         invoice_discounts = Decimal('0.00')
         invoice_net = Decimal('0.00')
         
         for inv in invoices:
-            invoice_gross += inv.subtotal  # Subtotal = CA brut avant remise globale
-            invoice_discounts += inv.discount_amount
-            invoice_net += inv.total_amount  # Total après remise
+            # Calculer le VRAI brut (avant remises lignes)
+            inv_items_gross = Decimal('0.00')
+            inv_items_discount = Decimal('0.00')
+            
+            for item in inv.invoiceitem_set.all():
+                # Brut ligne = Qté * PU
+                line_gross = Decimal(item.quantity) * item.unit_price
+                inv_items_gross += line_gross
+                
+                # Remise ligne = Brut ligne - Total ligne (qui est net)
+                inv_items_discount += (line_gross - item.total)
+            
+            invoice_gross += inv_items_gross
+            # Total remises = Remises lignes + Remise globale
+            invoice_discounts += inv_items_discount + inv.discount_amount
+            invoice_net += inv.total_amount
         
         # Calculer les métriques pour les commandes
         order_gross = Decimal('0.00')
@@ -212,8 +229,21 @@ class FinanceService:
         order_net = Decimal('0.00')
         
         for order in orders:
-            order_gross += order.subtotal
-            order_discounts += order.discount
+            # Calculer le VRAI brut (avant remises lignes)
+            ord_items_gross = Decimal('0.00')
+            ord_items_discount = Decimal('0.00')
+            
+            for item in order.items.all():
+                # Brut ligne = Qté * PU
+                line_gross = Decimal(item.quantity) * item.unit_price
+                ord_items_gross += line_gross
+                
+                # Remise ligne = Brut ligne - Total ligne (qui est net)
+                ord_items_discount += (line_gross - item.total_price)
+                
+            order_gross += ord_items_gross
+            # Total remises = Remises lignes + Remise globale
+            order_discounts += ord_items_discount + order.discount
             order_net += order.total_amount
         
         # Totaux combinés
