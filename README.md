@@ -87,30 +87,77 @@ npm run dev
 
 ## 🛠️ Installation sur une nouvelle machine (Clone)
 
-Si vous venez de cloner le dépôt sur un nouvel ordinateur, suivez ces étapes cruciales :
+Si vous venez de cloner le dépôt sur un nouvel ordinateur, suivez ces étapes cruciales pour éviter les erreurs courantes (dépendances manquantes, base de données inexistante).
 
-1. **Dépendances Backend** :
+### 1. Pré-requis
+- **Python 3.10+** et **Node.js 18+** installés.
+- **PostgreSQL** installé et en cours d'exécution.
 
-   ```bash
-   cd PGStock
-   python -m venv venv
-   # Activer venv...
-   pip install -r requirements.txt
-   ```
+### 2. Installation Backend (Django)
 
-2. **Dépendances Frontend** :
+```bash
+# A la racine du projet
+python -m venv venv
 
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+# Activation (Windows)
+.\venv\Scripts\activate
+# Activation (Mac/Linux)
+# source venv/bin/activate
 
-3. **Variables d'Environnement** :
-   Assurez-vous de créer les fichiers `.env` (basés sur les `.env.example` s'ils existent) dans les dossiers `PGStock` et `frontend`.
-4. **Lancer les serveurs** :
-   Ouvrez deux terminaux et lancez `python manage.py runserver` (Backend) et `npm run dev` (Frontend).
+# Installation des dépendances (depuis la racine !)
+pip install -r requirements.txt
+
+# Initialisation de la Base de Données
+# Assurez-vous que PostgreSQL tourne. L'utilisateur par défaut est 'postgres' avec mdp 'veve' (voir .env)
+# Si la base n'existe pas, créez-la :
+createdb -U postgres pgstock
+
+# Migrations
+cd PGStock
+python manage.py migrate
+```
+
+**Note :** Si vous rencontrez une erreur `UnicodeDecodeError` lors de la connexion à la base de données, cela signifie souvent que la base n'existe pas et que le message d'erreur français fait planter le pilote. Créez la base manuellement.
+
+### 3. Installation Frontend (React)
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 4. Lancer le projet
+
+Terminal 1 (Backend) :
+```bash
+cd PGStock
+python manage.py runserver
+```
+
+Terminal 2 (Frontend) :
+```bash
+cd frontend
+npm run dev
+```
 
 ---
+
+## 🔧 Dépannage (Troubleshooting)
+
+### Erreur : `ModuleNotFoundError: No module named '...'`
+Cela signifie que des dépendances manquent. Relancez l'installation à la racine :
+```bash
+pip install -r requirements.txt
+```
+
+### Erreur : `UnicodeDecodeError: 'utf-8' codec can't decode...`
+C'est une erreur masquée. Elle survient quand PostgreSQL renvoie un message d'erreur avec des accents (ex: "La base n'existe pas") et que Windows/Python échouent à le lire.
+**Solution :**
+1. Vérifiez que la base de données `pgstock` existe bien.
+2. Forcez l'anglais pour voir la vraie erreur :
+   ```powershell
+   $env:LC_ALL="C"; $env:PGCLIENTENCODING="latin-1"; python manage.py migrate
+   ```
 
 ## 📂 Structure du Projet
 
