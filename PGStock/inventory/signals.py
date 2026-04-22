@@ -19,6 +19,12 @@ def check_stock_after_movement(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Invoice)
 def update_profit_report_on_invoice(sender, instance, **kwargs):
     """Met à jour le rapport financier quand une facture est modifiée"""
+    # Optimization: Check if relevant fields were updated
+    if kwargs.get('update_fields') is not None:
+        relevant_fields = {'status', 'date_issued', 'total_amount', 'discount_amount'}
+        if not any(field in kwargs['update_fields'] for field in relevant_fields):
+            return
+
     # Ensure date_issued is a date object (could be string if assigned manually)
     from datetime import date, datetime
     d = instance.date_issued
@@ -41,6 +47,12 @@ def update_profit_report_on_invoice(sender, instance, **kwargs):
 @receiver(post_save, sender=Payment)
 def update_profit_report_on_payment(sender, instance, **kwargs):
     """Met à jour le rapport financier lors d'un paiement (peut changer le statut de la facture)"""
+    # Optimization: Check if relevant fields were updated
+    if kwargs.get('update_fields') is not None:
+        relevant_fields = {'amount', 'payment_date'}
+        if not any(field in kwargs['update_fields'] for field in relevant_fields):
+            return
+
     invoice = instance.invoice
     from datetime import date, datetime
     d = invoice.date_issued
@@ -64,6 +76,12 @@ def update_profit_report_on_payment(sender, instance, **kwargs):
 @receiver(post_save, sender=Expense)
 def update_profit_report_on_expense(sender, instance, **kwargs):
     """Met à jour le rapport financier lors d'une nouvelle dépense ou modification"""
+    # Optimization: Check if relevant fields were updated
+    if kwargs.get('update_fields') is not None:
+        relevant_fields = {'amount', 'date', 'point_of_sale'}
+        if not any(field in kwargs['update_fields'] for field in relevant_fields):
+            return
+
     FinanceService.recalculate_report_for_expense(instance)
     
     # Si la date ou le POS a changé, on recalcule aussi l'ancien rapport

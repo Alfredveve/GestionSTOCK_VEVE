@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import inventoryService from '@/services/inventoryService';
+import financeService from '@/services/financeService';
 import salesService from '@/services/salesService';
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -34,7 +34,7 @@ import {
   MoreVertical,
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import type { Order as Invoice } from '@/services/salesService'; // Using Order as Invoice for UI compatibility
+import type { Invoice } from '@/types';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatCurrency } from '@/lib/utils';
 import { PaymentDialog } from '@/components/sales/PaymentDialog';
-import { StatsCard } from '@/components/StatsCard';
+import { StatsCard } from '@/components/common/StatsCard';
 
 type StatusFilter = 'all' | 'paid' | 'partial' | 'unpaid';
 type DateFilter = 'all' | 'today' | 'week' | 'month' | 'custom';
@@ -90,11 +90,11 @@ export function InvoicesPage() {
 
   const { data: invoices, isLoading } = useQuery({
     queryKey: ['invoices', page, searchQuery, statusFilter],
-    queryFn: () => salesService.getOrders({ 
+    queryFn: () => financeService.getInvoices({ 
       page, 
       search: searchQuery || undefined,
-      payment_status: statusFilter === 'all' ? undefined : statusFilter,
-      ordering: '-date_created'
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      ordering: '-date_issued'
     }),
   });
 
@@ -107,7 +107,7 @@ export function InvoicesPage() {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
       filtered = filtered.filter((invoice: Invoice) => {
-        const invoiceDate = new Date(invoice.date_created || "");
+        const invoiceDate = new Date(invoice.date_issued || "");
         if (dateFilter === 'today') return invoiceDate >= today;
         if (dateFilter === 'week') {
           const weekAgo = new Date(today);
@@ -133,7 +133,7 @@ export function InvoicesPage() {
     return filtered;
   }, [invoices, dateFilter, customStartDate, customEndDate]);
 
-  const getBalance = (invoice: Invoice) => Number(invoice.total_amount) - (invoice.amount_paid || 0);
+  const getBalance = (invoice: Invoice) => Number(invoice.total_amount) - Number(invoice.amount_paid || 0);
 
   const stats = useMemo(() => {
     if (!invoices?.results) return { total: 0, paid: 0, balance: 0 };
@@ -156,7 +156,7 @@ export function InvoicesPage() {
   const handleExportExcel = async () => {
     try {
       setIsExporting('excel');
-      await inventoryService.exportInvoicesExcel();
+      await financeService.exportInvoicesExcel();
       toast.success("Registre Excel exporté avec succès");
     } catch {
       toast.error("Erreur lors de l'exportation Excel");
@@ -168,7 +168,7 @@ export function InvoicesPage() {
   const handleExportPdf = async () => {
     try {
       setIsExporting('pdf');
-      await inventoryService.exportInvoicesPdf();
+      await financeService.exportInvoicesPdf();
       toast.success("Catalogue PDF exporté avec succès");
     } catch {
       toast.error("Erreur lors de l'exportation PDF");
@@ -179,8 +179,8 @@ export function InvoicesPage() {
 
   const handleDownloadPdf = async (invoice: Invoice) => {
     try {
-      toast.info(`Téléchargement de la facture ${invoice.order_number}...`);
-      await salesService.exportOrderPdf(invoice.id!, invoice.order_number);
+      toast.info(`Téléchargement de la facture ${invoice.invoice_number}...`);
+      await financeService.exportInvoicePdf(invoice.id!, invoice.invoice_number);
       toast.success("Facture téléchargée avec succès");
     } catch {
       toast.error("Erreur lors du téléchargement");
@@ -198,11 +198,7 @@ export function InvoicesPage() {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      // Logic for deleting orders if available, otherwise fallback/dummy
-      toast.info(`Suppression de la facture ${id} à venir`);
-      return Promise.resolve();
-    },
+    mutationFn: (id: number) => financeService.deleteInvoice(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast.success("Facture supprimée avec succès");
@@ -325,15 +321,15 @@ export function InvoicesPage() {
                     >
                       <TableCell className="pl-8 py-4">
                         <div className="flex flex-col">
-                          <span className="font-mono text-sm font-bold text-primary">{inv.order_number}</span>
+                          <span className="font-mono text-sm font-bold text-primary">{inv.invoice_number}</span>
                           <span className="text-[10px] text-muted-foreground uppercase">{inv.point_of_sale_name || 'POS'}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4 font-bold text-slate-700 dark:text-slate-200">{inv.client_name}</TableCell>
                       <TableCell className="py-4"><StatusBadge balance={getBalance(inv)} total={Number(inv.total_amount)} /></TableCell>
-                      <TableCell className="py-4 text-sm text-slate-500">{new Date(inv.date_created || "").toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</TableCell>
+                      <TableCell className="py-4 text-sm text-slate-500">{new Date(inv.date_issued || "").toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</TableCell>
                       <TableCell className="text-right py-4 font-black text-slate-700 dark:text-slate-200">{formatCurrency(Number(inv.total_amount))}</TableCell>
-                      <TableCell className="text-right py-4 font-bold text-red-600">{formatCurrency(Number(inv.total_amount) - Number(inv.amount_paid))}</TableCell>
+                      <TableCell className="text-right py-4 font-bold text-red-600">{formatCurrency(getBalance(inv))}</TableCell>
                       <TableCell className="text-right pr-8 py-4">
                         <InvoiceActions 
                           invoice={inv} 
@@ -416,7 +412,7 @@ function InvoiceActions({ invoice, onView, onEdit, onDownload, onPay, onDelete }
         <DropdownMenuItem onClick={onView}><Eye className="mr-2 h-4 w-4" />Voir</DropdownMenuItem>
         <DropdownMenuItem onClick={onEdit}><Edit className="mr-2 h-4 w-4" />Modifier</DropdownMenuItem>
         <DropdownMenuItem onClick={onDownload}><Download className="mr-2 h-4 w-4" />PDF</DropdownMenuItem>
-        {(Number(invoice.total_amount) - (invoice.amount_paid || 0)) > 0 && <DropdownMenuItem onClick={onPay}><DollarSign className="mr-2 h-4 w-4" />Payer</DropdownMenuItem>}
+        {(Number(invoice.total_amount) - Number(invoice.amount_paid || 0)) > 0 && <DropdownMenuItem onClick={onPay}><DollarSign className="mr-2 h-4 w-4" />Payer</DropdownMenuItem>}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onDelete} className="text-destructive"><Trash2 className="mr-2 h-4 w-4" />Supprimer</DropdownMenuItem>
       </DropdownMenuContent>

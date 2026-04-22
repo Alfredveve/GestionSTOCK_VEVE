@@ -47,8 +47,7 @@ from .renderers import PDFRenderer
 class SettingsViewSet(viewsets.ModelViewSet):
     queryset = Settings.objects.all()
     serializer_class = SettingsSerializer
-    permission_classes = []  # No permission required
-    authentication_classes = []  # No authentication required
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         # Always return the first (and only) settings object
@@ -63,60 +62,68 @@ class SettingsViewSet(viewsets.ModelViewSet):
         settings = Settings.objects.first()
         if not settings:
             settings = Settings.objects.create()
-        
+
         if request.method in ['PATCH', 'PUT']:
+            from .permissions import is_admin
+            if not is_admin(request.user):
+                return Response({"error": "Seul un administrateur peut modifier les paramètres."}, status=403)
+
             serializer = self.get_serializer(settings, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
-            
+
         serializer = self.get_serializer(settings)
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'])
     def reset_application(self, request):
         """Réinitialise l'application en supprimant les produits et les transactions"""
+        from .permissions import is_admin
+        if not is_admin(request.user):
+            return Response({"error": "Action réservée aux administrateurs."}, status=403)
+
         from .models import (
             Product, Category, Inventory, StockMovement, Invoice, 
             Receipt, Payment, Expense, MonthlyProfitReport, Quote,
             Notification
         )
         from sales.models import Order, OrderItem
-        
+
         try:
             with transaction.atomic():
                 # On suit l'ordre inverse des dépendances pour éviter les erreurs de contrainte
                 # 1. Transactions et rapports
                 MonthlyProfitReport.objects.all().delete()
                 Payment.objects.all().delete()
-                
+
                 # 2. Commandes et Factures
                 OrderItem.objects.all().delete()
                 Order.objects.all().delete()
                 Invoice.objects.all().delete()
                 Quote.objects.all().delete()
-                
+
                 # 3. Achats et Dépenses
                 Receipt.objects.all().delete()
                 Expense.objects.all().delete()
-                
+
                 # 4. Mouvements de stock et notifications
                 StockMovement.objects.all().delete()
                 Notification.objects.all().delete()
-                
+
                 # 5. Inventaire et Produits
                 Inventory.objects.all().delete()
                 Product.objects.all().delete()
-                
+
                 # 6. Catégories (Optionnel, mais logique pour un "reset")
                 Category.objects.all().delete()
-                
+
                 return Response({"success": True, "message": "Application réinitialisée avec succès"})
         except Exception as e:
             return Response({"success": False, "message": str(e)}, status=500)
 
-from django.db.models import F, Sum, Count
-from django.db.models.functions import TruncDate
+from django.db.models import F, Sum, Count, Case, When, Value, CharField, DecimalField
+from django.db.models.functions import TruncDate, Coalesce
 from django.db import models
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -148,6 +155,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     serializer_class = SupplierSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -158,7 +166,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name', 'created_at', 'selling_price']
 
     def get_queryset(self):
-        queryset = Product.objects.all()
+        queryset = Product.objects.select_related('category', 'supplier').annotate(
+            total_stock=Coalesce(Sum('inventory__quantity'), Value(0), output_field=DecimalField())
+        )
         # Accept both 'point_of_sale' and 'pos_id' for better frontend compatibility
         pos_id = self.request.query_params.get('point_of_sale') or self.request.query_params.get('pos_id')
         if pos_id:
@@ -167,52 +177,75 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def export_excel(self, request):
+        # Optimization: use pre-calculated fields from annotate
         products = self.filter_queryset(self.get_queryset())
         headers = [
-            'ID', 'SKU', 'Nom', 'Catégorie', 'Fournisseur', 
+            'ID', 'SKU', 'Nom', 'Catégorie', 'Fournisseur',
             'Stock Total', 'Valeur Stock', 'Colis', 'Unités', 'Statut'
         ]
-        
+
         data = []
         for p in products:
-            analysis = p.get_analysis_data()
+            # Replicate logic from get_analysis_data but with pre-fetched total_stock
+            total_qty = p.total_stock
+            if p.units_per_box > 1:
+                colis = total_qty // p.units_per_box
+                unites = total_qty % p.units_per_box
+            else:
+                colis = 0
+                unites = total_qty
+
+            status = 'out_of_stock'
+            if total_qty > p.reorder_level:
+                status = 'in_stock'
+            elif total_qty > 0:
+                status = 'low_stock'
+
             status_map = {
                 'in_stock': 'En Stock',
                 'low_stock': 'Stock Faible',
                 'out_of_stock': 'Rupture'
             }
+
             data.append([
-                p.id, p.sku, p.name, p.category.name, 
+                p.id, p.sku, p.name, p.category.name,
                 p.supplier.name if p.supplier else "N/A",
-                p.get_total_stock_quantity(),
-                float(p.get_total_stock_quantity() * p.purchase_price),
-                analysis['colis'], analysis['unites'],
-                status_map.get(p.get_stock_status(), 'N/A')
+                total_qty,
+                float(total_qty * p.purchase_price),
+                colis, unites,
+                status_map.get(status, 'N/A')
             ])
-            
+
         return export_to_excel(headers, data, "L'Inventaire PGStock", "Produits")
 
     @action(detail=False, methods=['get'])
     def export_pdf(self, request):
         products = self.filter_queryset(self.get_queryset())
         headers = ['SKU', 'Produit', 'Catégorie', 'Stock', 'Valeur Stock', 'Statut']
-        
+
         data = []
         for p in products:
+            total_qty = p.total_stock
+            status = 'out_of_stock'
+            if total_qty > p.reorder_level:
+                status = 'in_stock'
+            elif total_qty > 0:
+                status = 'low_stock'
+
             status_map = {
                 'in_stock': 'En Stock',
                 'low_stock': 'Stock Faible',
                 'out_of_stock': 'Rupture'
             }
             data.append([
-                p.sku, 
-                p.name, 
+                p.sku,
+                p.name,
                 p.category.name,
-                p.get_total_stock_quantity(),
-                f"{float(p.get_total_stock_quantity() * p.purchase_price):,.0f} GNF",
-                status_map.get(p.get_stock_status(), 'N/A')
+                total_qty,
+                f"{float(total_qty * p.purchase_price):,.0f} GNF",
+                status_map.get(status, 'N/A')
             ])
-            
+
         return export_to_pdf(headers, data, "Catalogue et Valorisation de l'Inventaire", "Inventaire")
 
     @action(detail=False, methods=['post'])
@@ -1081,6 +1114,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    ordering = ['-created_at']
 
     def get_queryset(self):
         """Retourne uniquement les notifications de l'utilisateur connecté"""

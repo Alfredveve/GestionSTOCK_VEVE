@@ -106,7 +106,14 @@ class FinanceService:
         # Use our new calculated profit
         report.gross_profit = total_net_profit
         report.net_interest = report.gross_profit - report.total_expenses
-        report.save()
+        report.save(update_fields=[
+            'total_sales_brut', 
+            'total_discounts', 
+            'total_cost_of_goods', 
+            'total_expenses', 
+            'gross_profit', 
+            'net_interest'
+        ])
         
         return report
 

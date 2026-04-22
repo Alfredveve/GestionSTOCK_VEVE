@@ -216,6 +216,45 @@ export interface StockMovement {
   created_at: string;
 }
 
+export interface OrderItem {
+  id?: number;
+  product: number;
+  product_name?: string;
+  product_sku?: string;
+  quantity: number;
+  unit_price: number;
+  total_price?: number;
+  is_wholesale?: boolean;
+  discount?: number;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  client: number;
+  client_name: string;
+  order_type: 'retail' | 'wholesale';
+  status: string;
+  payment_status: 'unpaid' | 'partial' | 'paid';
+  date_created: string;
+  date_updated: string;
+  date_delivery_expected?: string | null;
+  subtotal: number;
+  discount: number;
+  total_amount: number;
+  amount_paid: number;
+  payment_method?: string | null;
+  stock_deducted: boolean;
+  notes: string;
+  walk_in_name?: string | null;
+  walk_in_phone?: string | null;
+  created_by: number;
+  created_by_name?: string;
+  point_of_sale: number | null;
+  point_of_sale_name?: string | null;
+  items: OrderItem[];
+}
+
 export interface Receipt {
   id: number;
   receipt_number: string;
@@ -435,5 +474,19 @@ export interface GlobalStockStats {
     stock_value: number;
     selling_price: number;
   }>;
+}
+
+export interface DiscountAnalytics {
+  month: number;
+  year: number;
+  gross_revenue: number;
+  net_revenue: number;
+  total_discounts: number;
+  discount_rate: number;
+  invoice_count: number;
+  order_count: number;
+  point_of_sale_id?: number | null;
+  point_of_sale_name?: string | null;
+  by_point_of_sale?: DiscountAnalytics[];
 }
 

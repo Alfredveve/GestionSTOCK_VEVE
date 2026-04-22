@@ -40,19 +40,15 @@ export function NotificationDropdown() {
 
   const fetchNotifications = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      const data = await notificationService.getNotifications();
-      setNotifications(Array.isArray(data) ? data : []);
+      // Pour le dropdown, on ne veut que les 5 dernières
+      const data = await notificationService.getNotifications(5);
+      setNotifications(data);
       
       const count = await notificationService.getUnreadCount();
-      setUnreadCount(typeof count === 'number' ? count : 0);
+      setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       setError('Impossible de charger les notifications');
-      setNotifications([]);
-      setUnreadCount(0);
     } finally {
       setIsLoading(false);
     }

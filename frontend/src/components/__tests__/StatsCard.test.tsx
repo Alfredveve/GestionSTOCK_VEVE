@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { StatsCard } from '../StatsCard';
+import { StatsCard } from '../common/StatsCard';
 import { DollarSign } from 'lucide-react';
 import { describe, it, expect } from 'vitest';
 

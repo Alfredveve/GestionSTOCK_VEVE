@@ -12,15 +12,30 @@ export interface Notification {
 }
 
 export const notificationService = {
-  async getNotifications(): Promise<Notification[]> {
-    const response = await api.get('/notifications/');
-    // API returns paginated response: {count, next, previous, results}
-    return response.data.results || response.data || [];
+  async getNotifications(limit?: number): Promise<Notification[]> {
+    const url = limit ? `/notifications/?page_size=${limit}` : '/notifications/';
+    const response = await api.get(url);
+    
+    // DRF returns results in .results when paginated, or as a direct array otherwise
+    if (response.data && response.data.results && Array.isArray(response.data.results)) {
+      return response.data.results;
+    }
+    
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    
+    return [];
   },
 
   async getUnreadCount(): Promise<number> {
-    const response = await api.get('/notifications/unread_count/');
-    return response.data.count;
+    try {
+      const response = await api.get('/notifications/unread_count/');
+      return typeof response.data.count === 'number' ? response.data.count : 0;
+    } catch (error) {
+      console.error('Error getting unread count:', error);
+      return 0;
+    }
   },
 
   async markAsRead(id: number): Promise<void> {

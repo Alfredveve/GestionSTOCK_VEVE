@@ -101,14 +101,12 @@ export function CategoryManager() {
   });
 
   const handleOpenCreate = () => {
-    console.log("Opening Create Dialog");
     setEditingCategory(null);
     setFormData({ name: '', description: '' });
     setIsDialogOpen(true);
   };
 
   const handleOpenEdit = (category: ExpenseCategory) => {
-    console.log("Opening Edit Dialog for", category);
     setEditingCategory(category);
     setFormData({ name: category.name, description: category.description });
     setIsDialogOpen(true);
